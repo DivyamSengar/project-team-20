@@ -1,7 +1,9 @@
 package edu.ucsd.cse110.successorator;
-
+import java.util.Calendar;
+import java.util.Date;
 import android.app.Activity;
 import android.os.Bundle;
+import java.text.SimpleDateFormat;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,8 +16,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         var view = ActivityMainBinding.inflate(getLayoutInflater(), null, false);
-        view.placeholderText.setText(R.string.hello_world);
 
+        //Code got from https://www.geeksforgeeks.org/how-to-get-current-time-and-date-in-android/
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE'\n'MM/dd");
+        String currentDate = sdf.format(new Date());
+        view.editTextDate.setText(currentDate);
+        view.emptyGoals.setText(R.string.emptygoals);
+
+        /* //current placeholder idea for showing the goal list and empty goal list situations
+        if (goalList == 0){
+            view.emptyGoals.setText(R.string.emptygoals);
+        }
+        else{
+            view.listGoals.setText();
+        }
+         */
         setContentView(view.getRoot());
     }
 }
