@@ -1,4 +1,5 @@
 package edu.ucsd.cse110.successorator;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import android.app.Activity;
@@ -33,14 +34,22 @@ public class MainActivity extends AppCompatActivity {
         //To test the empty goal text
         view.emptyGoals.setText(R.string.emptyGoalsText);
 
-        /* //current placeholder idea for showing the goal list and empty goal list situations
-        if (goalList == 0){
+
+
+
+        //current placeholder idea for showing the goal list and empty goal list situation
+        /* subject to changes
+        ArrayList<String> glist;
+        glist = new ArrayList<String>();
+        glist.add("Goal 1");
+        glist.add("Goal 2");
+        if (glist.size() == 0){
             view.emptyGoals.setText(R.string.emptyGoalsText);
         }
         else{
-            view.listGoals.setText();
+            view.listGoals.setText(glist);
         }
-         */
+        */
         setContentView(view.getRoot());
     }
 }
