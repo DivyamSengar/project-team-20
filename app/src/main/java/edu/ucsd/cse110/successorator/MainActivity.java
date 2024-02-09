@@ -21,11 +21,12 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE'\n'MM/dd");
         String currentDate = sdf.format(new Date());
         view.editTextDate.setText(currentDate);
-        view.emptyGoals.setText(R.string.emptygoals);
+        //To test the empty goal text
+        view.emptyGoals.setText(R.string.emptyGoalsText);
 
         /* //current placeholder idea for showing the goal list and empty goal list situations
         if (goalList == 0){
-            view.emptyGoals.setText(R.string.emptygoals);
+            view.emptyGoals.setText(R.string.emptyGoalsText);
         }
         else{
             view.listGoals.setText();
