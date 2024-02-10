@@ -4,7 +4,10 @@ import java.util.Calendar;
 import java.util.Date;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,14 +31,33 @@ public class MainActivity extends AppCompatActivity {
         String currentDateAndTime = sdf.format(new Date());
         -end
         */
-        SimpleDateFormat date = new SimpleDateFormat("EEEE'\n'MM/dd");
+        SimpleDateFormat date = new SimpleDateFormat("EEEE MM/dd", Locale.getDefault());
         String currentDate = date.format(new Date());
-        view.editTextDate.setText(currentDate);
+        view.dateText.setText(currentDate);
+
         //To test the empty goal text
         view.emptyGoals.setText(R.string.emptyGoalsText);
 
+        var addButton = view.imageButton;
+        // This triggers the popup for keyboard
+        addButton.setOnClickListener(v -> {
+            // Functionality for keyboard and input popup
+        });
 
+        /*
+        Temporary object goalList with instance variable List<Goals>
+        if (goalList.size() == 0){
+            view.emptyGoals.setVisibility(View.VISIBLE);
+            view.listGoals.setVisibility(View.INVISIBLE);
+        } else {
+            view.emptyGoals.setVisibility(View.INVISIBLE);
+            view.listGoals.setVisibility(View.VISIBLE);
 
+            // code for displaying goals in ListView
+            // use ArrayAdapter
+
+        }
+         */
 
         //current placeholder idea for showing the goal list and empty goal list situation
         /* subject to changes
