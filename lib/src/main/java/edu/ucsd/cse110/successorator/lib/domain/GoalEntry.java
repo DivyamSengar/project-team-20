@@ -62,12 +62,12 @@ public class GoalEntry {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GoalEntry goalEntry = (GoalEntry) o;
-        return Objects.equals(text, goalEntry.text) && Objects.equals(isComplete, goalEntry.isComplete);
+        return Objects.equals(id, goalEntry.id) && Objects.equals(text, goalEntry.text) && Objects.equals(isComplete, goalEntry.isComplete);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(text, isComplete);
+        return Objects.hash(id, text, isComplete);
     }
 
 }

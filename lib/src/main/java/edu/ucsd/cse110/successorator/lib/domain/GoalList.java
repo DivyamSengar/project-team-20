@@ -1,30 +1,33 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.util.ArrayList;
+import java.util.List;
+
+
+import edu.ucsd.cse110.successorator.lib.data.DataSource;
+import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 
 public class GoalList {
-    private ArrayList<GoalEntry> goalsInComplete;
 
-    private ArrayList<GoalEntry> goalsComplete;
+    private DataSource dataSource;
 
-    public GoalList(){
-        this.goalsInComplete = new ArrayList<>();
-        this.goalsComplete = new ArrayList<>();
+    public GoalList(DataSource dataSource){
+        this.dataSource = dataSource;
     }
 
-    public void addNewGoal(GoalEntry goal){
-        goalsInComplete.add(goal);
+    public Integer count() {
+        return dataSource.getGoals().size();
     }
 
-    public ArrayList<GoalEntry> displayGoals(){
-        ArrayList<GoalEntry> combinedList = new ArrayList<>();
-        combinedList.addAll(this.goalsInComplete);
-        combinedList.addAll(this.goalsComplete);
-
-        return combinedList;
+    public SimpleSubject<GoalEntry> find(int id){
+        return dataSource.getGoalEntrySubject(id);
     }
 
-    public void makeComplete(){
+    public SimpleSubject<List<GoalEntry>> findAll() {
+        return dataSource.getAllGoalEntrySubject();
+    }
 
+    public void save(GoalEntry goalEntry) {
+        dataSource.putGoalEntry(goalEntry);
     }
 }
