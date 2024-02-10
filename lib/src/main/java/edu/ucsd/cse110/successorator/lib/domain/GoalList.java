@@ -9,24 +9,28 @@ import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 
 public class GoalList {
 
+    // main backing database/datasource
     private DataSource dataSource;
 
+    // base constructor
     public GoalList(DataSource dataSource){
         this.dataSource = dataSource;
     }
 
-    public Integer count() {
-        return dataSource.getGoals().size();
-    }
+    // Potentially useful for UI Implementation
+    public Integer count() {return dataSource.getGoals().size();}
 
+    // getting a SimpleSubject to a goal based on its id
     public SimpleSubject<GoalEntry> find(int id){
         return dataSource.getGoalEntrySubject(id);
     }
 
+    // get all Goals, Incomplete and Complete
     public SimpleSubject<List<GoalEntry>> findAll() {
         return dataSource.getAllGoalEntrySubject();
     }
 
+    // add a goal to the list
     public void save(GoalEntry goalEntry) {
         dataSource.putGoalEntry(goalEntry);
     }

@@ -15,35 +15,44 @@ public class GoalEntry {
     private @NonNull String text;
     private @NonNull boolean isComplete;
 
+    // Goal class with base constructor
     public GoalEntry(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
     }
 
+    // id getter
     public @Nullable Integer id() {
         return id;
     }
 
+    // gets whether it isComplete
     public @NonNull boolean getIsComplete(){
         return this.isComplete;
     }
 
+    // getter for the text for the Goal
     public @NonNull String getText(){
         return this.text;
     }
 
+    // Although no usages yet, may prove useful later
     public void updateText(String text){
         this.text = text;
     }
 
+    // updates the complete status of the goal
     public void updateStatus(){
         this.isComplete = !this.isComplete;
     }
 
+    // cse
     public void makeComplete(){
 
-        //Code to strike through texts provided by ChatGpt
+        /* Convert the String to an AttributeString, strike it through,
+         convert it to StringBuilder and return it as a String
+         */
         AttributedString strike = new AttributedString(this.text);
         strike.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, 0, text.length());
         AttributedCharacterIterator iterator = strike.getIterator();
@@ -56,15 +65,16 @@ public class GoalEntry {
 
         this.text = stringBuilder.toString();
     }
-
+    // overridden equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GoalEntry goalEntry = (GoalEntry) o;
-        return Objects.equals(id, goalEntry.id) && Objects.equals(text, goalEntry.text) && Objects.equals(isComplete, goalEntry.isComplete);
+        return Objects.equals(this.id, goalEntry.id) && Objects.equals(this.text, goalEntry.text) && Objects.equals(this.isComplete, goalEntry.isComplete);
     }
 
+    // overridden hashCode
     @Override
     public int hashCode() {
         return Objects.hash(id, text, isComplete);
