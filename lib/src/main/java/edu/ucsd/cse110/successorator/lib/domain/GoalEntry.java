@@ -2,20 +2,26 @@ package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.awt.font.TextAttribute;
 import java.text.AttributedString;
-public class GoalEntry {
-    private String text;
-    private boolean isComplete;
+import java.text.AttributedCharacterIterator;
+import java.text.CharacterIterator;
+import java.util.Objects;
 
-    public GoalEntry(String text, boolean isComplete){
+import androidx.annotation.NonNull;
+
+public class GoalEntry {
+    private @NonNull String text;
+    private @NonNull boolean isComplete;
+
+    public GoalEntry(@NonNull String text, @NonNull boolean isComplete){
         this.text = text;
         this.isComplete = isComplete;
     }
 
-    public boolean getIsComplete(){
+    public @NonNull boolean getIsComplete(){
         return this.isComplete;
     }
 
-    public String getText(){
+    public @NonNull String getText(){
         return this.text;
     }
 
@@ -28,9 +34,32 @@ public class GoalEntry {
     }
 
     public void makeComplete(){
+
+        //Code to strike through texts provided by ChatGpt
         AttributedString strike = new AttributedString(this.text);
         strike.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, 0, text.length());
+        AttributedCharacterIterator iterator = strike.getIterator();
+        StringBuilder stringBuilder = new StringBuilder();
 
+        // Iterate over the characters in the iterator and append them to the StringBuilder
+        for (char c = iterator.first(); c != CharacterIterator.DONE; c = iterator.next()) {
+            stringBuilder.append(c);
+        }
+
+        this.text = stringBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GoalEntry goalEntry = (GoalEntry) o;
+        return Objects.equals(text, goalEntry.text) && Objects.equals(isComplete, goalEntry.isComplete);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(text, isComplete);
     }
 
 }

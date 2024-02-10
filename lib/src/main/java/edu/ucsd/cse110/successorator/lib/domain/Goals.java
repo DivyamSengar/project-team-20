@@ -2,6 +2,8 @@ package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Objects;
+
 import edu.ucsd.cse110.successorator.lib.domain.GoalEntry;
 
 public class Goals {
@@ -26,4 +28,7 @@ public class Goals {
         return combinedList;
     }
 
+    public void makeComplete(){
+
+    }
 }
