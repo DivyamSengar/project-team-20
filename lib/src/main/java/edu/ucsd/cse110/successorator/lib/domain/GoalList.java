@@ -1,17 +1,13 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Objects;
 
-import edu.ucsd.cse110.successorator.lib.domain.GoalEntry;
-
-public class Goals {
+public class GoalList {
     private ArrayList<GoalEntry> goalsInComplete;
 
     private ArrayList<GoalEntry> goalsComplete;
 
-    public Goals(){
+    public GoalList(){
         this.goalsInComplete = new ArrayList<>();
         this.goalsComplete = new ArrayList<>();
     }

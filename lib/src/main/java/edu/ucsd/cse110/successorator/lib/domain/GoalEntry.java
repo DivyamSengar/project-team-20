@@ -7,14 +7,22 @@ import java.text.CharacterIterator;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class GoalEntry {
+
+    private final @Nullable Integer id;
     private @NonNull String text;
     private @NonNull boolean isComplete;
 
-    public GoalEntry(@NonNull String text, @NonNull boolean isComplete){
+    public GoalEntry(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete){
+        this.id = id;
         this.text = text;
         this.isComplete = isComplete;
+    }
+
+    public @Nullable Integer id() {
+        return id;
     }
 
     public @NonNull boolean getIsComplete(){
