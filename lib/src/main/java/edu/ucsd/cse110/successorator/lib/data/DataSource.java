@@ -1,5 +1,7 @@
 package edu.ucsd.cse110.successorator.lib.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +33,11 @@ public class DataSource {
     public DataSource() {}
 
     // updater to make goals contain current incomplete goals followed by complete goals
-    private void updateGoals() {
-        goals.clear();
+    protected void updateGoals() {
+        if (goals != null) {
+            goals.clear();
+        }
+        else goals = new ArrayList<>();
         goals.addAll(List.copyOf(this.goalsInComplete.values()));
         goals.addAll(List.copyOf(this.goalsComplete.values()));
     }

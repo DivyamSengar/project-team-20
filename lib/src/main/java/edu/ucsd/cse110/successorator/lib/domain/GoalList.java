@@ -17,6 +17,10 @@ public class GoalList {
         this.dataSource = dataSource;
     }
 
+    // DataSource getter used for testing
+    protected DataSource getDataSource(){
+        return this.dataSource;
+    }
     // Potentially useful for UI Implementation
     public Integer count() {return dataSource.getGoals().size();}
 
