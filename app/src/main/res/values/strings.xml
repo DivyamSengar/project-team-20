@@ -5,4 +5,6 @@
     <string name="emptyGoalsText">No goals for the Day.\n
         Click the + at the upper right to enter your Most Important Thing.</string>
     <string name="add_goals">Add Goals</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
