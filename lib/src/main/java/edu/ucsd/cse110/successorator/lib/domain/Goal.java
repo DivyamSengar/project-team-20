@@ -9,14 +9,14 @@ import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class GoalEntry {
+public class Goal {
 
     private final @Nullable Integer id;
     private @NonNull String text;
     private @NonNull boolean isComplete;
 
     // Goal class with base constructor
-    public GoalEntry(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete){
+    public Goal(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
@@ -28,7 +28,7 @@ public class GoalEntry {
     }
 
     // gets whether it isComplete
-    public @NonNull boolean getIsComplete(){
+    public @NonNull boolean isComplete(){
         return this.isComplete;
     }
 
@@ -70,8 +70,8 @@ public class GoalEntry {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GoalEntry goalEntry = (GoalEntry) o;
-        return Objects.equals(this.id, goalEntry.id) && Objects.equals(this.text, goalEntry.text) && Objects.equals(this.isComplete, goalEntry.isComplete);
+        Goal goal = (Goal) o;
+        return Objects.equals(this.id, goal.id) && Objects.equals(this.text, goal.text) && Objects.equals(this.isComplete, goal.isComplete);
     }
 
     // overridden hashCode

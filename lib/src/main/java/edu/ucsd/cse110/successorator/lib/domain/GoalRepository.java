@@ -1,19 +1,18 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 
-public class GoalList {
+public class GoalRepository {
 
     // main backing database/datasource
     private DataSource dataSource;
 
     // base constructor
-    public GoalList(DataSource dataSource){
+    public GoalRepository(DataSource dataSource){
         this.dataSource = dataSource;
     }
 
@@ -25,17 +24,17 @@ public class GoalList {
     public Integer count() {return dataSource.getGoals().size();}
 
     // getting a SimpleSubject to a goal based on its id
-    public SimpleSubject<GoalEntry> find(int id){
+    public SimpleSubject<Goal> find(int id){
         return dataSource.getGoalEntrySubject(id);
     }
 
     // get all Goals, Incomplete and Complete
-    public SimpleSubject<List<GoalEntry>> findAll() {
+    public SimpleSubject<List<Goal>> findAll() {
         return dataSource.getAllGoalEntrySubject();
     }
 
     // add a goal to the list
-    public void save(GoalEntry goalEntry) {
-        dataSource.putGoalEntry(goalEntry);
+    public void save(Goal goal) {
+        dataSource.putGoalEntry(goal);
     }
 }
