@@ -5,15 +5,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
+import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
+import edu.ucsd.cse110.successorator.databinding.GoalListItemBinding;
 
 public class MainFragmentAdapter extends ArrayAdapter<Goal> {
     public MainFragmentAdapter(Context context, List<Goal> goals) {
@@ -22,20 +28,24 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         var goal = getItem(position);
         assert goal != null;
 
-        FragmentMainBinding binding;
+        GoalListItemBinding binding;
         if (convertView != null) {
-            binding = FragmentMainBinding.bind(convertView);
-        } else {
+            binding = GoalListItemBinding.bind(convertView);
+        }
+        else {
             var layoutInflater = LayoutInflater.from(getContext());
-            binding = FragmentMainBinding.inflate(layoutInflater, parent, false);
+            binding = GoalListItemBinding.inflate(layoutInflater, parent, false);
         }
 
-//        binding.
-        //binding.____ ask in office hours
+        binding.goalText.setText(goal.getText());
+
+
+
+
         return binding.getRoot();
     }
 
