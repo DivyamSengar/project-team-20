@@ -1,11 +1,9 @@
 package edu.ucsd.cse110.successorator.lib.data;
-import edu.ucsd.cse110.successorator.lib.domain.GoalEntry;
-import edu.ucsd.cse110.successorator.lib.data.DataSource;
+import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 
 import org.junit.Test;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -32,15 +30,15 @@ public class TestDataSource {
         DataSource dataSource = new DataSource();
 
         // Add incomplete goals
-        dataSource.putGoalEntry(new GoalEntry(1, "Incomplete Goal 1", false));
-        dataSource.putGoalEntry(new GoalEntry(2, "Incomplete Goal 2", false));
+        dataSource.putGoalEntry(new Goal(1, "Incomplete Goal 1", false));
+        dataSource.putGoalEntry(new Goal(2, "Incomplete Goal 2", false));
 
         // Add complete goals
-        dataSource.putGoalEntry(new GoalEntry(3, "Complete Goal 1", true));
-        dataSource.putGoalEntry(new GoalEntry(4, "Complete Goal 2", true));
+        dataSource.putGoalEntry(new Goal(3, "Complete Goal 1", true));
+        dataSource.putGoalEntry(new Goal(4, "Complete Goal 2", true));
 
 
-        List<GoalEntry> goals = dataSource.getGoals();
+        List<Goal> goals = dataSource.getGoals();
         assertEquals(4, goals.size());
         assertEquals("Incomplete Goal 1", goals.get(0).getText());
         assertEquals("Incomplete Goal 2", goals.get(1).getText());
@@ -58,11 +56,11 @@ public class TestDataSource {
         DataSource dataSource = new DataSource();
 
         // Add incomplete goal
-        GoalEntry incompleteGoal = new GoalEntry(1, "Incomplete Goal", false);
+        Goal incompleteGoal = new Goal(1, "Incomplete Goal", false);
         dataSource.putGoalEntry(incompleteGoal);
 
         // Add complete goal
-        GoalEntry completeGoal = new GoalEntry(2, "Complete Goal", true);
+        Goal completeGoal = new Goal(2, "Complete Goal", true);
         dataSource.putGoalEntry(completeGoal);
 
         assertEquals(incompleteGoal, dataSource.getGoalEntry(1));
@@ -75,10 +73,10 @@ public class TestDataSource {
         DataSource dataSource = new DataSource();
 
         // Add goal
-        GoalEntry goal = new GoalEntry(1, "Test Goal", false);
+        Goal goal = new Goal(1, "Test Goal", false);
         dataSource.putGoalEntry(goal);
 
-        SimpleSubject<GoalEntry> subject = dataSource.getGoalEntrySubject(1);
+        SimpleSubject<Goal> subject = dataSource.getGoalEntrySubject(1);
         assertEquals(goal, subject.getValue());
     }
 
@@ -91,11 +89,11 @@ public class TestDataSource {
     public void testPutGoalEntry() {
         DataSource dataSource = new DataSource();
 
-        GoalEntry goal1 = new GoalEntry(1, "Goal 1", false);
-        GoalEntry goal3 = new GoalEntry(3, "Goal 3", false);
-        GoalEntry goal2 = new GoalEntry(2, "Goal 2", true);
-        GoalEntry goal4 = new GoalEntry(4, "Goal 4", true);
-        GoalEntry goal5 = new GoalEntry(5, "Goal 5", true);
+        Goal goal1 = new Goal(1, "Goal 1", false);
+        Goal goal3 = new Goal(3, "Goal 3", false);
+        Goal goal2 = new Goal(2, "Goal 2", true);
+        Goal goal4 = new Goal(4, "Goal 4", true);
+        Goal goal5 = new Goal(5, "Goal 5", true);
 
 
 
@@ -110,14 +108,14 @@ public class TestDataSource {
         boolean com = true;
         int numInc = 0; int numCom = 0;
         var goals = dataSource.getGoals();
-        for (GoalEntry goal : goals){
-            if (goal.getIsComplete()) {
+        for (Goal goal : goals){
+            if (goal.isComplete()) {
                 numCom++;
-                com = com && goal.getIsComplete();
+                com = com && goal.isComplete();
             }
             else {
                 numInc++;
-                inc = inc || goal.getIsComplete();
+                inc = inc || goal.isComplete();
             }
         }
         assertEquals(true, com);
@@ -128,7 +126,7 @@ public class TestDataSource {
         // Check subjects
         assertEquals(goal1, dataSource.getGoalEntrySubject(1).getValue());
         assertEquals(goal2, dataSource.getGoalEntrySubject(2).getValue());
-        List<GoalEntry> allGoals = dataSource.getAllGoalEntrySubject().getValue();
+        List<Goal> allGoals = dataSource.getAllGoalEntrySubject().getValue();
         assertEquals(5, allGoals.size());
     }
 }

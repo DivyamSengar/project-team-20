@@ -11,11 +11,16 @@ import java.util.Locale;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
+import edu.ucsd.cse110.successorator.lib.data.DataSource;
+import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
+import edu.ucsd.cse110.successorator.ui.MainFragmentAdapter;
 
 public class MainActivity extends AppCompatActivity {
+    private MainViewModel model;
     private ActivityMainBinding view;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,6 +37,37 @@ public class MainActivity extends AppCompatActivity {
 
         //To test the empty goal text
         v.emptyGoals.setText(R.string.emptyGoalsText);
+
+        var datasource = DataSource.fromDefault();
+        this.model = new MainViewModel(new GoalRepository(datasource));
+        this.view = ActivityMainBinding.inflate(getLayoutInflater());
+
+//        var modelOwner = this;
+//        var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
+//        var modelProvider = new ViewModelProvider(modelOwner, modelFactory);
+//        this.model = modelProvider.get(MainViewModel.class);
+
+        model.isGoalsEmpty().observe(isGoalsEmpty -> {
+            if (Boolean.TRUE.equals(isGoalsEmpty)) {
+                // set viz one way
+                model.getGoals().observe(text -> v.emptyGoals.setText(R.string.emptyGoalsText));
+                v.emptyGoals.setVisibility(View.VISIBLE);
+                v.listGoals.setVisibility(View.INVISIBLE);
+            } else {
+                MainFragmentAdapter adapter = new MainFragmentAdapter(this, datasource.getGoals());
+                model.getGoals().observe(text -> v.listGoals.setAdapter(adapter));
+                v.emptyGoals.setVisibility(View.INVISIBLE);
+                v.listGoals.setVisibility(View.VISIBLE);
+            }
+        });
+
+//        var addButton = view.goalAddButton;
+//        // This triggers the popup for keyboard
+//        addButton.setOnClickListener(v -> {
+//            // Functionality for keyboard and input popup
+//
+//
+//        });
 
 //        this.view = ActivityMainBinding.inflate(getLayoutInflater());
 //        setContentView(view.getRoot());

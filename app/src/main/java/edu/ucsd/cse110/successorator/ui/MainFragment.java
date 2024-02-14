@@ -2,17 +2,24 @@ package edu.ucsd.cse110.successorator.ui;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
 
 public class MainFragment extends Fragment {
-    // private MainViewModel activityModel
+    private MainViewModel activityModel;
     private FragmentMainBinding view;
+    private MainFragmentAdapter adapter;
 
     public MainFragment() {
         // Required empty public constructor
@@ -30,17 +37,26 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // Initialize the model
-        // var modelOwner = requireActivity()
-        // var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer)
-        // var modelProvider = new ViewModelProvider.get(MainViewModel.class)
+        var modelOwner = requireActivity();
+        var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
+        var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
+        this.activityModel = modelProvider.get(MainViewModel.class);
+        this.adapter = new MainFragmentAdapter(requireContext(), List.of());
+        activityModel.getGoals().observe(goal -> {
+            if (goal == null) return;
+            adapter.clear();
+            adapter.addAll(new ArrayList<>(goal));
+            adapter.notifyDataSetChanged();
+        });
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        view = FragmentMainBinding.inflate(inflater, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @NonNull ViewGroup container,
+                             @NonNull Bundle savedInstanceState) {
+        this.view = FragmentMainBinding.inflate(inflater, container, false);
 
-        setupMvp();
+        view.listGoals.setAdapter(adapter);
         // Inflate the layout for this fragment
         return view.getRoot();
     }
