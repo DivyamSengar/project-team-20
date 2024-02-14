@@ -52,8 +52,8 @@ public class TestGoal {
         Goal incompleteGoal = new Goal(null, "Incomplete Goal", false);
         Goal completeGoal = new Goal(null, "Complete Goal", true);
 
-        assertFalse(incompleteGoal.getIsComplete());
-        assertTrue(completeGoal.getIsComplete());
+        assertFalse(incompleteGoal.isComplete());
+        assertTrue(completeGoal.isComplete());
     }
 
     @Test
