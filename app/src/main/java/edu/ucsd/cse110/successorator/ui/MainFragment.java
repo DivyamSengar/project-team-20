@@ -15,6 +15,7 @@ import java.util.List;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
+import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 
 public class MainFragment extends Fragment {
     private MainViewModel activityModel;
@@ -57,6 +58,14 @@ public class MainFragment extends Fragment {
         this.view = FragmentMainBinding.inflate(inflater, container, false);
 
         view.listGoals.setAdapter(adapter);
+
+        // Show DialogFragment
+        view.imageButton.setOnClickListener(v -> {
+            System.out.println("clicked");
+            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
+        });
+
         // Inflate the layout for this fragment
         return view.getRoot();
     }
