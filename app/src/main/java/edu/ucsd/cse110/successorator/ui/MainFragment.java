@@ -10,10 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
+import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 
@@ -42,6 +46,7 @@ public class MainFragment extends Fragment {
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
         var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
+
         this.adapter = new MainFragmentAdapter(requireContext(), List.of());
         activityModel.getGoals().observe(goal -> {
             if (goal == null) return;
@@ -59,11 +64,28 @@ public class MainFragment extends Fragment {
 
         view.listGoals.setAdapter(adapter);
 
+        SimpleDateFormat date = new SimpleDateFormat("EEEE MM/dd", Locale.getDefault());
+        String currentDate = date.format(new Date());
+        view.dateText.setText(currentDate);
+
         // Show DialogFragment
         view.imageButton.setOnClickListener(v -> {
             System.out.println("clicked");
             var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
+        });
+
+        activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
+            if (Boolean.TRUE.equals(isGoalsEmpty)) {
+                activityModel.getGoals().observe(text -> view.emptyGoals.setText(R.string.emptyGoalsText));
+                view.emptyGoals.setVisibility(View.VISIBLE);
+                view.listGoals.setVisibility(View.INVISIBLE);
+            } else {
+//                MainFragmentAdapter adapter = this.adapter;
+//                activityModel.getGoals().observe(text -> view.listGoals.setAdapter(adapter));
+                view.emptyGoals.setVisibility(View.INVISIBLE);
+                view.listGoals.setVisibility(View.VISIBLE);
+            }
         });
 
         // Inflate the layout for this fragment

@@ -13,6 +13,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
@@ -22,8 +23,11 @@ import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.databinding.GoalListItemBinding;
 
 public class MainFragmentAdapter extends ArrayAdapter<Goal> {
+//    Consumer<Integer> onMarkIncompleteClick;
+//    , Consumer<Integer> onMarkIncompleteClick
     public MainFragmentAdapter(Context context, List<Goal> goals) {
         super(context, 0, new ArrayList<>(goals));
+//        this.onMarkIncompleteClick = onMarkIncompleteClick;
     }
 
     @NonNull
@@ -41,10 +45,10 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
             binding = GoalListItemBinding.inflate(layoutInflater, parent, false);
         }
 
+        // bind tap
+
+
         binding.goalText.setText(goal.getText());
-
-
-
 
         return binding.getRoot();
     }

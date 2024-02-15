@@ -60,22 +60,9 @@ public class CreateGoalDialogFragment extends DialogFragment {
         var input = view.cardFrontEditText.getText().toString();
 
         // should be null instead
-        var newGoal = new Goal(5, input, false);
-        activityModel.addGoal(newGoal);
-
-//        var front = view.cardFrontEditText.getText().toString();
-//        var back = view.cardBackEditText.getText().toString();
-//
-//        // Sort order is an invalid value here, because append/prepend will replace it
-//        var card = new Flashcard(null, front, back, -1);
-//
-//        if (view.appendRadioBtn.isChecked()){
-//            activityModel.append(card);
-//        } else if (view.prependRadioBtn.isChecked()) {
-//            activityModel.prepend(card);
-//        } else {
-//            throw new IllegalStateException("No radio button is checked");
-//        }
+        var newGoal = new Goal(null, input, false, -1);
+        activityModel.append(newGoal);
+//        activityModel.addGoal(newGoal);
 
         dialog.dismiss();
     }
@@ -84,11 +71,3 @@ public class CreateGoalDialogFragment extends DialogFragment {
         dialog.cancel();
     }
 }
-
-//            return new AlertDialog.Builder(getActivity())
-//            .setTitle("Enter Most Important Thing")
-//                .setView(view.getRoot())
-//            .setPositiveButton("", this::onPositiveButtonClick)
-//                .setPositiveButtonIcon(ContextCompat.getDrawable(getActivity(), R.drawable.done))
-//            .setNegativeButton("Cancel", this::onNegativeButtonClick)
-//                .create();

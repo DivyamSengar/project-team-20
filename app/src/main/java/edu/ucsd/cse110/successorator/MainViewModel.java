@@ -6,7 +6,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
@@ -28,19 +31,39 @@ public class MainViewModel extends ViewModel {
     private final GoalRepository goalRepository;
     private MutableSubject<List<Goal>> goals;
     private MutableSubject<Boolean> isGoalsEmpty;
+//    private MutableSubject<Boolean> isComplete;
 
     public MainViewModel(GoalRepository goalRepository) {
         this.goalRepository = goalRepository;
-//        isGoalsEmpty.setValue(true);
+
+        // observables
         this.goals = new SimpleSubject<>();
         this.isGoalsEmpty = new SimpleSubject<>();
+        // this.isComplete = new SimpleSubject<>();
 
         isGoalsEmpty.setValue(true);
 
+//         revert back to this if something goes wrong
+//        this.goalRepository.findAll().observe(newGoals -> {
+//            goals.setValue(newGoals);
+//        });
+
         this.goalRepository.findAll().observe(newGoals -> {
-            goals.setValue(newGoals);
+            if (newGoals == null) return;
+
+            var orderedGoals = newGoals.stream()
+                    .sorted(Comparator.comparingInt(Goal::sortOrder))
+                    .collect(Collectors.toList());
+
+            goals.setValue(orderedGoals);
         });
 
+        // potentially useful for monitoring strikethroughs
+        /*
+        this.isComplete.observe()
+         */
+
+        // listens for if goals is empty
         this.goals.observe(gs -> {
             if (gs == null) return;
             isGoalsEmpty.setValue(gs.isEmpty());
@@ -57,5 +80,18 @@ public class MainViewModel extends ViewModel {
 
     public void addGoal(Goal goal) {
         goalRepository.save(goal);
+    }
+
+    // markAsIncomplete
+    public void remove(int id){
+        goalRepository.remove(id);
+    }
+
+    public void append(Goal goal){
+        goalRepository.append(goal);
+    }
+
+    public void prepend(Goal goal){
+        goalRepository.prepend(goal);
     }
 }

@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 
 public class DataSource {
+
+    private int nextId = 0;
+
+    private int minSortOrder = Integer.MIN_VALUE;
+    private int maxSortOrder = Integer.MAX_VALUE;
 
     // list of complete Goals
     private Map<Integer, Goal> goalsComplete
@@ -31,14 +37,19 @@ public class DataSource {
     // empty constructor
     public DataSource() {}
 
-    // updater to make goals contain current incomplete goals followed by complete goals
-    protected void updateGoals() {
-        if (goals != null) {
-            goals.clear();
+    public final static List<Goal> DEFAULT_GOALS = List.of(
+            new Goal(1, "do homework", false, 0),
+            new Goal(2, "clean room", false, 1),
+            new Goal(3, "play basketball", false, 2),
+            new Goal(4, "do smn", false, 3)
+    );
+
+    public static DataSource fromDefault() {
+        var data = new DataSource();
+        for (int i = 0; i < 4; i++) {
+            data.putGoalEntry(DEFAULT_GOALS.get(i));
         }
-        else goals = new ArrayList<>();
-        goals.addAll(List.copyOf(this.goalsInComplete.values()));
-        goals.addAll(List.copyOf(this.goalsComplete.values()));
+        return data;
     }
 
     // return goals after updating them
@@ -57,6 +68,16 @@ public class DataSource {
         }
     }
 
+    // updater to make goals contain current incomplete goals followed by complete goals
+    protected void updateGoals() {
+        if (goals != null) {
+            goals.clear();
+        }
+        else goals = new ArrayList<>();
+        goals.addAll(List.copyOf(this.goalsInComplete.values()));
+        goals.addAll(List.copyOf(this.goalsComplete.values()));
+    }
+
     // return goalSubject from id
     public SimpleSubject<Goal> getGoalEntrySubject(int id) {
         if (!goalEntrySubjects.containsKey(id)) {
@@ -72,37 +93,110 @@ public class DataSource {
         return allGoalEntrySubjects;
     }
 
-    /* modifier to add a goal, adding it into the complete/incomplete list,
-    then making a subject for it, and adding it to the list of all subejcts
-     */
-    public void putGoalEntry(Goal goal) {
-        if(goal.isComplete()){
-            goalsComplete.put(goal.id(), goal);
-        } else {
-            goalsInComplete.put(goal.id(), goal);
-        }
+    public int getMaxSortOrder() {
+        return maxSortOrder;
+    }
 
-        if (goalEntrySubjects.containsKey(goal.id())) {
-            goalEntrySubjects.get(goal.id()).setValue(goal);
+    public int getMinSortOrder() {
+        return minSortOrder;
+    }
+
+    /* modifier to add a goal, adding it into the complete/incomplete list,
+            then making a subject for it, and adding it to the list of all subejcts
+             */
+    public void putGoalEntry(Goal goal) {
+        var fixedGoal = preInsert(goal);
+
+        if(fixedGoal.isComplete()){
+            goalsComplete.put(fixedGoal.id(), fixedGoal);
+        } else {
+            goalsInComplete.put(fixedGoal.id(), fixedGoal);
         }
+        postInsert();
+
+        if (goalEntrySubjects.containsKey(fixedGoal.id())) {
+            goalEntrySubjects.get(fixedGoal.id()).setValue(fixedGoal);
+        }
+        // I have no idea what this does but the null pointer exception makes me scared
         else {
-            getGoalEntrySubject(goal.id()).setValue(goal);
+            getGoalEntrySubject(fixedGoal.id()).setValue(fixedGoal);
         }
         allGoalEntrySubjects.setValue(getGoals());
     }
 
-    public final static List<Goal> DEFAULT_GOALS = List.of(
-            new Goal(1, "do homework", false),
-            new Goal(2, "clean room", false),
-            new Goal(3, "play basketball", false),
-            new Goal(4, "do smn", false)
-    );
+    public void putGoalEntries(List<Goal> goals){
+        var fixedGoals = goals.stream()
+                .map(this::preInsert)
+                .collect(Collectors.toList());
 
-    public static DataSource fromDefault() {
-        var data = new DataSource();
-        for (int i = 0; i < 4; i++) {
-            data.putGoalEntry(DEFAULT_GOALS.get(i));
+        fixedGoals.forEach(goal -> {
+            if (goal.isComplete()){
+                goalsComplete.put(goal.id(), goal);
+            } else {
+                goalsInComplete.put(goal.id(), goal);
+            }
+        });
+        postInsert();
+        fixedGoals.forEach(goal -> {
+            if (goalEntrySubjects.containsKey(goal.id())) {
+                goalEntrySubjects.get(goal.id()).setValue(goal);
+            }
+            // I have no idea what this does but the null pointer exception makes me scared
+            else {
+                getGoalEntrySubject(goal.id()).setValue(goal);
+            }
+        });
+        allGoalEntrySubjects.setValue(getGoals());
+    }
+
+    // markAsIncomplete
+    public void removeGoal(int id){
+        var goal = getGoals().get(id);
+        var sortOrder = goal.sortOrder();
+
+//        // remove from complete
+//        if (goal.isComplete()){
+//
+//        } else {
+//            goal.updateStatus();
+//        }
+
+        // mark as incomplete
+        goal.updateStatus();
+
+        shiftSortOrders(sortOrder, maxSortOrder, -1);
+
+        allGoalEntrySubjects.setValue(getGoals());
+
+    }
+
+    public void shiftSortOrders(int from, int to, int by){
+         var allGoals = goals.stream()
+                .filter(goal -> goal.sortOrder() >= from && goal.sortOrder() <= to)
+                .map(goal -> goal.withSortOrder(goal.sortOrder() + by))
+                .collect(Collectors.toList());
+         putGoalEntries(allGoals);
+    }
+
+    private Goal preInsert(Goal goal){
+        var id = goal.id();
+        if (id == null){
+            goal = goal.withId(nextId++);
+        } else if (id > nextId) {
+            nextId = id + 1;
         }
-        return data;
+        return goal;
+    }
+
+    private void postInsert(){
+        minSortOrder = getGoals().stream()
+                .map(Goal::sortOrder)
+                .min(Integer::compareTo)
+                .orElse(Integer.MAX_VALUE);
+
+        maxSortOrder = getGoals().stream()
+                .map(Goal::sortOrder)
+                .max(Integer::compareTo)
+                .orElse(Integer.MIN_VALUE);
     }
 }

@@ -37,4 +37,28 @@ public class GoalRepository {
     public void save(Goal goal) {
         dataSource.putGoalEntry(goal);
     }
+
+    // adds a set of goals to the list
+    public void save(List<Goal> goals) {dataSource.putGoalEntries(goals);}
+
+    // markAsIncomplete
+    public void remove(int id){
+        dataSource.removeGoal(id);
+    }
+
+    /*
+    WILL BE USEFUL FOR SHIFTING GOALS, but not exactly these methods
+     */
+    public void append(Goal goal){
+        dataSource.putGoalEntry(
+                goal.withSortOrder(dataSource.getMaxSortOrder() + 1)
+        );
+    }
+
+    public void prepend(Goal goal){
+        dataSource.shiftSortOrders(0, dataSource.getMaxSortOrder(), 1);
+        dataSource.putGoalEntry(
+                goal.withSortOrder(dataSource.getMinSortOrder() - 1)
+        );
+    }
 }

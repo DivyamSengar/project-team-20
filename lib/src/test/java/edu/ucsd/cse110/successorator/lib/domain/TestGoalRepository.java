@@ -25,9 +25,9 @@ public class TestGoalRepository {
         assertEquals((int)0, (int) goalRepository.count());
 
         // Add goals and check count
-        goalRepository.save(new Goal(1, "Goal 1", false));
+        goalRepository.save(new Goal(1, "Goal 1", false, 0));
         assertEquals((int)1, (int) goalRepository.count());
-        goalRepository.save(new Goal(2, "Goal 2", true));
+        goalRepository.save(new Goal(2, "Goal 2", true, 1));
         assertEquals((int)2, (int) goalRepository.count());
     }
 
@@ -37,8 +37,8 @@ public class TestGoalRepository {
         GoalRepository goalRepository = new GoalRepository(dataSource);
 
         // Add goals
-        Goal goal1 = new Goal(1, "Goal 1", false);
-        Goal goal2 = new Goal(2, "Goal 2", true);
+        Goal goal1 = new Goal(1, "Goal 1", false, 0);
+        Goal goal2 = new Goal(2, "Goal 2", true, 1);
         goalRepository.save(goal1);
         goalRepository.save(goal2);
 
@@ -58,8 +58,8 @@ public class TestGoalRepository {
         GoalRepository goalRepository = new GoalRepository(dataSource);
 
         // Add goals
-        Goal goal1 = new Goal(1, "Goal 1", false);
-        Goal goal2 = new Goal(2, "Goal 2", true);
+        Goal goal1 = new Goal(1, "Goal 1", false, 0);
+        Goal goal2 = new Goal(2, "Goal 2", true, 1);
         goalRepository.save(goal1);
         goalRepository.save(goal2);
 
@@ -74,8 +74,8 @@ public class TestGoalRepository {
         GoalRepository goalRepository = new GoalRepository(dataSource);
 
         // Add goals
-        Goal goal1 = new Goal(1, "Goal 1", false);
-        Goal goal2 = new Goal(2, "Goal 2", true);
+        Goal goal1 = new Goal(1, "Goal 1", false, 0);
+        Goal goal2 = new Goal(2, "Goal 2", true, 1);
         goalRepository.save(goal1);
         goalRepository.save(goal2);
 

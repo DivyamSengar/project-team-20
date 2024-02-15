@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="96dp">
+    android:layout_height="76dp">
 
     <TextView
         android:id="@+id/goal_text"
@@ -15,7 +15,10 @@
         android:layout_marginBottom="16dp"
         android:gravity="center_horizontal|center_vertical"
         android:text="@string/textview"
-        android:textSize="20sp"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

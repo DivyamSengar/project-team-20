@@ -13,6 +13,7 @@ public class SuccessoratorApplication extends Application {
     public void onCreate(){
         super.onCreate();
 
+
         this.dataSource = DataSource.fromDefault();
         this.goalRepository= new GoalRepository(dataSource);
     }
