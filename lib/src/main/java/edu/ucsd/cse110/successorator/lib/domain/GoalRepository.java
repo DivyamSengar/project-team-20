@@ -24,12 +24,12 @@ public class GoalRepository {
     public Integer count() {return dataSource.getGoals().size();}
 
     // getting a SimpleSubject to a goal based on its id
-    public SimpleSubject<Goal> find(int id){
+    public Subject<Goal> find(int id){
         return dataSource.getGoalEntrySubject(id);
     }
 
     // get all Goals, Incomplete and Complete
-    public SimpleSubject<List<Goal>> findAll() {
+    public Subject<List<Goal>> findAll() {
         return dataSource.getAllGoalEntrySubject();
     }
 
