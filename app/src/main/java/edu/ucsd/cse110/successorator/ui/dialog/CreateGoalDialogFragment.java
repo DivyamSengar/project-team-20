@@ -60,7 +60,7 @@ public class CreateGoalDialogFragment extends DialogFragment {
         var input = view.cardFrontEditText.getText().toString();
 
         // should be null instead
-        var newGoal = new Goal(null, input, false, -1);
+        var newGoal = new Goal(null, input, false, 1);
         activityModel.append(newGoal);
 //        activityModel.addGoal(newGoal);
 
