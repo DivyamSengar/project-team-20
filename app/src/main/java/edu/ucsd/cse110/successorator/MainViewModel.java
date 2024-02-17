@@ -68,6 +68,8 @@ public class MainViewModel extends ViewModel {
             if (gs == null) return;
             isGoalsEmpty.setValue(gs.isEmpty());
         });
+
+
     }
 
     public Subject<List<Goal>> getGoals() {

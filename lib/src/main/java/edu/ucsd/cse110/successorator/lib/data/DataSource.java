@@ -39,17 +39,17 @@ public class DataSource {
     public DataSource() {}
 
     public final static List<Goal> DEFAULT_GOALS = List.of(
-            new Goal(1, "do homework", false, 0),
-            new Goal(2, "clean room", false, 1),
-            new Goal(3, "play basketball", false, 2),
-            new Goal(4, "do smn", false, 3)
+//            new Goal(1, "do homework", false, 0),
+//            new Goal(2, "clean room", false, 1),
+//            new Goal(3, "play basketball", false, 2),
+//            new Goal(4, "do smn", false, 3)
     );
 
     public static DataSource fromDefault() {
         var data = new DataSource();
-        for (int i = 0; i < 4; i++) {
-            data.putGoalEntry(DEFAULT_GOALS.get(i));
-        }
+//        for (int i = 0; i < 4; i++) {
+//            data.putGoalEntry(DEFAULT_GOALS.get(i));
+//        }
         return data;
     }
 
@@ -103,7 +103,7 @@ public class DataSource {
     }
 
     /* modifier to add a goal, adding it into the complete/incomplete list,
-            then making a subject for it, and adding it to the list of all subejcts
+            then making a subject for it, and adding it to the list of all subjects
              */
     public void putGoalEntry(Goal goal) {
         var fixedGoal = preInsert(goal);
