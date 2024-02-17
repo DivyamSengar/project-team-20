@@ -4,13 +4,12 @@ import androidx.lifecycle.Transformations;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.ucsd.cse110.successorator.lib.domain.SimpleGoalRepository;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
-import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.util.*;
-import androidx.lifecycle.Transformations;
 
-public class RoomGoalRepository implements GoalRepository {
+public class RoomGoalRepository implements SimpleGoalRepository {
     private final GoalDao goalDao;
     public RoomGoalRepository(GoalDao goalDao){
         this.goalDao = goalDao;

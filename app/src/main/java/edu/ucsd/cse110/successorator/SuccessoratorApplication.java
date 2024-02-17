@@ -4,6 +4,7 @@ import android.app.Application;
 
 import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
+import edu.ucsd.cse110.successorator.lib.domain.SimpleGoalRepository;
 
 public class SuccessoratorApplication extends Application {
     private DataSource dataSource;
@@ -15,7 +16,7 @@ public class SuccessoratorApplication extends Application {
 
 
         this.dataSource = DataSource.fromDefault();
-        this.goalRepository= new GoalRepository(dataSource);
+        this.goalRepository= new SimpleGoalRepository(dataSource);
     }
 
     public GoalRepository getGoalRepository(){

@@ -11,7 +11,7 @@ public class TestGoalRepository {
     @Test
     public void testConstructor() {
         DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
+        GoalRepository goalRepository = new SimpleGoalRepository(dataSource);
 
         assertSame(dataSource, goalRepository.getDataSource());
     }
@@ -19,7 +19,7 @@ public class TestGoalRepository {
     @Test
     public void testCount() {
         DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
+        GoalRepository goalRepository = new SimpleGoalRepository(dataSource);
 
         // Initial count should be 0
         assertEquals((int)0, (int) goalRepository.count());
@@ -34,7 +34,7 @@ public class TestGoalRepository {
     @Test
     public void testFind() {
         DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
+        GoalRepository goalRepository = new SimpleGoalRepository(dataSource);
 
         // Add goals
         Goal goal1 = new Goal(1, "Goal 1", false, 0);
@@ -55,7 +55,7 @@ public class TestGoalRepository {
     @Test
     public void testFindAll() {
         DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
+        GoalRepository goalRepository = new SimpleGoalRepository(dataSource);
 
         // Add goals
         Goal goal1 = new Goal(1, "Goal 1", false, 0);
@@ -71,7 +71,7 @@ public class TestGoalRepository {
     @Test
     public void testSave() {
         DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
+        GoalRepository goalRepository = new SimpleGoalRepository(dataSource);
 
         // Add goals
         Goal goal1 = new Goal(1, "Goal 1", false, 0);
