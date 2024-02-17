@@ -30,12 +30,12 @@ public class TestDataSource {
         DataSource dataSource = new DataSource();
 
         // Add incomplete goals
-        dataSource.putGoalEntry(new Goal(1, "Incomplete Goal 1", false));
-        dataSource.putGoalEntry(new Goal(2, "Incomplete Goal 2", false));
+        dataSource.putGoalEntry(new Goal(1, "Incomplete Goal 1", false, 0));
+        dataSource.putGoalEntry(new Goal(2, "Incomplete Goal 2", false, 1));
 
         // Add complete goals
-        dataSource.putGoalEntry(new Goal(3, "Complete Goal 1", true));
-        dataSource.putGoalEntry(new Goal(4, "Complete Goal 2", true));
+        dataSource.putGoalEntry(new Goal(3, "Complete Goal 1", true, 2));
+        dataSource.putGoalEntry(new Goal(4, "Complete Goal 2", true, 3));
 
 
         List<Goal> goals = dataSource.getGoals();
@@ -56,11 +56,11 @@ public class TestDataSource {
         DataSource dataSource = new DataSource();
 
         // Add incomplete goal
-        Goal incompleteGoal = new Goal(1, "Incomplete Goal", false);
+        Goal incompleteGoal = new Goal(1, "Incomplete Goal", false, 0);
         dataSource.putGoalEntry(incompleteGoal);
 
         // Add complete goal
-        Goal completeGoal = new Goal(2, "Complete Goal", true);
+        Goal completeGoal = new Goal(2, "Complete Goal", true, 1);
         dataSource.putGoalEntry(completeGoal);
 
         assertEquals(incompleteGoal, dataSource.getGoalEntry(1));
@@ -73,7 +73,7 @@ public class TestDataSource {
         DataSource dataSource = new DataSource();
 
         // Add goal
-        Goal goal = new Goal(1, "Test Goal", false);
+        Goal goal = new Goal(1, "Test Goal", false, 0);
         dataSource.putGoalEntry(goal);
 
         SimpleSubject<Goal> subject = dataSource.getGoalEntrySubject(1);
@@ -89,11 +89,11 @@ public class TestDataSource {
     public void testPutGoalEntry() {
         DataSource dataSource = new DataSource();
 
-        Goal goal1 = new Goal(1, "Goal 1", false);
-        Goal goal3 = new Goal(3, "Goal 3", false);
-        Goal goal2 = new Goal(2, "Goal 2", true);
-        Goal goal4 = new Goal(4, "Goal 4", true);
-        Goal goal5 = new Goal(5, "Goal 5", true);
+        Goal goal1 = new Goal(1, "Goal 1", false, 0);
+        Goal goal3 = new Goal(3, "Goal 3", false, 1);
+        Goal goal2 = new Goal(2, "Goal 2", true, 2);
+        Goal goal4 = new Goal(4, "Goal 4", true, 3);
+        Goal goal5 = new Goal(5, "Goal 5", true, 4);
 
 
 

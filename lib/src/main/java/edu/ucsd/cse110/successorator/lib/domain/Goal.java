@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.awt.font.TextAttribute;
+import java.io.Serializable;
 import java.text.AttributedString;
 import java.text.AttributedCharacterIterator;
 import java.text.CharacterIterator;
@@ -9,17 +10,19 @@ import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class Goal {
+public class Goal implements Serializable {
 
     private final @Nullable Integer id;
     private @NonNull String text;
     private @NonNull boolean isComplete;
+    private int sortOrder;
 
     // Goal class with base constructor
-    public Goal(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete){
+    public Goal(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete, int sortOrder){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
+        this.sortOrder = sortOrder;
     }
 
     // id getter
@@ -47,24 +50,36 @@ public class Goal {
         this.isComplete = !this.isComplete;
     }
 
-    // cse
-    public void makeComplete(){
-
-        /* Convert the String to an AttributeString, strike it through,
-         convert it to StringBuilder and return it as a String
-         */
-        AttributedString strike = new AttributedString(this.text);
-        strike.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, 0, text.length());
-        AttributedCharacterIterator iterator = strike.getIterator();
-        StringBuilder stringBuilder = new StringBuilder();
-
-        // Iterate over the characters in the iterator and append them to the StringBuilder
-        for (char c = iterator.first(); c != CharacterIterator.DONE; c = iterator.next()) {
-            stringBuilder.append(c);
-        }
-
-        this.text = stringBuilder.toString();
+    public int sortOrder(){
+        return this.sortOrder;
     }
+
+    public Goal withId(int id){
+        return new Goal(id, this.text, this.isComplete, this.sortOrder);
+    }
+
+    public Goal withSortOrder(int sortOrder){
+        return new Goal(this.id, this.text, this.isComplete, sortOrder);
+    }
+
+    // cse
+//    public void makeComplete(){
+//
+//        /* Convert the String to an AttributeString, strike it through,
+//         convert it to StringBuilder and return it as a String
+//         */
+//        AttributedString strike = new AttributedString(this.text);
+//        strike.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, 0, text.length());
+//        AttributedCharacterIterator iterator = strike.getIterator();
+//        StringBuilder stringBuilder = new StringBuilder();
+//
+//        // Iterate over the characters in the iterator and append them to the StringBuilder
+//        for (char c = iterator.first(); c != CharacterIterator.DONE; c = iterator.next()) {
+//            stringBuilder.append(c);
+//        }
+//
+//        this.text = stringBuilder.toString();
+//    }
     // overridden equals
     @Override
     public boolean equals(Object o) {
