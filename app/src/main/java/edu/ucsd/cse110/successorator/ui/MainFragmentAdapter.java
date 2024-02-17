@@ -37,6 +37,7 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
         super.add(object);
     }
 
+
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
@@ -53,9 +54,13 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
         }
 
         binding.goalText.setText(goal.getText());
+        if (goal.isComplete()) {
+            binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            binding.goalText.setPaintFlags(0);
+        }
 
 
         return binding.getRoot();
     }
-
 }

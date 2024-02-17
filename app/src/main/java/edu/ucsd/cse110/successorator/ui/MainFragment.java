@@ -101,27 +101,18 @@ public class MainFragment extends Fragment {
 
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
             Goal goal = adapter.getItem(position);
-            TextView text = (TextView) view.findViewById(R.id.goal_text);
-            if (!adapter.getItem(position).isComplete()){
+            assert goal != null;
+            if (!goal.isComplete()){
                 goal.makeComplete();
                 adapter.remove(goal);
                 adapter.add(goal);
-                text.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-
-//                goal.updateText("complete");
-//                adapter.add(goal);
-//                adapter.remove(goal);
-                //move goal to bottom of the list
-//                    adapter.add(goal);
-//                    adapter.remove(goal);
             }
             else{
-                text.setPaintFlags(0);
                 goal.makeInComplete();
-
-//                goal.updateText("incomplete");
+                adapter.remove(goal);
+                adapter.insert(goal, 0);
+                adapter.notifyDataSetChanged();
             }
-            adapter.notifyDataSetChanged();
         });
 
         // Inflate the layout for this fragment
