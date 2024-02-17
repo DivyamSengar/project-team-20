@@ -8,6 +8,8 @@ import androidx.room.Transaction;
 
 import java.util.List;
 
+import edu.ucsd.cse110.successorator.lib.data.DataSource;
+
 @Dao
 public interface GoalDao {
 

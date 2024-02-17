@@ -4,6 +4,7 @@ import java.util.List;
 
 
 import edu.ucsd.cse110.successorator.lib.data.DataSource;
+import edu.ucsd.cse110.successorator.lib.util.Subject;
 
 public class SimpleGoalRepository implements GoalRepository {
 
@@ -16,7 +17,6 @@ public class SimpleGoalRepository implements GoalRepository {
     }
 
     // DataSource getter used for testing
-    @Override
     public DataSource getDataSource(){
         return this.dataSource;
     }
@@ -27,7 +27,7 @@ public class SimpleGoalRepository implements GoalRepository {
     // getting a SimpleSubject to a goal based on its id
     @Override
     public Subject<Goal> find(int id){
-        return dataSource.getGoalEntrySubject(id);
+        return (Subject<Goal>) dataSource.getGoalEntrySubject(id);
     }
 
     // get all Goals, Incomplete and Complete

@@ -4,12 +4,13 @@ import androidx.lifecycle.Transformations;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.ucsd.cse110.successorator.lib.domain.SimpleGoalRepository;
+import edu.ucsd.cse110.successorator.lib.data.DataSource;
+import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.util.*;
 
-public class RoomGoalRepository implements SimpleGoalRepository {
+public class RoomGoalRepository implements GoalRepository {
     private final GoalDao goalDao;
     public RoomGoalRepository(GoalDao goalDao){
         this.goalDao = goalDao;
@@ -33,5 +34,27 @@ public class RoomGoalRepository implements SimpleGoalRepository {
     @Override
     public void save(Goal goal){
         goalDao.insert(GoalEntity.fromGoal(goal));
+    }
+    public void save(List<Goal> goals){
+        var entities = goals.stream()
+                .map(GoalEntity::fromGoal)
+                .collect(Collectors.toList());
+                goalDao.insert(entities);
+    }
+
+    public void append(Goal goal){
+        goalDao.append(GoalEntity.fromGoal(goal));
+    }
+
+    public void prepend(Goal goal){
+        goalDao.prepend(GoalEntity.fromGoal(goal));
+    }
+
+    public void remove(int id){
+        goalDao.delete(id);
+    }
+
+    public Integer count(){
+        return goalDao.count();
     }
 }
