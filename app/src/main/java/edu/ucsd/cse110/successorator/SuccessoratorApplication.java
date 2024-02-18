@@ -12,7 +12,9 @@ import edu.ucsd.cse110.successorator.lib.domain.SimpleGoalRepository;
 
 public class SuccessoratorApplication extends Application {
     private DataSource dataSource;
-    private GoalRepository goalRepository;
+    private GoalRepository goalRepositoryComplete;
+
+    private GoalRepository goalRepositoryIncomplete;
 
     @Override
     public void onCreate(){
@@ -26,7 +28,13 @@ public class SuccessoratorApplication extends Application {
                 SuccessoratorDatabase.class, "successorator-database")
                 .allowMainThreadQueries()
                 .build();
-        this.goalRepository = new RoomGoalRepository(database.goalDao());
+        this.goalRepositoryComplete = new RoomGoalRepository(database.goalDao());
+
+        var database2 = Room.databaseBuilder(getApplicationContext(),
+                        SuccessoratorDatabase.class, "successorator-database")
+                .allowMainThreadQueries()
+                .build();
+        this.goalRepositoryIncomplete = new RoomGoalRepository(database2.goalDao());
 
         // can use default goals to test
 //        var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
@@ -40,7 +48,11 @@ public class SuccessoratorApplication extends Application {
 //        }
     }
 
-    public GoalRepository getGoalRepository(){
-        return goalRepository;
+    public GoalRepository getGoalRepositoryComplete(){
+        return goalRepositoryComplete;
+    }
+
+    public GoalRepository getGoalRepositoryIncomplete(){
+        return goalRepositoryIncomplete;
     }
 }

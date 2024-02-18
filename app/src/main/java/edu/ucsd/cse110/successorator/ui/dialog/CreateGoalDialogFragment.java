@@ -61,7 +61,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
 
         // should be null instead
         var newGoal = new Goal(null, input, false, 1);
-        activityModel.append(newGoal);
+        activityModel.appendIncomplete(newGoal);
+        
 //        activityModel.addGoal(newGoal);
 
         dialog.dismiss();

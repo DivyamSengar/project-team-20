@@ -58,8 +58,14 @@ public class MainFragment extends Fragment {
         var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
 
-        this.adapter = new MainFragmentAdapter(requireContext(), List.of());
-        activityModel.getGoals().observe(goal -> {
+        this.adapter = new MainFragmentAdapter(requireContext(), List.of(), List.of());
+        activityModel.getCompletedGoals().observe(goal -> {
+            if (goal == null) return;
+            adapter.clear();
+            adapter.addAll(new ArrayList<>(goal));
+            adapter.notifyDataSetChanged();
+        });
+        activityModel.getIncompletedGoals().observe(goal -> {
             if (goal == null) return;
             adapter.clear();
             adapter.addAll(new ArrayList<>(goal));
@@ -105,16 +111,18 @@ public class MainFragment extends Fragment {
             assert goal != null;
             if (!goal.isComplete()){
                 goal.makeComplete();
-                activityModel.DatabaseComplete(goal);
+                adapter.removeComplete(goal);
                 adapter.remove(goal);
                 adapter.add(goal);
+                adapter.addComplete(goal);
                 adapter.notifyDataSetChanged();
             }
             else{
                 goal.makeInComplete();
-                activityModel.DatabaseIncomplete(goal);
+                adapter.removeComplete(goal);
                 adapter.remove(goal);
                 adapter.insert(goal, 0);
+                adapter.prependIncomplete(goal);
                 adapter.notifyDataSetChanged();
             }
         });
