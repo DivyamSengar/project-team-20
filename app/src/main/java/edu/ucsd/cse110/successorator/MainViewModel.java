@@ -92,7 +92,9 @@ public class MainViewModel extends ViewModel {
     public void append(Goal goal){
         goalRepository.append(goal);
     }
-
+    public void DatabaseComplete(Goal goal){
+        goalRepository.markAsComplete(goal);
+    }
     public void prepend(Goal goal){
         goalRepository.prepend(goal);
     }

@@ -53,6 +53,10 @@ public interface GoalDao {
     @Query("DELETE from Goals WHERE isComplete = true")
     void deleteComplete();
 
+    @Query("UPDATE Goals SET isComplete = 1 WHERE id = :id")
+    void markComplete(int id);
+
+
     @Transaction
     default int append(GoalEntity goal){
         var maxSort = getMaxSortOrder();
@@ -65,5 +69,6 @@ public interface GoalDao {
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete, getMinSortOrder()-1);
         return Math.toIntExact(insert(newGoalEntity));
     }
+
 
 }

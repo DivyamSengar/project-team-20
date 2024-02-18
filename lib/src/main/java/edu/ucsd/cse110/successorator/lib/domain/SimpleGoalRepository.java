@@ -69,4 +69,8 @@ public class SimpleGoalRepository implements GoalRepository {
                 goal.withSortOrder(dataSource.getMinSortOrder() - 1)
         );
     }
+
+    public void markAsComplete(Goal goal){
+        goal.makeComplete();
+    }
 }

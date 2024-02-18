@@ -19,7 +19,7 @@ public class SuccessoratorApplication extends Application {
         super.onCreate();
 
 // Pre persistence model
-//        this.dataSource = DataSource.fromDefault();
+//        this.dataSource = new DataSource();
 //        this.goalRepository= new SimpleGoalRepository(dataSource);
 
         var database = Room.databaseBuilder(getApplicationContext(),

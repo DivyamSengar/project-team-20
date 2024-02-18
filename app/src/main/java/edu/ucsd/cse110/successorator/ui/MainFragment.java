@@ -30,6 +30,7 @@ import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
+import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 
 public class MainFragment extends Fragment {
     private MainViewModel activityModel;
@@ -104,8 +105,10 @@ public class MainFragment extends Fragment {
             assert goal != null;
             if (!goal.isComplete()){
                 goal.makeComplete();
+                activityModel.DatabaseComplete(goal);
                 adapter.remove(goal);
                 adapter.add(goal);
+                adapter.notifyDataSetChanged();
             }
             else{
                 goal.makeInComplete();

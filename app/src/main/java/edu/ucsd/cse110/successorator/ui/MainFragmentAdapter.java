@@ -13,6 +13,10 @@ import androidx.annotation.Nullable;
 
 import org.w3c.dom.Text;
 
+import java.awt.font.TextAttribute;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
+import java.text.CharacterIterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -52,7 +56,6 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
             var layoutInflater = LayoutInflater.from(getContext());
             binding = GoalListItemBinding.inflate(layoutInflater, parent, false);
         }
-
         binding.goalText.setText(goal.getText());
         if (goal.isComplete()) {
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
