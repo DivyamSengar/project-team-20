@@ -81,8 +81,11 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        System.out.println("hi");
         var goal = getItem(position);
         assert goal != null;
+        System.out.println("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+        System.out.println(goal);
 
         GoalListItemBinding binding;
         if (convertView != null) {

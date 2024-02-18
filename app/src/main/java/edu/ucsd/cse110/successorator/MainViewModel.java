@@ -85,10 +85,10 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
+            var temp = Stream.concat(current.stream(), orderedGoals.stream());
+            var temp2 = temp.collect(Collectors.toList());
             goalsIncompleted.setValue(orderedGoals);
-//            var temp = Stream.concat(current.stream(), orderedGoals.stream());
-//            var temp2 = temp.collect(Collectors.toList());
-//            goals.setValue(temp2);
+            goals.setValue(temp2);
         });
 
         // potentially useful for monitoring strikethroughs
@@ -106,16 +106,19 @@ public class MainViewModel extends ViewModel {
             isGoalsEmpty.setValue(gs.isEmpty());
         });
 
+//        this.goalRepositoryIncomplete.observe(gs)
 
-//        this.goalsIncompleted.observe(gs -> {
-//            if (gs == null) return;
-//            isIncompletedGoalsEmpty.setValue(gs.isEmpty());
-//        });
-//
-//        this.goalsCompleted.observe(gs -> {
-//            if (gs == null) return;
-//            isCompletedGoalsEmpty.setValue(gs.isEmpty());
-//        });
+        this.goalsIncompleted.observe(gs -> {
+            System.out.println(gs + "RAHHHHHH");
+            if (gs == null) return;
+            System.out.println("ADDED BROOOO");
+            isIncompletedGoalsEmpty.setValue(gs.isEmpty());
+        });
+
+        this.goalsCompleted.observe(gs -> {
+            if (gs == null) return;
+            isCompletedGoalsEmpty.setValue(gs.isEmpty());
+        });
 
 
     }
@@ -164,10 +167,14 @@ public class MainViewModel extends ViewModel {
 
     public void appendComplete(Goal goal){
         goalRepositoryComplete.append(goal);
+        this.goalsCompleted.setValue(goalRepositoryComplete.findAll().getValue());
     }
 
     public void appendIncomplete(Goal goal){
+        System.out.println("GOALLLLL" + goal);
+        System.out.println("AGGGGGGG" + goalRepositoryIncomplete.findAll().getValue());
         goalRepositoryIncomplete.append(goal);
+        this.goalsIncompleted.setValue(goalRepositoryIncomplete.findAll().getValue());
     }
 
     public void prependComplete(Goal goal){
@@ -178,4 +185,10 @@ public class MainViewModel extends ViewModel {
         goalRepositoryIncomplete.prepend(goal);
     }
 
+//    public void DatabaseComplete(Goal goal){
+//        goalRepository.markAsComplete(goal);
+//    }
+//    public void DatabaseIncomplete(Goal goal){
+//        goalRepository.markAsIncomplete(goal);
+//    }
 }

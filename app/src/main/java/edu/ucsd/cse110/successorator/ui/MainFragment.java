@@ -42,6 +42,7 @@ public class MainFragment extends Fragment {
     }
 
     public static MainFragment newInstance() {
+        System.out.println("hello from newInstance");
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -51,6 +52,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("hello from onCreate");
 
         // Initialize the model
         var modelOwner = requireActivity();
@@ -72,11 +74,13 @@ public class MainFragment extends Fragment {
             adapter.notifyDataSetChanged();
         });
         activityModel.getIncompletedGoals().observe(goal -> {
+            System.out.println("This is" + goal);
             if (goal == null) return;
             adapter.clear();
             adapter.addAll(new ArrayList<>(goal));
             adapter.notifyDataSetChanged();
         });
+        System.out.print(adapter);
     }
 
     @Override
@@ -100,12 +104,14 @@ public class MainFragment extends Fragment {
 
         activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
             if (Boolean.TRUE.equals(isGoalsEmpty)) {
+//                activityModel.getGoals().observe(text -> view.emptyGoals.setText(R.string.emptyGoalsText));
                 view.emptyGoals.setText(R.string.emptyGoalsText);
                 view.emptyGoals.setVisibility(View.VISIBLE);
                 view.listGoals.setVisibility(View.INVISIBLE);
             } else {
                 view.emptyGoals.setVisibility(View.INVISIBLE);
                 view.listGoals.setVisibility(View.VISIBLE);
+                view.listGoals.setBackgroundColor(60);
             }
 
         });
@@ -116,10 +122,20 @@ public class MainFragment extends Fragment {
             if (!goal.isComplete()){
                 goal.makeComplete();
                 activityModel.appendComplete(goal);
+//                adapter.removeComplete(goal);
+//                adapter.remove(goal);
+//                adapter.add(goal);
+//                adapter.addComplete(goal);
+//                adapter.notifyDataSetChanged();
             }
             else{
                 goal.makeInComplete();
                 activityModel.prependIncomplete(goal);
+//                adapter.removeComplete(goal);
+//                adapter.remove(goal);
+//                adapter.insert(goal, 0);
+//                adapter.prependIncomplete(goal);
+//                adapter.notifyDataSetChanged();
             }
         });
 

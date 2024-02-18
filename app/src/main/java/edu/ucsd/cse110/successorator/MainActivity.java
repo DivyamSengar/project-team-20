@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
         setTitle(R.string.app_name);
 
         this.view = ActivityMainBinding.inflate(getLayoutInflater());
+        System.out.println(view);
+        System.out.println(view.getRoot());
         setContentView(view.getRoot());
     }
 }
