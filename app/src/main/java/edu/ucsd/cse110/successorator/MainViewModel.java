@@ -210,4 +210,7 @@ public class MainViewModel extends ViewModel {
 //    public void DatabaseIncomplete(Goal goal){
 //        goalRepository.markAsIncomplete(goal);
 //    }
+    public void deleteCompleted(){
+        goalRepositoryComplete.deleteCompleted();
+    }
 }

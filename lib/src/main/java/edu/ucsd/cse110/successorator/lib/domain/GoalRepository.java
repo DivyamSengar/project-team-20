@@ -36,4 +36,6 @@ public interface GoalRepository {
     void markAsComplete(Goal goal);
 
     void markAsIncomplete(Goal goal);
+
+    void deleteCompleted();
 }

@@ -107,6 +107,7 @@ public class MainFragment extends Fragment {
                 c.add(Calendar.DATE, 1);
                 String currentDate = date.format(c.getTime());
                 view.dateText.setText(currentDate);
+                activityModel.deleteCompleted();
 
             }
 

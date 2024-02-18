@@ -64,7 +64,7 @@ public class RoomGoalRepository implements GoalRepository {
 
     public void markAsIncomplete(Goal goal){ goalDao.markIncomplete(goal.id());}
 
-    public void deleteCompletedGoals(){
+    public void deleteCompleted(){
         goalDao.deleteComplete();
     }
 }

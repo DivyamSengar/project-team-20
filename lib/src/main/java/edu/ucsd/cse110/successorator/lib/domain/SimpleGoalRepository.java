@@ -77,4 +77,9 @@ public class SimpleGoalRepository implements GoalRepository {
 
     @Override
     public void markAsIncomplete(Goal goal){ goal.makeInComplete();}
+
+    @Override
+    public void deleteCompleted(){
+        return;
+    }
 }
