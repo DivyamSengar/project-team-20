@@ -66,16 +66,21 @@ public class MainViewModel extends ViewModel {
 //        });
 
         this.goalRepositoryComplete.findAll().observe(newGoals -> {
-            if (newGoals == null) return;
-            if (newGoals.size() == 0) return;
-            var orderedGoals = newGoals.stream()
-                    .sorted(Comparator.comparingInt(Goal::sortOrder))
-                    .collect(Collectors.toList());
+            List<Goal> orderedGoals = List.of();
+//            if (newGoals == null) return;
+//            if (newGoals.size() == 0) return;
+            if (newGoals == null) ;
+            else if (newGoals.size() == 0);
+            else {
+                orderedGoals = newGoals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
 
-            current = orderedGoals;
+//            current = orderedGoals;
             goalsCompleted.setValue(orderedGoals);
         });
-        if (current == null) current = List.of();
+//        if (current == null) current = List.of();
         this.goalRepositoryIncomplete.findAll().observe(newGoals -> {
             List<Goal> orderedGoals = List.of();
             if (newGoals == null) ;
@@ -85,10 +90,10 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            var temp = Stream.concat(current.stream(), orderedGoals.stream());
-            var temp2 = temp.collect(Collectors.toList());
+//            var temp = Stream.concat(current.stream(), orderedGoals.stream());
+//            var temp2 = temp.collect(Collectors.toList());
             goalsIncompleted.setValue(orderedGoals);
-            goals.setValue(temp2);
+//            goals.setValue(temp2);
         });
 
         // potentially useful for monitoring strikethroughs
@@ -113,11 +118,25 @@ public class MainViewModel extends ViewModel {
             if (gs == null) return;
             System.out.println("ADDED BROOOO");
             isIncompletedGoalsEmpty.setValue(gs.isEmpty());
+
+            if (goalsCompleted.getValue() == null){
+                goalsCompleted.setValue(List.of());
+            }
+
+            goals.setValue(Stream.concat(gs.stream(), goalsCompleted.getValue().stream())
+                    .collect(Collectors.toList()));
         });
 
         this.goalsCompleted.observe(gs -> {
             if (gs == null) return;
             isCompletedGoalsEmpty.setValue(gs.isEmpty());
+
+            if (goalsIncompleted.getValue() == null){
+                goalsIncompleted.setValue(List.of());
+            }
+
+            goals.setValue(Stream.concat(goalsIncompleted.getValue().stream(), gs.stream())
+                    .collect(Collectors.toList()));
         });
 
 

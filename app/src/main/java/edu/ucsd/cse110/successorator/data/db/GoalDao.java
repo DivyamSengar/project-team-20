@@ -63,12 +63,12 @@ public interface GoalDao {
     @Transaction
     default int append(GoalEntity goal){
         var maxSort = getMaxSortOrder();
-        var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete, maxSort+1);
+        var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete, getMaxSortOrder()+1);
         return Math.toIntExact(insert(newGoalEntity));
     }
     @Transaction
     default int prepend(GoalEntity goal){
-        shiftSortOrders(getMinSortOrder(), getMaxSortOrder(), 1);
+//        shiftSortOrders(getMinSortOrder(), getMaxSortOrder(), 1);
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete, getMinSortOrder()-1);
         return Math.toIntExact(insert(newGoalEntity));
     }

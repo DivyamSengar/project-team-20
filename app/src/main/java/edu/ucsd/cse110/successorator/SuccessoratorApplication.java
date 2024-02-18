@@ -31,7 +31,7 @@ public class SuccessoratorApplication extends Application {
         this.goalRepositoryComplete = new RoomGoalRepository(database.goalDao());
 
         var database2 = Room.databaseBuilder(getApplicationContext(),
-                        SuccessoratorDatabase.class, "successorator-database")
+                        SuccessoratorDatabase.class, "successorator-database2")
                 .allowMainThreadQueries()
                 .build();
         this.goalRepositoryIncomplete = new RoomGoalRepository(database2.goalDao());

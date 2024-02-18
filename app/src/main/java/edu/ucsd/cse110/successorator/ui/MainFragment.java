@@ -60,26 +60,26 @@ public class MainFragment extends Fragment {
         var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
 
-        this.adapter = new MainFragmentAdapter(requireContext(), List.of(), List.of());
-//        activityModel.getGoals().observe(goal -> {
+        this.adapter = new MainFragmentAdapter(requireContext(), List.of());
+        activityModel.getGoals().observe(goal -> {
+            if (goal == null) return;
+            adapter.clear();
+            adapter.addAll(new ArrayList<>(goal));
+            adapter.notifyDataSetChanged();
+        });
+//        activityModel.getIncompletedGoals().observe(goal -> {
+//            System.out.println("This is" + goal);
 //            if (goal == null) return;
 //            adapter.clear();
 //            adapter.addAll(new ArrayList<>(goal));
 //            adapter.notifyDataSetChanged();
 //        });
-        activityModel.getCompletedGoals().observe(goal -> {
-            if (goal == null) return;
-            adapter.clear();
-            adapter.addAll(new ArrayList<>(goal));
-            adapter.notifyDataSetChanged();
-        });
-        activityModel.getIncompletedGoals().observe(goal -> {
-            System.out.println("This is" + goal);
-            if (goal == null) return;
-            adapter.clear();
-            adapter.addAll(new ArrayList<>(goal));
-            adapter.notifyDataSetChanged();
-        });
+//        activityModel.getCompletedGoals().observe(goal -> {
+//            if (goal == null) return;
+//            adapter.clear();
+//            adapter.addAll(new ArrayList<>(goal));
+//            adapter.notifyDataSetChanged();
+//        });
         System.out.print(adapter);
     }
 
@@ -121,6 +121,7 @@ public class MainFragment extends Fragment {
             assert goal != null;
             if (!goal.isComplete()){
                 goal.makeComplete();
+                activityModel.removeGoalIncomplete(goal.id());
                 activityModel.appendComplete(goal);
 //                adapter.removeComplete(goal);
 //                adapter.remove(goal);
@@ -130,6 +131,7 @@ public class MainFragment extends Fragment {
             }
             else{
                 goal.makeInComplete();
+                activityModel.removeGoalComplete(goal.id());
                 activityModel.prependIncomplete(goal);
 //                adapter.removeComplete(goal);
 //                adapter.remove(goal);
