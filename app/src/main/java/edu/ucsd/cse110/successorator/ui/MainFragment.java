@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -114,10 +116,40 @@ public class MainFragment extends Fragment {
 
 
         Calendar currentTime = Calendar.getInstance();
+        LocalDateTime lastOpened = LocalDateTime.now();
+        LocalDate lastOpenedDate = lastOpened.toLocalDate();
+
+        int lastOpenedHour = lastOpened.getHour();
+        int lastOpenedMinute = lastOpened.getMinute();
+        int lastDay = lastOpenedDate.getDayOfMonth();
+        int lastMonth = lastOpenedDate.getMonthValue();
+        int lastYear = lastOpenedDate.getYear();
+
         int hour = currentTime.get(Calendar.HOUR_OF_DAY);
         int minute = currentTime.get(Calendar.MINUTE);
-        if (hour == 2 && minute == 0) {
+        int currDay = currentTime.get(Calendar.DATE);
+        int currMonth = currentTime.get(Calendar.MONTH);
+        int currYear = currentTime.get(Calendar.YEAR);
+
+//        if (hour == 2 && minute == 0) {
+//            activityModel.deleteCompleted();
+//        }
+        if ((currMonth >= lastMonth) || (currYear >= lastYear)) {
             activityModel.deleteCompleted();
+        }
+        else if (currDay > lastDay) {
+            if ((lastDay + 1) < currDay) {
+                activityModel.deleteCompleted();
+            } else {
+                if (hour >= 2) {
+                    activityModel.deleteCompleted();
+                }
+            }
+        } else {
+            if ((hour >= 2)
+                && (lastOpenedHour < 2)) {
+                activityModel.deleteCompleted();
+            }
         }
 
 
