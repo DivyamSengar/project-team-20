@@ -60,7 +60,10 @@ public class RoomGoalRepository implements GoalRepository {
 
     public void markAsComplete(Goal goal){
         goalDao.markComplete(goal.id());
+        goalDao.shiftSortOrders();
     }
+
+    public void markAsIncomplete(Goal goal){ goalDao.markIncomplete(goal.id());}
 
     public void deleteCompletedGoals(){
         goalDao.deleteComplete();

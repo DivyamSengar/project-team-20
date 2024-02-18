@@ -56,6 +56,9 @@ public interface GoalDao {
     @Query("UPDATE Goals SET isComplete = 1 WHERE id = :id")
     void markComplete(int id);
 
+    @Query("UPDATE Goals SET isComplete = 0 WHERE id = :id")
+    void markIncomplete(int id);
+
 
     @Transaction
     default int append(GoalEntity goal){

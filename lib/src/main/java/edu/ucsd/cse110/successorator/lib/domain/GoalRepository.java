@@ -34,4 +34,6 @@ public interface GoalRepository {
     void prepend(Goal goal);
 
     void markAsComplete(Goal goal);
+
+    void markAsIncomplete(Goal goal);
 }

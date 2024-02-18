@@ -112,6 +112,7 @@ public class MainFragment extends Fragment {
             }
             else{
                 goal.makeInComplete();
+                activityModel.DatabaseIncomplete(goal);
                 adapter.remove(goal);
                 adapter.insert(goal, 0);
                 adapter.notifyDataSetChanged();

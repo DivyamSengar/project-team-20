@@ -50,7 +50,7 @@ public class MainViewModel extends ViewModel {
 
         this.goalRepository.findAll().observe(newGoals -> {
             if (newGoals == null) return;
-
+            if (newGoals.size() == 0) return;
             var orderedGoals = newGoals.stream()
                     .sorted(Comparator.comparingInt(Goal::sortOrder))
                     .collect(Collectors.toList());
@@ -94,6 +94,9 @@ public class MainViewModel extends ViewModel {
     }
     public void DatabaseComplete(Goal goal){
         goalRepository.markAsComplete(goal);
+    }
+    public void DatabaseIncomplete(Goal goal){
+        goalRepository.markAsIncomplete(goal);
     }
     public void prepend(Goal goal){
         goalRepository.prepend(goal);
