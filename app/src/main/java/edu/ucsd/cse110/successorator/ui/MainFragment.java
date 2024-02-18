@@ -108,13 +108,17 @@ public class MainFragment extends Fragment {
                 String currentDate = date.format(c.getTime());
                 view.dateText.setText(currentDate);
                 activityModel.deleteCompleted();
-
             }
 
         });
 
 
-
+        Calendar currentTime = Calendar.getInstance();
+        int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+        int minute = currentTime.get(Calendar.MINUTE);
+        if (hour == 2 && minute == 0) {
+            activityModel.deleteCompleted();
+        }
 
 
         // Show DialogFragment
