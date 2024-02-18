@@ -59,6 +59,12 @@ public class MainFragment extends Fragment {
         this.activityModel = modelProvider.get(MainViewModel.class);
 
         this.adapter = new MainFragmentAdapter(requireContext(), List.of(), List.of());
+//        activityModel.getGoals().observe(goal -> {
+//            if (goal == null) return;
+//            adapter.clear();
+//            adapter.addAll(new ArrayList<>(goal));
+//            adapter.notifyDataSetChanged();
+//        });
         activityModel.getCompletedGoals().observe(goal -> {
             if (goal == null) return;
             adapter.clear();
@@ -94,14 +100,12 @@ public class MainFragment extends Fragment {
 
         activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
             if (Boolean.TRUE.equals(isGoalsEmpty)) {
-//                activityModel.getGoals().observe(text -> view.emptyGoals.setText(R.string.emptyGoalsText));
                 view.emptyGoals.setText(R.string.emptyGoalsText);
                 view.emptyGoals.setVisibility(View.VISIBLE);
                 view.listGoals.setVisibility(View.INVISIBLE);
             } else {
                 view.emptyGoals.setVisibility(View.INVISIBLE);
                 view.listGoals.setVisibility(View.VISIBLE);
-                view.listGoals.setBackgroundColor(60);
             }
 
         });
@@ -111,19 +115,11 @@ public class MainFragment extends Fragment {
             assert goal != null;
             if (!goal.isComplete()){
                 goal.makeComplete();
-                adapter.removeComplete(goal);
-                adapter.remove(goal);
-                adapter.add(goal);
-                adapter.addComplete(goal);
-                adapter.notifyDataSetChanged();
+                activityModel.appendComplete(goal);
             }
             else{
                 goal.makeInComplete();
-                adapter.removeComplete(goal);
-                adapter.remove(goal);
-                adapter.insert(goal, 0);
-                adapter.prependIncomplete(goal);
-                adapter.notifyDataSetChanged();
+                activityModel.prependIncomplete(goal);
             }
         });
 

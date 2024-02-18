@@ -73,6 +73,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList());
 
             current = orderedGoals;
+            goalsCompleted.setValue(orderedGoals);
         });
         if (current == null) current = List.of();
         this.goalRepositoryIncomplete.findAll().observe(newGoals -> {
@@ -84,10 +85,10 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            var temp = Stream.concat(current.stream(), orderedGoals.stream());
-            var temp2 = temp.collect(Collectors.toList());
-
-            goals.setValue(temp2);
+            goalsIncompleted.setValue(orderedGoals);
+//            var temp = Stream.concat(current.stream(), orderedGoals.stream());
+//            var temp2 = temp.collect(Collectors.toList());
+//            goals.setValue(temp2);
         });
 
         // potentially useful for monitoring strikethroughs
@@ -98,22 +99,23 @@ public class MainViewModel extends ViewModel {
         // listens for if goals is empty
         this.goals.observe(gs -> {
             if (gs == null) return;
-            if (gs.size() == 0 ){
-                isGoalsEmpty.setValue(true);
-                return;
-            }
+//            if (gs.size() == 0 ){
+//                isGoalsEmpty.setValue(true);
+//                return;
+//            }
             isGoalsEmpty.setValue(gs.isEmpty());
         });
 
-        this.goalsIncompleted.observe(gs -> {
-            if (gs == null) return;
-            isIncompletedGoalsEmpty.setValue(gs.isEmpty());
-        });
 
-        this.goalsCompleted.observe(gs -> {
-            if (gs == null) return;
-            isCompletedGoalsEmpty.setValue(gs.isEmpty());
-        });
+//        this.goalsIncompleted.observe(gs -> {
+//            if (gs == null) return;
+//            isIncompletedGoalsEmpty.setValue(gs.isEmpty());
+//        });
+//
+//        this.goalsCompleted.observe(gs -> {
+//            if (gs == null) return;
+//            isCompletedGoalsEmpty.setValue(gs.isEmpty());
+//        });
 
 
     }
@@ -176,10 +178,4 @@ public class MainViewModel extends ViewModel {
         goalRepositoryIncomplete.prepend(goal);
     }
 
-//    public void DatabaseComplete(Goal goal){
-//        goalRepository.markAsComplete(goal);
-//    }
-//    public void DatabaseIncomplete(Goal goal){
-//        goalRepository.markAsIncomplete(goal);
-//    }
 }
