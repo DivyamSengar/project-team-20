@@ -12,11 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -83,6 +85,7 @@ public class MainFragment extends Fragment {
         System.out.print(adapter);
     }
 
+    ImageButton imageButton2;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @NonNull ViewGroup container,
@@ -94,6 +97,24 @@ public class MainFragment extends Fragment {
         SimpleDateFormat date = new SimpleDateFormat("EEEE MM/dd", Locale.getDefault());
         String currentDate = date.format(new Date());
         view.dateText.setText(currentDate);
+
+        imageButton2 = view.imageButton2;
+        imageButton2.setOnClickListener(new View.OnClickListener(){
+            Calendar c = Calendar.getInstance();
+
+            @Override
+            public void onClick(View v){
+                c.add(Calendar.DATE, 1);
+                String currentDate = date.format(c.getTime());
+                view.dateText.setText(currentDate);
+
+            }
+
+        });
+
+
+
+
 
         // Show DialogFragment
         view.imageButton.setOnClickListener(v -> {
