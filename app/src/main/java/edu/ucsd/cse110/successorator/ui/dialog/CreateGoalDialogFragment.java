@@ -70,13 +70,20 @@ public class CreateGoalDialogFragment extends DialogFragment {
 
                     // Create a new Goal with the text and add it
                     var newGoal = new Goal(null, input, false, -1);
-                    activityModel.append(newGoal);
+                    activityModel.appendIncomplete(newGoal);
                     dismiss();
                 }
                 return false;
             }
         });
-
+//        var input = view.cardFrontEditText.getText().toString();
+//        // should be null instead
+//        var newGoal = new Goal(null, input, false, -1);
+//        activityModel.appendIncomplete(newGoal);
+//
+////        activityModel.addGoal(newGoal);
+//
+//        dialog.dismiss();
         /*
         https://stackoverflow.com/questions/17237952/dialogfragment-and-force-to-show-keyboard
         Source Title: DialogFragment and force to show keyboard

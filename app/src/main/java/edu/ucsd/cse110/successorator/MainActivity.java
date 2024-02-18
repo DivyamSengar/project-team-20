@@ -17,6 +17,7 @@ import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
 import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
+import edu.ucsd.cse110.successorator.ui.MainFragment;
 import edu.ucsd.cse110.successorator.ui.MainFragmentAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,8 +28,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTitle(R.string.app_name);
 
-
         this.view = ActivityMainBinding.inflate(getLayoutInflater());
+        System.out.println(view);
+        System.out.println(view.getRoot());
         setContentView(view.getRoot());
     }
 }

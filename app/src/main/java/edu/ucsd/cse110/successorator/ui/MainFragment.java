@@ -30,6 +30,7 @@ import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
+import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 
 public class MainFragment extends Fragment {
     private MainViewModel activityModel;
@@ -41,6 +42,7 @@ public class MainFragment extends Fragment {
     }
 
     public static MainFragment newInstance() {
+        System.out.println("hello from newInstance");
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -50,6 +52,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("hello from onCreate");
 
         // Initialize the model
         var modelOwner = requireActivity();
@@ -64,6 +67,20 @@ public class MainFragment extends Fragment {
             adapter.addAll(new ArrayList<>(goal));
             adapter.notifyDataSetChanged();
         });
+//        activityModel.getIncompletedGoals().observe(goal -> {
+//            System.out.println("This is" + goal);
+//            if (goal == null) return;
+//            adapter.clear();
+//            adapter.addAll(new ArrayList<>(goal));
+//            adapter.notifyDataSetChanged();
+//        });
+//        activityModel.getCompletedGoals().observe(goal -> {
+//            if (goal == null) return;
+//            adapter.clear();
+//            adapter.addAll(new ArrayList<>(goal));
+//            adapter.notifyDataSetChanged();
+//        });
+        System.out.print(adapter);
     }
 
     @Override
@@ -87,14 +104,14 @@ public class MainFragment extends Fragment {
 
         activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
             if (Boolean.TRUE.equals(isGoalsEmpty)) {
-                activityModel.getGoals().observe(text -> view.emptyGoals.setText(R.string.emptyGoalsText));
+//                activityModel.getGoals().observe(text -> view.emptyGoals.setText(R.string.emptyGoalsText));
+                view.emptyGoals.setText(R.string.emptyGoalsText);
                 view.emptyGoals.setVisibility(View.VISIBLE);
                 view.listGoals.setVisibility(View.INVISIBLE);
             } else {
-//                MainFragmentAdapter adapter = this.adapter;
-//                activityModel.getGoals().observe(text -> view.listGoals.setAdapter(adapter));
                 view.emptyGoals.setVisibility(View.INVISIBLE);
                 view.listGoals.setVisibility(View.VISIBLE);
+                view.listGoals.setBackgroundColor(60);
             }
 
         });
@@ -104,30 +121,28 @@ public class MainFragment extends Fragment {
             assert goal != null;
             if (!goal.isComplete()){
                 goal.makeComplete();
-                adapter.remove(goal);
-                adapter.add(goal);
+                activityModel.removeGoalIncomplete(goal.id());
+                activityModel.appendComplete(goal);
+//                adapter.removeComplete(goal);
+//                adapter.remove(goal);
+//                adapter.add(goal);
+//                adapter.addComplete(goal);
+//                adapter.notifyDataSetChanged();
             }
             else{
                 goal.makeInComplete();
-                adapter.remove(goal);
-                adapter.insert(goal, 0);
-                adapter.notifyDataSetChanged();
+                activityModel.removeGoalComplete(goal.id());
+                activityModel.prependIncomplete(goal);
+//                adapter.removeComplete(goal);
+//                adapter.remove(goal);
+//                adapter.insert(goal, 0);
+//                adapter.prependIncomplete(goal);
+//                adapter.notifyDataSetChanged();
             }
         });
 
         // Inflate the layout for this fragment
         return view.getRoot();
-    }
-
-    private void setupMvp(){
-        // Observe Model -> call View
-
-        // Observe View -> call Model
-
-    }
-
-    private void showDate(){
-
     }
 
 
