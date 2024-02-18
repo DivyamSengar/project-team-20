@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.stream.Stream;
 
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
+import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
@@ -27,10 +29,13 @@ public class MainViewModel extends ViewModel {
                     creationExtras -> {
                         var app = (SuccessoratorApplication) creationExtras.get(APPLICATION_KEY);
                         assert app != null;
-                        return new MainViewModel(app.getGoalRepositoryComplete(), app.getGoalRepositoryIncomplete());
+                        return new MainViewModel(app.getGoalRepositoryComplete(),
+                                app.getGoalRepositoryIncomplete(), app.getTimeKeeper());
                     });
     private final GoalRepository goalRepositoryComplete;
     private final GoalRepository goalRepositoryIncomplete;
+
+    private final TimeKeeper timeKeeper;
     private MutableSubject<List<Goal>> goals;
     private MutableSubject<Boolean> isGoalsEmpty;
 
@@ -45,9 +50,11 @@ public class MainViewModel extends ViewModel {
     private List<Goal> current;
 //    private MutableSubject<Boolean> isComplete;
 
-    public MainViewModel(GoalRepository goalRepositoryComplete, GoalRepository goalRepositoryIncomplete) {
+    public MainViewModel(GoalRepository goalRepositoryComplete,
+                         GoalRepository goalRepositoryIncomplete, TimeKeeper timeKeeper) {
         this.goalRepositoryComplete = goalRepositoryComplete;
         this.goalRepositoryIncomplete = goalRepositoryIncomplete;
+        this.timeKeeper = timeKeeper;
         // observables
         this.goals = new SimpleSubject<>();
         this.isGoalsEmpty = new SimpleSubject<>();
@@ -212,5 +219,17 @@ public class MainViewModel extends ViewModel {
 //    }
     public void deleteCompleted(){
         goalRepositoryComplete.deleteCompleted();
+    }
+
+    public void appendTime(LocalDateTime localDateTime){
+        timeKeeper.setDateTime(localDateTime);
+    }
+
+    public void deleteTime(){
+        timeKeeper.removeDateTime();
+    }
+
+    public LocalDateTime getTime(){
+        return timeKeeper.getDateTime().getValue();
     }
 }

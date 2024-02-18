@@ -9,12 +9,17 @@ import edu.ucsd.cse110.successorator.data.db.SuccessoratorDatabase;
 import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.SimpleGoalRepository;
+import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
+import edu.ucsd.cse110.successorator.timedata.db.RoomTimeKeeper;
+import edu.ucsd.cse110.successorator.timedata.db.SuccessoratorTimeDatabase;
 
 public class SuccessoratorApplication extends Application {
     private DataSource dataSource;
     private GoalRepository goalRepositoryComplete;
 
     private GoalRepository goalRepositoryIncomplete;
+
+    private TimeKeeper timeKeeper;
 
     @Override
     public void onCreate(){
@@ -36,8 +41,15 @@ public class SuccessoratorApplication extends Application {
                 .build();
         this.goalRepositoryIncomplete = new RoomGoalRepository(database2.goalDao());
 
+        var database3 = Room.databaseBuilder(getApplicationContext(),
+                        SuccessoratorTimeDatabase.class, "successorator-database3")
+                .allowMainThreadQueries()
+                .build();
+        this.timeKeeper = new RoomTimeKeeper(database3.timeDao());
+
         // can use default goals to test
-//        var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
+        var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
+
 //        var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
 //        if (isFirstRun && database.goalDao().count() == 0){
 //            goalRepository.save(DataSource.DEFAULT_GOALS);
@@ -54,5 +66,9 @@ public class SuccessoratorApplication extends Application {
 
     public GoalRepository getGoalRepositoryIncomplete(){
         return goalRepositoryIncomplete;
+    }
+
+    public TimeKeeper getTimeKeeper() {
+        return timeKeeper;
     }
 }
