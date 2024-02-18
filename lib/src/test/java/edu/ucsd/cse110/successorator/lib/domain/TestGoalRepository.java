@@ -2,6 +2,8 @@ package edu.ucsd.cse110.successorator.lib.domain;
 import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import org.junit.Test;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
+import edu.ucsd.cse110.successorator.lib.util.Subject;
+
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -9,17 +11,9 @@ import static org.junit.Assert.*;
 public class TestGoalRepository {
 
     @Test
-    public void testConstructor() {
-        DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
-
-        assertSame(dataSource, goalRepository.getDataSource());
-    }
-
-    @Test
     public void testCount() {
         DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
+        GoalRepository goalRepository = new SimpleGoalRepository(dataSource);
 
         // Initial count should be 0
         assertEquals((int)0, (int) goalRepository.count());
@@ -34,7 +28,7 @@ public class TestGoalRepository {
     @Test
     public void testFind() {
         DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
+        GoalRepository goalRepository = new SimpleGoalRepository(dataSource);
 
         // Add goals
         Goal goal1 = new Goal(1, "Goal 1", false, 0);
@@ -43,9 +37,9 @@ public class TestGoalRepository {
         goalRepository.save(goal2);
 
         // Find by ID
-        SimpleSubject<Goal> subject1 = goalRepository.find(1);
+        Subject<Goal> subject1 = goalRepository.find(1);
         assertEquals(goal1, subject1.getValue());
-        SimpleSubject<Goal> subject2 = goalRepository.find(2);
+        Subject<Goal> subject2 = goalRepository.find(2);
         assertEquals(goal2, subject2.getValue());
 
         // Find non-existent ID
@@ -55,7 +49,7 @@ public class TestGoalRepository {
     @Test
     public void testFindAll() {
         DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
+        GoalRepository goalRepository = new SimpleGoalRepository(dataSource);
 
         // Add goals
         Goal goal1 = new Goal(1, "Goal 1", false, 0);
@@ -71,7 +65,7 @@ public class TestGoalRepository {
     @Test
     public void testSave() {
         DataSource dataSource = new DataSource();
-        GoalRepository goalRepository = new GoalRepository(dataSource);
+        GoalRepository goalRepository = new SimpleGoalRepository(dataSource);
 
         // Add goals
         Goal goal1 = new Goal(1, "Goal 1", false, 0);

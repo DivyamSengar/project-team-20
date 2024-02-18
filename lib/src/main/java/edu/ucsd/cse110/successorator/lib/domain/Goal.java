@@ -63,23 +63,18 @@ public class Goal implements Serializable {
     }
 
     // cse
-//    public void makeComplete(){
-//
-//        /* Convert the String to an AttributeString, strike it through,
-//         convert it to StringBuilder and return it as a String
-//         */
-//        AttributedString strike = new AttributedString(this.text);
-//        strike.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, 0, text.length());
-//        AttributedCharacterIterator iterator = strike.getIterator();
-//        StringBuilder stringBuilder = new StringBuilder();
-//
-//        // Iterate over the characters in the iterator and append them to the StringBuilder
-//        for (char c = iterator.first(); c != CharacterIterator.DONE; c = iterator.next()) {
-//            stringBuilder.append(c);
-//        }
-//
-//        this.text = stringBuilder.toString();
-//    }
+    public void makeComplete(){
+
+        this.isComplete = true;
+    }
+
+    public Goal switchGoal(Goal newgoal){
+        return new Goal(newgoal.id, newgoal.text, newgoal.isComplete, newgoal.sortOrder);
+    }
+
+    public void makeInComplete(){
+        this.isComplete = false;
+    }
     // overridden equals
     @Override
     public boolean equals(Object o) {
