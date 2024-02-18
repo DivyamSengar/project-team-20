@@ -55,7 +55,6 @@ public class MainViewModel extends ViewModel {
         this.goalsIncompleted = new SimpleSubject<>();
         this.isCompletedGoalsEmpty = new SimpleSubject<>();
         this.isIncompletedGoalsEmpty = new SimpleSubject<>();
-        // this.isComplete = new SimpleSubject<>();
 
         isGoalsEmpty.setValue(true);
         isCompletedGoalsEmpty.setValue(true);

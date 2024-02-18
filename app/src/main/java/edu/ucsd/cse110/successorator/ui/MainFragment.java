@@ -94,14 +94,14 @@ public class MainFragment extends Fragment {
 
         activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
             if (Boolean.TRUE.equals(isGoalsEmpty)) {
-                activityModel.getGoals().observe(text -> view.emptyGoals.setText(R.string.emptyGoalsText));
+//                activityModel.getGoals().observe(text -> view.emptyGoals.setText(R.string.emptyGoalsText));
+                view.emptyGoals.setText(R.string.emptyGoalsText);
                 view.emptyGoals.setVisibility(View.VISIBLE);
                 view.listGoals.setVisibility(View.INVISIBLE);
             } else {
-//                MainFragmentAdapter adapter = this.adapter;
-//                activityModel.getGoals().observe(text -> view.listGoals.setAdapter(adapter));
                 view.emptyGoals.setVisibility(View.INVISIBLE);
                 view.listGoals.setVisibility(View.VISIBLE);
+                view.listGoals.setBackgroundColor(60);
             }
 
         });
@@ -129,17 +129,6 @@ public class MainFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return view.getRoot();
-    }
-
-    private void setupMvp(){
-        // Observe Model -> call View
-
-        // Observe View -> call Model
-
-    }
-
-    private void showDate(){
-
     }
 
 

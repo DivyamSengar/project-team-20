@@ -20,6 +20,7 @@ import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.text.CharacterIterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -39,11 +40,10 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
 
     private List<Goal> incompletedGoals;
     public MainFragmentAdapter(Context context, List<Goal> completedGoals, List<Goal> incompletedGoals) {
-        super(context, 0, new ArrayList<>( Stream.concat(incompletedGoals.stream(),
+        super(context, 0, new ArrayList<>(Stream.concat(incompletedGoals.stream(),
                 completedGoals.stream()).collect(Collectors.toList())));
         this.completedGoals = completedGoals;
         this.incompletedGoals = incompletedGoals;
-//        this.onMarkIncompleteClick = onMarkIncompleteClick;
     }
     @Override
     public void add(@Nullable Goal object) {
