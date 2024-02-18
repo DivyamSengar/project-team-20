@@ -57,4 +57,8 @@ public class RoomGoalRepository implements GoalRepository {
     public Integer count(){
         return goalDao.count();
     }
+
+    public void deleteCompletedGoals(){
+        goalDao.deleteComplete();
+    }
 }

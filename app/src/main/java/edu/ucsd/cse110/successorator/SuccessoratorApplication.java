@@ -28,15 +28,16 @@ public class SuccessoratorApplication extends Application {
                 .build();
         this.goalRepository = new RoomGoalRepository(database.goalDao());
 
-        var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
-        var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
-        if (isFirstRun && database.goalDao().count() == 0){
-            goalRepository.save(DataSource.DEFAULT_GOALS);
-
-            sharedPreferences.edit()
-                    .putBoolean("isFirstRun", false)
-                    .apply();
-        }
+        // can use default goals to test
+//        var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
+//        var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
+//        if (isFirstRun && database.goalDao().count() == 0){
+//            goalRepository.save(DataSource.DEFAULT_GOALS);
+//
+//            sharedPreferences.edit()
+//                    .putBoolean("isFirstRun", false)
+//                    .apply();
+//        }
     }
 
     public GoalRepository getGoalRepository(){
