@@ -1,8 +1,14 @@
 package edu.ucsd.cse110.successorator.ui.dialog;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +21,7 @@ import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
+import kotlinx.coroutines.ObsoleteCoroutinesApi;
 
 public class CreateGoalDialogFragment extends DialogFragment {
     private MainViewModel activityModel;
@@ -42,22 +49,33 @@ public class CreateGoalDialogFragment extends DialogFragment {
 
     @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
 
-        return new AlertDialog.Builder(getActivity())
-                .setTitle("Enter Most Important Thing")
-                .setView(view.getRoot())
-                .setPositiveButton("", this::onPositiveButtonClick)
-                .setPositiveButtonIcon(ContextCompat.getDrawable(getActivity(), R.drawable.done))
-                .setNegativeButton("Cancel", this::onNegativeButtonClick)
-                .create();
+        /*
+        https://stackoverflow.com/questions/12937731/android-enter-key-listener
+        Source Title:
+        Date Captured: 2/17/2024 4:51 pm
+        Used as a reference to have the done/check button on the keyboard to "mark as done"
+        and capture the input to add as a goal. When typing .setOnEditorActionListener()
+        the code automatically generated, the rest was reused from previously written code
+        Handle: smhitle
+         */
+        view.goalEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
+                    // Get the input of the textEdit
+                    var input = view.goalEditText.getText().toString();
 
-    }
-
-    private void onPositiveButtonClick(DialogInterface dialog, int which){
-        // Functionality for adding
-        var input = view.cardFrontEditText.getText().toString();
+                    // Create a new Goal with the text and add it
+                    var newGoal = new Goal(null, input, false, -1);
+                    activityModel.append(newGoal);
+                    dismiss();
+                }
+                return false;
+            }
+        });
 
         // should be null instead
         var newGoal = new Goal(null, input, false, -1);
@@ -66,6 +84,24 @@ public class CreateGoalDialogFragment extends DialogFragment {
 //        activityModel.addGoal(newGoal);
 
         dialog.dismiss();
+        /*
+        https://stackoverflow.com/questions/17237952/dialogfragment-and-force-to-show-keyboard
+        Source Title: DialogFragment and force to show keyboard
+        Date Captured: 2/17/2024 4:48 pm
+        Used as a reference to get the keyboard to show up on screen and have the editText focus,
+        built upon previous code written just in a different way
+        Handle: smhitle
+         */
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        dialogBuilder
+                .setTitle("Enter Most Important Thing")
+                .setView(view.getRoot())
+                .setNegativeButton("Cancel", this::onNegativeButtonClick);
+        Dialog dialog = dialogBuilder.create();
+        var edit = view.goalEditText;
+        edit.requestFocus();
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        return dialog;
     }
 
     private void onNegativeButtonClick(DialogInterface dialog, int which){
