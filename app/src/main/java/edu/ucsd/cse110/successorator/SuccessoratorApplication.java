@@ -8,15 +8,12 @@ import java.time.LocalDateTime;
 
 import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 import edu.ucsd.cse110.successorator.data.db.SuccessoratorDatabase;
-import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
-import edu.ucsd.cse110.successorator.lib.domain.SimpleGoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
 import edu.ucsd.cse110.successorator.timedata.db.RoomTimeKeeper;
 import edu.ucsd.cse110.successorator.timedata.db.SuccessoratorTimeDatabase;
 
 public class SuccessoratorApplication extends Application {
-    private DataSource dataSource;
     private GoalRepository goalRepositoryComplete;
 
     private GoalRepository goalRepositoryIncomplete;
@@ -27,9 +24,6 @@ public class SuccessoratorApplication extends Application {
     public void onCreate(){
         super.onCreate();
 
-// Pre persistence model
-//        this.dataSource = new DataSource();
-//        this.goalRepository= new SimpleGoalRepository(dataSource);
 
         var database = Room.databaseBuilder(getApplicationContext(),
                 SuccessoratorDatabase.class, "successorator-database")

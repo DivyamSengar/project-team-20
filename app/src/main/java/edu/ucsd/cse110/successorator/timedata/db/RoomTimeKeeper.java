@@ -23,8 +23,10 @@ public class RoomTimeKeeper implements TimeKeeper {
     }
 
     public int[] getFields(){
-        var entity = timeDao.getTimeAsLiveData();
-        var liveDataTemp = entity.getValue();
+//        var entity = timeDao.getTimeAsLiveData();
+//        var liveDataTemp = entity.getValue();
+        var liveDataTemp = timeDao.getTime();
+        assert liveDataTemp != null;
         return liveDataTemp.Fields();
     }
     public void setDateTime(LocalDateTime dateTime){

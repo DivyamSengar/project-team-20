@@ -35,7 +35,7 @@ public class MainViewModel extends ViewModel {
     private final GoalRepository goalRepositoryComplete;
     private final GoalRepository goalRepositoryIncomplete;
 
-    private final TimeKeeper timeKeeper;
+    public final TimeKeeper timeKeeper;
     private MutableSubject<List<Goal>> goals;
     private MutableSubject<Boolean> isGoalsEmpty;
 
@@ -236,4 +236,7 @@ public class MainViewModel extends ViewModel {
     public int[] getFields() {
         return timeKeeper.getFields();
     }
+
+
+
 }

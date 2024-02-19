@@ -30,7 +30,6 @@ import edu.ucsd.cse110.successorator.MainActivity;
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
-import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
@@ -64,6 +63,8 @@ public class MainFragment extends Fragment {
         var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
 
+
+
         this.adapter = new MainFragmentAdapter(requireContext(), List.of());
         activityModel.getGoals().observe(goal -> {
             if (goal == null) return;
@@ -84,6 +85,7 @@ public class MainFragment extends Fragment {
 //            adapter.addAll(new ArrayList<>(goal));
 //            adapter.notifyDataSetChanged();
 //        });
+
         System.out.print(adapter);
     }
 
@@ -115,20 +117,24 @@ public class MainFragment extends Fragment {
         });
 
 
-        Calendar currentTime = Calendar.getInstance();
+        LocalDateTime currentTime = LocalDateTime.now();
 
+//
         int lastOpenedHour = activityModel.getFields()[3];
         int lastOpenedMinute = activityModel.getFields()[4];
         int lastDay = activityModel.getFields()[2];
         int lastMonth =activityModel.getFields()[1];
         int lastYear = activityModel.getFields()[0];
 
-        int hour = currentTime.get(Calendar.HOUR_OF_DAY);
-        int minute = currentTime.get(Calendar.MINUTE);
-        int currDay = currentTime.get(Calendar.DATE);
-        int currMonth = currentTime.get(Calendar.MONTH);
-        int currYear = currentTime.get(Calendar.YEAR);
+        int hour = currentTime.getHour();
+        int minute = currentTime.getMinute();
+        int currDay = currentTime.getDayOfMonth();
+        int currMonth = currentTime.getMonthValue();
+        int currYear = currentTime.getYear();
 
+//        if (currMonth>= lastMonth){
+//            if (hour >= 2 && las)
+//        }
 //        if (hour == 2 && minute == 0) {
 //            activityModel.deleteCompleted();
 //        }
@@ -149,6 +155,8 @@ public class MainFragment extends Fragment {
                 activityModel.deleteCompleted();
             }
         }
+        activityModel.deleteTime();
+        activityModel.appendTime(currentTime);
 
 
         // Show DialogFragment
