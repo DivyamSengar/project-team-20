@@ -118,7 +118,6 @@ public class MainFragment extends Fragment {
 
 
         LocalDateTime currentTime = LocalDateTime.now();
-
 //
         int lastOpenedHour = activityModel.getFields()[3];
         int lastOpenedMinute = activityModel.getFields()[4];
@@ -126,35 +125,75 @@ public class MainFragment extends Fragment {
         int lastMonth =activityModel.getFields()[1];
         int lastYear = activityModel.getFields()[0];
 
+        LocalDateTime previous = LocalDateTime.of(lastYear, lastMonth,
+                lastDay, lastOpenedHour, lastOpenedMinute);
+
         int hour = currentTime.getHour();
         int minute = currentTime.getMinute();
         int currDay = currentTime.getDayOfMonth();
         int currMonth = currentTime.getMonthValue();
         int currYear = currentTime.getYear();
 
+        var minus24 = currentTime.minusHours(24);
+        if(minus24.isAfter(previous)){
+            activityModel.deleteCompleted();
+        }
+        else if (minus24.isEqual(previous)){
+            activityModel.deleteCompleted();
+        }
+        else if (currentTime.isBefore(previous));
+
+        else {
+                // Convert the last opened time and current time to total minutes since midnight
+                int lastOpenedTotalMinutes = lastOpenedHour * 60 + lastOpenedMinute;
+                int currentTotalMinutes = hour * 60 + minute;
+
+               int interval =  currentTotalMinutes-lastOpenedTotalMinutes / 60;
+               int temp = lastOpenedHour;
+               for (int i = 0; i <= interval; i++ ){
+                   if (temp == 2 ) activityModel.deleteCompleted();
+                   if (++temp >=24){
+                       temp = 0;
+                   }
+                   else temp++;
+               }
+                // Check if last opened time is before 2:00 AM
+                if (lastOpenedTotalMinutes < 120) { // 2:00 AM is at minute 120
+                    // If last opened time is before 2:00 AM and current time is after or equal to 2:00 AM, 2:00 AM has passed
+                    if(currentTotalMinutes >= 120) activityModel.deleteCompleted();
+                } else {
+                    // If last opened time is after or equal to 2:00 AM and current time is before 2:00 AM, check if it's the next day
+                    if (currentTotalMinutes < 120) {
+                        // If current time is before 2:00 AM and it's the next day, 2:00 AM has passed
+                        activityModel.deleteCompleted();
+                    } else {
+                        // If current time is after 2:00 AM, or it's still before 2:00 AM on the same day, 2:00 AM has not passed
+                    }
+                }
+        }
 //        if (currMonth>= lastMonth){
 //            if (hour >= 2 && las)
 //        }
 //        if (hour == 2 && minute == 0) {
 //            activityModel.deleteCompleted();
 //        }
-        if ((currMonth >= lastMonth) || (currYear >= lastYear)) {
-            activityModel.deleteCompleted();
-        }
-        else if (currDay > lastDay) {
-            if ((lastDay + 1) < currDay) {
-                activityModel.deleteCompleted();
-            } else {
-                if (hour >= 2) {
-                    activityModel.deleteCompleted();
-                }
-            }
-        } else {
-            if ((hour >= 2)
-                && (lastOpenedHour < 2)) {
-                activityModel.deleteCompleted();
-            }
-        }
+//        if ((currMonth >= lastMonth) || (currYear >= lastYear)) {
+//            activityModel.deleteCompleted();
+//        }
+//        else if (currDay > lastDay) {
+//            if ((lastDay + 1) < currDay) {
+//                activityModel.deleteCompleted();
+//            } else {
+//                if (hour >= 2) {
+//                    activityModel.deleteCompleted();
+//                }
+//            }
+//        } else {
+//            if ((hour >= 2)
+//                && (lastOpenedHour < 2)) {
+//                activityModel.deleteCompleted();
+//            }
+//        }
         activityModel.deleteTime();
         activityModel.appendTime(currentTime);
 
