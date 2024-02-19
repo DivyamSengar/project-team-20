@@ -232,4 +232,8 @@ public class MainViewModel extends ViewModel {
     public LocalDateTime getTime(){
         return timeKeeper.getDateTime().getValue();
     }
+    
+    public int[] getFields() {
+        return timeKeeper.getFields();
+    }
 }

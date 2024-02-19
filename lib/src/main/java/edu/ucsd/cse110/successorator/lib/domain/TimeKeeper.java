@@ -10,4 +10,6 @@ public interface TimeKeeper {
 
     void removeDateTime();
 
+    int[] getFields();
+
 }

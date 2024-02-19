@@ -116,14 +116,12 @@ public class MainFragment extends Fragment {
 
 
         Calendar currentTime = Calendar.getInstance();
-        LocalDateTime lastOpened = LocalDateTime.now();
-        LocalDate lastOpenedDate = lastOpened.toLocalDate();
 
-        int lastOpenedHour = lastOpened.getHour();
-        int lastOpenedMinute = lastOpened.getMinute();
-        int lastDay = lastOpenedDate.getDayOfMonth();
-        int lastMonth = lastOpenedDate.getMonthValue();
-        int lastYear = lastOpenedDate.getYear();
+        int lastOpenedHour = activityModel.getFields()[3];
+        int lastOpenedMinute = activityModel.getFields()[4];
+        int lastDay = activityModel.getFields()[2];
+        int lastMonth =activityModel.getFields()[1];
+        int lastYear = activityModel.getFields()[0];
 
         int hour = currentTime.get(Calendar.HOUR_OF_DAY);
         int minute = currentTime.get(Calendar.MINUTE);

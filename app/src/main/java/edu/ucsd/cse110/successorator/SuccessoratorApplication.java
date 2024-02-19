@@ -55,6 +55,7 @@ public class SuccessoratorApplication extends Application {
         var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         if (isFirstRun && database3.timeDao().count() == 0){
             timeKeeper.setDateTime(LocalDateTime.of(1900, 1, 20, 10, 30));
+            System.out.println("reached set date time");
 
             sharedPreferences.edit()
                     .putBoolean("isFirstRun", false)
