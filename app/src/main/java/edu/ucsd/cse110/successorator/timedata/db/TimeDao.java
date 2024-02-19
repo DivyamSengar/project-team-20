@@ -14,6 +14,8 @@ public interface TimeDao {
     @Query("SELECT * FROM Time")
     TimeEntity getTime();
 
+    @Query("SELECT COUNT(*) FROM Time")
+    int count();
     @Query("SELECT * FROM Time")
     LiveData<TimeEntity> getTimeAsLiveData();
 

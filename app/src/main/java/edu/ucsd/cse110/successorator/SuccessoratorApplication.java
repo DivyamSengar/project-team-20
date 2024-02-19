@@ -4,6 +4,8 @@ import android.app.Application;
 
 import androidx.room.Room;
 
+import java.time.LocalDateTime;
+
 import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 import edu.ucsd.cse110.successorator.data.db.SuccessoratorDatabase;
 import edu.ucsd.cse110.successorator.lib.data.DataSource;
@@ -50,14 +52,14 @@ public class SuccessoratorApplication extends Application {
         // can use default goals to test
         var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
 
-//        var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
-//        if (isFirstRun && database.goalDao().count() == 0){
-//            goalRepository.save(DataSource.DEFAULT_GOALS);
-//
-//            sharedPreferences.edit()
-//                    .putBoolean("isFirstRun", false)
-//                    .apply();
-//        }
+        var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
+        if (isFirstRun && database3.timeDao().count() == 0){
+            timeKeeper.setDateTime(LocalDateTime.of(1900, 1, 20, 10, 30));
+
+            sharedPreferences.edit()
+                    .putBoolean("isFirstRun", false)
+                    .apply();
+        }
     }
 
     public GoalRepository getGoalRepositoryComplete(){
