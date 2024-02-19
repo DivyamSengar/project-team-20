@@ -15,17 +15,24 @@ import androidx.lifecycle.ViewModelProvider;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 
+/**
+ * The main activity of the app
+ */
 public class MainActivity extends AppCompatActivity {
-    private MainViewModel model;
     private ActivityMainBinding view;
+
+    /**
+     * Method that runs when MainActivity is created
+     *
+     * @param savedInstanceState - state of the application
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle(R.string.app_name);
 
+        // Sets the content view to the view root of MainActivity
         this.view = ActivityMainBinding.inflate(getLayoutInflater());
-        System.out.println(view);
-        System.out.println(view.getRoot());
         setContentView(view.getRoot());
     }
 }

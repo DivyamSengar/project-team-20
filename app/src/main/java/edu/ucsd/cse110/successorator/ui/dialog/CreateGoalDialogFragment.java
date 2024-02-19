@@ -23,12 +23,25 @@ import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import kotlinx.coroutines.ObsoleteCoroutinesApi;
 
+/**
+ * DialogFragment that captures the input of the user when inputting a goal
+ *
+ */
 public class CreateGoalDialogFragment extends DialogFragment {
     private MainViewModel activityModel;
     private FragmentDialogCreateGoalBinding view;
+
+    /**
+     * Required empty public constructor
+     */
     CreateGoalDialogFragment(){
     }
 
+    /**
+     * Creates a new instance of MainFragment
+     *
+     * @return Fragment - returns a new fragment instance for MainFragment
+     */
     public static CreateGoalDialogFragment newInstance(){
         var fragment = new CreateGoalDialogFragment();
         Bundle args = new Bundle();
@@ -36,6 +49,11 @@ public class CreateGoalDialogFragment extends DialogFragment {
         return fragment;
     }
 
+    /**
+     * Initializes the model when the DialogFragment is created
+     *
+     * @param savedInstanceState - state of the application
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -47,6 +65,12 @@ public class CreateGoalDialogFragment extends DialogFragment {
         this.activityModel = modelProvider.get(MainViewModel.class);
     }
 
+    /**
+     * Creates a dialog for capturing input from the user when entering a goal
+     *
+     * @param savedInstanceState - state of the application
+     * @return The dialog fragment for capturing text input
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -76,6 +100,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
                 return false;
             }
         });
+
+
         /*
         https://stackoverflow.com/questions/17237952/dialogfragment-and-force-to-show-keyboard
         Source Title: DialogFragment and force to show keyboard
@@ -96,6 +122,12 @@ public class CreateGoalDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    /**
+     * Behavior of the negative button of the DialogFragment
+     *
+     * @param dialog - instance of the dialog the negative button belongs to
+     * @param which - the identifier of the button that was clicked
+     */
     private void onNegativeButtonClick(DialogInterface dialog, int which){
         dialog.cancel();
     }

@@ -35,27 +35,40 @@ import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 
+/**
+ * MainFragment is the main fragment for the application
+ */
 public class MainFragment extends Fragment {
     private MainViewModel activityModel;
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
 
+    /**
+     * Required empty public constructor
+     */
     public MainFragment() {
-        // Required empty public constructor
     }
 
+    /**
+     * Creates a new instance of MainFragment
+     *
+     * @return Fragment - returns a new fragment instance for MainFragment
+     */
     public static MainFragment newInstance() {
-        System.out.println("hello from newInstance");
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
 
+    /**
+     * Method that runs when MainFragment is created
+     *
+     * @param savedInstanceState - state of the application
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println("hello from onCreate");
 
         // Initialize the model
         var modelOwner = requireActivity();
@@ -63,9 +76,10 @@ public class MainFragment extends Fragment {
         var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
 
-
-
+        // Initialize the adapter
         this.adapter = new MainFragmentAdapter(requireContext(), List.of());
+
+        // Observe goals, adapter fills the ListView
         activityModel.getGoals().observe(goal -> {
             if (goal == null) return;
             adapter.clear();
@@ -73,23 +87,32 @@ public class MainFragment extends Fragment {
             adapter.notifyDataSetChanged();
         });
 
-        System.out.print(adapter);
     }
 
-    ImageButton imageButton2;
+    /**
+     * Method that runs when the View is created
+     *
+     * @param inflater - instantiates XML into View objects
+     * @param container - container that holds View objects
+     * @param savedInstanceState - state of the application
+     * @return The root of the view layout
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @NonNull ViewGroup container,
                              @NonNull Bundle savedInstanceState) {
         this.view = FragmentMainBinding.inflate(inflater, container, false);
+        ImageButton imageButton2;
 
         view.listGoals.setAdapter(adapter);
 
+        // Show the current date at the top
         SimpleDateFormat date = new SimpleDateFormat("EEEE MM/dd", Locale.getDefault());
         String currentDate = date.format(new Date());
         view.dateText.setText(currentDate);
 
         imageButton2 = view.imageButton2;
+        // Button for developer testing, changes the date by a day
         imageButton2.setOnClickListener(new View.OnClickListener(){
             Calendar c = Calendar.getInstance();
 
@@ -103,7 +126,7 @@ public class MainFragment extends Fragment {
 
         });
 
-
+        // Current time and time that the app was last opened
         LocalDateTime currentTime = LocalDateTime.now();
         int lastOpenedHour = activityModel.getFields()[3];
         int lastOpenedMinute = activityModel.getFields()[4];
@@ -120,6 +143,7 @@ public class MainFragment extends Fragment {
         int currMonth = currentTime.getMonthValue();
         int currYear = currentTime.getYear();
 
+        // If current time is at least 24 hours ahead, perform completed goals deletion
         var minus24 = currentTime.minusHours(24);
         if(minus24.isAfter(previous)){
             activityModel.deleteCompleted();
@@ -147,13 +171,13 @@ public class MainFragment extends Fragment {
         activityModel.appendTime(currentTime);
 
 
-        // Show DialogFragment
+        // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
-            System.out.println("clicked");
             var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
 
+        // Observer to check whether or not goals is empty to display the ListView or TextView
         activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
             if (Boolean.TRUE.equals(isGoalsEmpty)) {
                 view.emptyGoals.setText(R.string.emptyGoalsText);
@@ -166,14 +190,17 @@ public class MainFragment extends Fragment {
 
         });
 
+        // Listener for taps/clicks on each list item
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
             Goal goal = adapter.getItem(position);
             assert goal != null;
+            // If the tapped goal is incomplete, make it complete
             if (!goal.isComplete()){
                 goal.makeComplete();
                 activityModel.removeGoalIncomplete(goal.id());
                 activityModel.appendComplete(goal);
             }
+            // If goal is complete make incomplete
             else{
                 goal.makeInComplete();
                 activityModel.removeGoalComplete(goal.id());

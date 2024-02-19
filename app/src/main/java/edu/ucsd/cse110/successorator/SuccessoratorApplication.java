@@ -13,6 +13,9 @@ import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
 import edu.ucsd.cse110.successorator.timedata.db.RoomTimeKeeper;
 import edu.ucsd.cse110.successorator.timedata.db.SuccessoratorTimeDatabase;
 
+/**
+ * The Successorator Application
+ */
 public class SuccessoratorApplication extends Application {
     private GoalRepository goalRepositoryComplete;
 
@@ -20,36 +23,41 @@ public class SuccessoratorApplication extends Application {
 
     private TimeKeeper timeKeeper;
 
+    /**
+     * Initializes the databases for the application upon application creation
+     */
     @Override
     public void onCreate(){
         super.onCreate();
 
 
+        // Initialize the database for the repository of complete goals
         var database = Room.databaseBuilder(getApplicationContext(),
                 SuccessoratorDatabase.class, "successorator-database")
                 .allowMainThreadQueries()
                 .build();
         this.goalRepositoryComplete = new RoomGoalRepository(database.goalDao());
 
+        // Initialize the database for the repository of incomplete goals
         var database2 = Room.databaseBuilder(getApplicationContext(),
                         SuccessoratorDatabase.class, "successorator-database2")
                 .allowMainThreadQueries()
                 .build();
         this.goalRepositoryIncomplete = new RoomGoalRepository(database2.goalDao());
 
+        // Initialize the database for keeping track of the time the app was last previously opened
         var database3 = Room.databaseBuilder(getApplicationContext(),
                         SuccessoratorTimeDatabase.class, "successorator-database3")
                 .allowMainThreadQueries()
                 .build();
         this.timeKeeper = new RoomTimeKeeper(database3.timeDao());
 
-        // can use default goals to test
+        // Initalize a default value into the time keeper database
         var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
 
         var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         if (isFirstRun && database3.timeDao().count() == 0){
             timeKeeper.setDateTime(LocalDateTime.of(1900, 1, 20, 10, 30));
-            System.out.println("reached set date time");
 
             sharedPreferences.edit()
                     .putBoolean("isFirstRun", false)
@@ -57,14 +65,29 @@ public class SuccessoratorApplication extends Application {
         }
     }
 
+    /**
+     * Getter for the repository for complete goals
+     *
+     * @return The repository for incomplete goals
+     */
     public GoalRepository getGoalRepositoryComplete(){
         return goalRepositoryComplete;
     }
 
+    /**
+     * Getter for the repository for incomplete goals
+     *
+     * @return The repository for incomplete goals
+     */
     public GoalRepository getGoalRepositoryIncomplete(){
         return goalRepositoryIncomplete;
     }
 
+    /**
+     * Getter for the app's TimeKeeper
+     *
+     * @return The TimeKeeper of the app
+     */
     public TimeKeeper getTimeKeeper() {
         return timeKeeper;
     }
