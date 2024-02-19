@@ -1,17 +1,8 @@
 package edu.ucsd.cse110.successorator;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 

@@ -1,15 +1,14 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
-import java.awt.font.TextAttribute;
 import java.io.Serializable;
-import java.text.AttributedString;
-import java.text.AttributedCharacterIterator;
-import java.text.CharacterIterator;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * Goal class that describes the behavior and attributes of goal
+ */
 public class Goal implements Serializable {
 
     private final @Nullable Integer id;
@@ -17,7 +16,13 @@ public class Goal implements Serializable {
     private @NonNull boolean isComplete;
     private int sortOrder;
 
-    // Goal class with base constructor
+    /**
+     * Goal constructor to initialize the fields of goal
+     * @param id = integer id of a goal
+     * @param text = string text value of the goal
+     * @param isComplete = boolean status of whether the goal is complete or incomplete
+     * @param sortOrder = index of goal in the List according the sorted order
+     */
     public Goal(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete, int sortOrder){
         this.id = id;
         this.text = text;
@@ -25,57 +30,58 @@ public class Goal implements Serializable {
         this.sortOrder = sortOrder;
     }
 
-    // id getter
+    /**
+     * Getter method to fetch a goal's id
+     * @return integer id of the goal
+     */
     public @Nullable Integer id() {
         return id;
     }
 
-    // gets whether it isComplete
+    /**
+     * Getter method to get the complete status of the goal
+     * @return boolean whether goal is complete or not
+     */
     public @NonNull boolean isComplete(){
         return this.isComplete;
     }
 
-    // getter for the text for the Goal
+    /**
+     * Getter method to get the string text value of the goal
+     * @return string value of the goal
+     */
     public @NonNull String getText(){
         return this.text;
     }
 
-    // Although no usages yet, may prove useful later
-    public void updateText(String text){
-        this.text = text;
-    }
-
-    // updates the complete status of the goal
-    public void updateStatus(){
-        this.isComplete = !this.isComplete;
-    }
-
+    /**
+     * Getter method to get the index of the goal in sortOrder
+     * @return integer value of the sortOrder of the goal
+     */
     public int sortOrder(){
         return this.sortOrder;
     }
 
-    public Goal withId(int id){
-        return new Goal(id, this.text, this.isComplete, this.sortOrder);
-    }
-
-    public Goal withSortOrder(int sortOrder){
-        return new Goal(this.id, this.text, this.isComplete, sortOrder);
-    }
-
-    // cse
+    /**
+     * Method changes the status of the current goal to complete
+     */
     public void makeComplete(){
 
         this.isComplete = true;
     }
 
-    public Goal switchGoal(Goal newgoal){
-        return new Goal(newgoal.id, newgoal.text, newgoal.isComplete, newgoal.sortOrder);
-    }
-
+    /**
+     * Method changes the status of the current goal to incomplete
+     */
     public void makeInComplete(){
         this.isComplete = false;
     }
-    // overridden equals
+
+    /**
+     * Methods overrides the equals method in order to compare two goal objects
+     * @param o Object to compare this object with
+     * @return boolean value of whether the two goals are the same or not
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -84,7 +90,10 @@ public class Goal implements Serializable {
         return Objects.equals(this.id, goal.id) && Objects.equals(this.text, goal.text) && Objects.equals(this.isComplete, goal.isComplete);
     }
 
-    // overridden hashCode
+    /**
+     * Method overrides the hashCode function to hash a goal object
+     * @return integer hash value of a goal object
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id, text, isComplete);

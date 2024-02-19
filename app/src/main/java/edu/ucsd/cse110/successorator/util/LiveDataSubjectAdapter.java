@@ -1,6 +1,5 @@
 package edu.ucsd.cse110.successorator.util;
 
-import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 
