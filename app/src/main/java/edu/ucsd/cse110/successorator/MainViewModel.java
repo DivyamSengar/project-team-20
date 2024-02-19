@@ -47,9 +47,6 @@ public class MainViewModel extends ViewModel {
 
     private MutableSubject<Boolean> isIncompletedGoalsEmpty;
 
-    private List<Goal> current;
-//    private MutableSubject<Boolean> isComplete;
-
     public MainViewModel(GoalRepository goalRepositoryComplete,
                          GoalRepository goalRepositoryIncomplete, TimeKeeper timeKeeper) {
         this.goalRepositoryComplete = goalRepositoryComplete;
@@ -67,15 +64,8 @@ public class MainViewModel extends ViewModel {
         isCompletedGoalsEmpty.setValue(true);
         isIncompletedGoalsEmpty.setValue(true);
 
-//         revert back to this if something goes wrong
-//        this.goalRepository.findAll().observe(newGoals -> {
-//            goals.setValue(newGoals);
-//        });
-
         this.goalRepositoryComplete.findAll().observe(newGoals -> {
             List<Goal> orderedGoals = List.of();
-//            if (newGoals == null) return;
-//            if (newGoals.size() == 0) return;
             if (newGoals == null) ;
             else if (newGoals.size() == 0);
             else {
@@ -84,10 +74,8 @@ public class MainViewModel extends ViewModel {
                         .collect(Collectors.toList());
             }
 
-//            current = orderedGoals;
             goalsCompleted.setValue(orderedGoals);
         });
-//        if (current == null) current = List.of();
         this.goalRepositoryIncomplete.findAll().observe(newGoals -> {
             List<Goal> orderedGoals = List.of();
             if (newGoals == null) ;
@@ -97,28 +85,16 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-//            var temp = Stream.concat(current.stream(), orderedGoals.stream());
-//            var temp2 = temp.collect(Collectors.toList());
             goalsIncompleted.setValue(orderedGoals);
-//            goals.setValue(temp2);
         });
 
-        // potentially useful for monitoring strikethroughs
-        /*
-        this.isComplete.observe()
-         */
 
         // listens for if goals is empty
         this.goals.observe(gs -> {
             if (gs == null) return;
-//            if (gs.size() == 0 ){
-//                isGoalsEmpty.setValue(true);
-//                return;
-//            }
             isGoalsEmpty.setValue(gs.isEmpty());
         });
 
-//        this.goalRepositoryIncomplete.observe(gs)
 
         this.goalsIncompleted.observe(gs -> {
             System.out.println(gs + "RAHHHHHH");
@@ -153,33 +129,8 @@ public class MainViewModel extends ViewModel {
         return goals;
     }
 
-    public Subject<List<Goal>> getCompletedGoals() {
-        return goalsCompleted;
-    }
-
-    public Subject<List<Goal>> getIncompletedGoals() {
-        return goalsIncompleted;
-    }
-
-
     public Subject<Boolean> isGoalsEmpty() {
         return isGoalsEmpty;
-    }
-
-    public Subject<Boolean> isCompletedGoalsEmpty() {
-        return isCompletedGoalsEmpty;
-    }
-
-    public Subject<Boolean> isIncompletedGoalsEmpty() {
-        return isIncompletedGoalsEmpty;
-    }
-
-    public void addGoalComplete (Goal goal) {
-        goalRepositoryComplete.save(goal);
-    }
-
-    public void addGoalIncomplete (Goal goal) {
-        goalRepositoryIncomplete.save(goal);
     }
 
     // markAsIncomplete
@@ -203,20 +154,11 @@ public class MainViewModel extends ViewModel {
         this.goalsIncompleted.setValue(goalRepositoryIncomplete.findAll().getValue());
     }
 
-    public void prependComplete(Goal goal){
-        goalRepositoryComplete.prepend(goal);
-    }
-
     public void prependIncomplete(Goal goal){
         goalRepositoryIncomplete.prepend(goal);
     }
 
-//    public void DatabaseComplete(Goal goal){
-//        goalRepository.markAsComplete(goal);
-//    }
-//    public void DatabaseIncomplete(Goal goal){
-//        goalRepository.markAsIncomplete(goal);
-//    }
+
     public void deleteCompleted(){
         goalRepositoryComplete.deleteCompleted();
     }
@@ -229,10 +171,6 @@ public class MainViewModel extends ViewModel {
         timeKeeper.removeDateTime();
     }
 
-    public LocalDateTime getTime(){
-        return timeKeeper.getDateTime().getValue();
-    }
-    
     public int[] getFields() {
         return timeKeeper.getFields();
     }

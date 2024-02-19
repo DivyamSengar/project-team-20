@@ -72,19 +72,6 @@ public class MainFragment extends Fragment {
             adapter.addAll(new ArrayList<>(goal));
             adapter.notifyDataSetChanged();
         });
-//        activityModel.getIncompletedGoals().observe(goal -> {
-//            System.out.println("This is" + goal);
-//            if (goal == null) return;
-//            adapter.clear();
-//            adapter.addAll(new ArrayList<>(goal));
-//            adapter.notifyDataSetChanged();
-//        });
-//        activityModel.getCompletedGoals().observe(goal -> {
-//            if (goal == null) return;
-//            adapter.clear();
-//            adapter.addAll(new ArrayList<>(goal));
-//            adapter.notifyDataSetChanged();
-//        });
 
         System.out.print(adapter);
     }
@@ -118,7 +105,6 @@ public class MainFragment extends Fragment {
 
 
         LocalDateTime currentTime = LocalDateTime.now();
-//
         int lastOpenedHour = activityModel.getFields()[3];
         int lastOpenedMinute = activityModel.getFields()[4];
         int lastDay = activityModel.getFields()[2];
@@ -142,58 +128,21 @@ public class MainFragment extends Fragment {
             activityModel.deleteCompleted();
         }
         else if (currentTime.isBefore(previous));
-
-        else {
-                // Convert the last opened time and current time to total minutes since midnight
-                int lastOpenedTotalMinutes = lastOpenedHour * 60 + lastOpenedMinute;
-                int currentTotalMinutes = hour * 60 + minute;
-
-               int interval =  currentTotalMinutes-lastOpenedTotalMinutes / 60;
-               int temp = lastOpenedHour;
-               for (int i = 0; i <= interval; i++ ){
-                   if (temp == 2 ) activityModel.deleteCompleted();
-                   if (++temp >=24){
-                       temp = 0;
-                   }
-                   else temp++;
-               }
-                // Check if last opened time is before 2:00 AM
-                if (lastOpenedTotalMinutes < 120) { // 2:00 AM is at minute 120
-                    // If last opened time is before 2:00 AM and current time is after or equal to 2:00 AM, 2:00 AM has passed
-                    if(currentTotalMinutes >= 120) activityModel.deleteCompleted();
-                } else {
-                    // If last opened time is after or equal to 2:00 AM and current time is before 2:00 AM, check if it's the next day
-                    if (currentTotalMinutes < 120) {
-                        // If current time is before 2:00 AM and it's the next day, 2:00 AM has passed
-                        activityModel.deleteCompleted();
-                    } else {
-                        // If current time is after 2:00 AM, or it's still before 2:00 AM on the same day, 2:00 AM has not passed
-                    }
+        else if (currDay > lastDay) {
+            if ((lastDay + 1) < currDay) {
+                activityModel.deleteCompleted();
+            } else {
+                if (hour >= 2) {
+                    activityModel.deleteCompleted();
                 }
+            }
         }
-//        if (currMonth>= lastMonth){
-//            if (hour >= 2 && las)
-//        }
-//        if (hour == 2 && minute == 0) {
-//            activityModel.deleteCompleted();
-//        }
-//        if ((currMonth >= lastMonth) || (currYear >= lastYear)) {
-//            activityModel.deleteCompleted();
-//        }
-//        else if (currDay > lastDay) {
-//            if ((lastDay + 1) < currDay) {
-//                activityModel.deleteCompleted();
-//            } else {
-//                if (hour >= 2) {
-//                    activityModel.deleteCompleted();
-//                }
-//            }
-//        } else {
-//            if ((hour >= 2)
-//                && (lastOpenedHour < 2)) {
-//                activityModel.deleteCompleted();
-//            }
-//        }
+        else {
+            if ((hour >= 2)
+                && (lastOpenedHour <= 2)) {
+                activityModel.deleteCompleted();
+            }
+        }
         activityModel.deleteTime();
         activityModel.appendTime(currentTime);
 
@@ -207,14 +156,12 @@ public class MainFragment extends Fragment {
 
         activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
             if (Boolean.TRUE.equals(isGoalsEmpty)) {
-//                activityModel.getGoals().observe(text -> view.emptyGoals.setText(R.string.emptyGoalsText));
                 view.emptyGoals.setText(R.string.emptyGoalsText);
                 view.emptyGoals.setVisibility(View.VISIBLE);
                 view.listGoals.setVisibility(View.INVISIBLE);
             } else {
                 view.emptyGoals.setVisibility(View.INVISIBLE);
                 view.listGoals.setVisibility(View.VISIBLE);
-                view.listGoals.setBackgroundColor(60);
             }
 
         });
@@ -226,21 +173,11 @@ public class MainFragment extends Fragment {
                 goal.makeComplete();
                 activityModel.removeGoalIncomplete(goal.id());
                 activityModel.appendComplete(goal);
-//                adapter.removeComplete(goal);
-//                adapter.remove(goal);
-//                adapter.add(goal);
-//                adapter.addComplete(goal);
-//                adapter.notifyDataSetChanged();
             }
             else{
                 goal.makeInComplete();
                 activityModel.removeGoalComplete(goal.id());
                 activityModel.prependIncomplete(goal);
-//                adapter.removeComplete(goal);
-//                adapter.remove(goal);
-//                adapter.insert(goal, 0);
-//                adapter.prependIncomplete(goal);
-//                adapter.notifyDataSetChanged();
             }
         });
 
@@ -248,56 +185,4 @@ public class MainFragment extends Fragment {
         return view.getRoot();
     }
 
-
-
-//    /*Code got from:
-//https://www.geeksforgeeks.org/how-to-get-current-time-and-date-in-android/
-//How to Get Current Time and Date in Android?
-//Captured at 2/09/2024
-//Used for copying code to capture the date, and changed the format to fit our format
-//Copied code start-
-//SimpleDateFormat sdf = new SimpleDateFormat("'Date\n'dd-MM-yyyy '\n\nand\n\nTime\n'HH:mm:ss z");
-//String currentDateAndTime = sdf.format(new Date());
-//-end
-//*/
-//    SimpleDateFormat date = new SimpleDateFormat("EEEE MM/dd", Locale.getDefault());
-//    String currentDate = date.format(new Date());
-//        view.dateText.setText(currentDate);
-//
-//    //To test the empty goal text
-//        view.emptyGoals.setText(R.string.emptyGoalsText);
-//
-//    var addButton = view.imageButton;
-//    // This triggers the popup for keyboard
-//        addButton.setOnClickListener(v -> {
-//        // Functionality for keyboard and input popup
-//    });
-            /*
-        Temporary object goalList with instance variable List<Goals>
-        if (goalList.size() == 0){
-            view.emptyGoals.setVisibility(View.VISIBLE);
-            view.listGoals.setVisibility(View.INVISIBLE);
-        } else {
-            view.emptyGoals.setVisibility(View.INVISIBLE);
-            view.listGoals.setVisibility(View.VISIBLE);
-
-            // code for displaying goals in ListView
-            // use ArrayAdapter
-
-        }
-         */
-
-    //current placeholder idea for showing the goal list and empty goal list situation
-        /* subject to changes
-        ArrayList<String> glist;
-        glist = new ArrayList<String>();
-        glist.add("Goal 1");
-        glist.add("Goal 2");
-        if (glist.size() == 0){
-            view.emptyGoals.setText(R.string.emptyGoalsText);
-        }
-        else{
-            view.listGoals.setText(glist);
-        }
-        */
 }

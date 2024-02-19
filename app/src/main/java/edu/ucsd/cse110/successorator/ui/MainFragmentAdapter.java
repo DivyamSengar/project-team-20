@@ -34,16 +34,9 @@ import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.databinding.GoalListItemBinding;
 
 public class MainFragmentAdapter extends ArrayAdapter<Goal> {
-//    private List<Goal> completedGoals;
-//
-//    private List<Goal> incompletedGoals;
     private List<Goal> goals;
     public MainFragmentAdapter(Context context, List<Goal> goals) {
         super(context, 0, new ArrayList<>(goals));
-//        super(context, 0, new ArrayList<>(Stream.concat(incompletedGoals.stream(),
-//                completedGoals.stream()).collect(Collectors.toList())));
-//        this.completedGoals = completedGoals;
-//        this.incompletedGoals = incompletedGoals;
         this.goals = goals;
     }
     @Override
@@ -51,32 +44,6 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
         super.add(object);
     }
 
-//    public void addComplete(Goal object){
-//        completedGoals.add(object);
-//        super.clear();
-//        super.addAll(incompletedGoals);
-//        super.addAll(completedGoals);
-//    }
-//
-//    public void prependIncomplete(Goal object){
-//        incompletedGoals.add(0, object);
-//        super.clear();
-//        super.addAll(incompletedGoals);
-//        super.addAll(completedGoals);
-//    }
-//    public void removeComplete(Goal goal){
-//        completedGoals.remove(goal);
-//        super.clear();
-//        super.addAll(incompletedGoals);
-//        super.addAll(completedGoals);
-//    }
-//
-//    public void removeIncomplete(Goal goal){
-//        incompletedGoals.remove(goal);
-//        super.clear();
-//        super.addAll(incompletedGoals);
-//        super.addAll(completedGoals);
-//    }
 
 
     @NonNull

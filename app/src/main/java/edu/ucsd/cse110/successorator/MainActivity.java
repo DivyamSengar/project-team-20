@@ -14,11 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
-import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
-import edu.ucsd.cse110.successorator.lib.data.DataSource;
-import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
-import edu.ucsd.cse110.successorator.ui.MainFragment;
-import edu.ucsd.cse110.successorator.ui.MainFragmentAdapter;
 
 public class MainActivity extends AppCompatActivity {
     private MainViewModel model;
