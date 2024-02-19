@@ -1,9 +1,10 @@
 package edu.ucsd.cse110.successorator.timedata.db;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
 import java.time.LocalDateTime;
-
+import androidx.lifecycle.LiveData;
 import edu.ucsd.cse110.successorator.data.db.GoalDao;
 import edu.ucsd.cse110.successorator.data.db.GoalEntity;
 import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
@@ -19,6 +20,12 @@ public class RoomTimeKeeper implements TimeKeeper {
         var entityLiveData = timeDao.getTimeAsLiveData();
         var TimeLiveData = Transformations.map(entityLiveData, TimeEntity::toLocalDateTime);
         return new LiveDataSubjectAdapter<>(TimeLiveData);
+    }
+
+    public int[] getFields(){
+        var entity = timeDao.getTimeAsLiveData();
+        var liveDataTemp = entity.getValue();
+        return liveDataTemp.Fields();
     }
     public void setDateTime(LocalDateTime dateTime){
         timeDao.insertTime(TimeEntity.fromLocalDateTime(dateTime));
