@@ -1,7 +1,5 @@
 package edu.ucsd.cse110.successorator.ui;
 
-import android.graphics.Paint;
-import android.inputmethodservice.ExtractEditText;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,48 +9,56 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ImageButton;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import edu.ucsd.cse110.successorator.MainActivity;
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
-import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
-import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
-import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 
+/**
+ * MainFragment is the main fragment for the application
+ */
 public class MainFragment extends Fragment {
     private MainViewModel activityModel;
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
 
+    /**
+     * Required empty public constructor
+     */
     public MainFragment() {
-        // Required empty public constructor
     }
 
+    /**
+     * Creates a new instance of MainFragment
+     *
+     * @return Fragment - returns a new fragment instance for MainFragment
+     */
     public static MainFragment newInstance() {
-        System.out.println("hello from newInstance");
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
 
+    /**
+     * Method that runs when MainFragment is created
+     *
+     * @param savedInstanceState - state of the application
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println("hello from onCreate");
 
         // Initialize the model
         var modelOwner = requireActivity();
@@ -60,84 +66,135 @@ public class MainFragment extends Fragment {
         var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
 
+        // Initialize the adapter
         this.adapter = new MainFragmentAdapter(requireContext(), List.of());
+
+        // Observe goals, adapter fills the ListView
         activityModel.getGoals().observe(goal -> {
             if (goal == null) return;
             adapter.clear();
             adapter.addAll(new ArrayList<>(goal));
             adapter.notifyDataSetChanged();
         });
-//        activityModel.getIncompletedGoals().observe(goal -> {
-//            System.out.println("This is" + goal);
-//            if (goal == null) return;
-//            adapter.clear();
-//            adapter.addAll(new ArrayList<>(goal));
-//            adapter.notifyDataSetChanged();
-//        });
-//        activityModel.getCompletedGoals().observe(goal -> {
-//            if (goal == null) return;
-//            adapter.clear();
-//            adapter.addAll(new ArrayList<>(goal));
-//            adapter.notifyDataSetChanged();
-//        });
-        System.out.print(adapter);
+
     }
 
+    /**
+     * Method that runs when the View is created
+     *
+     * @param inflater - instantiates XML into View objects
+     * @param container - container that holds View objects
+     * @param savedInstanceState - state of the application
+     * @return The root of the view layout
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @NonNull ViewGroup container,
                              @NonNull Bundle savedInstanceState) {
         this.view = FragmentMainBinding.inflate(inflater, container, false);
+        ImageButton imageButton2;
 
         view.listGoals.setAdapter(adapter);
 
+        // Show the current date at the top
         SimpleDateFormat date = new SimpleDateFormat("EEEE MM/dd", Locale.getDefault());
         String currentDate = date.format(new Date());
         view.dateText.setText(currentDate);
 
-        // Show DialogFragment
+        imageButton2 = view.imageButton2;
+        // Button for developer testing, changes the date by a day
+        imageButton2.setOnClickListener(new View.OnClickListener(){
+            Calendar c = Calendar.getInstance();
+
+            @Override
+            public void onClick(View v){
+                c.add(Calendar.DATE, 1);
+                String currentDate = date.format(c.getTime());
+                view.dateText.setText(currentDate);
+                activityModel.deleteCompleted();
+            }
+
+        });
+
+        // Current time and time that the app was last opened
+        LocalDateTime currentTime = LocalDateTime.now();
+        int lastOpenedHour = activityModel.getFields()[3];
+        int lastOpenedMinute = activityModel.getFields()[4];
+        int lastDay = activityModel.getFields()[2];
+        int lastMonth =activityModel.getFields()[1];
+        int lastYear = activityModel.getFields()[0];
+
+        LocalDateTime previous = LocalDateTime.of(lastYear, lastMonth,
+                lastDay, lastOpenedHour, lastOpenedMinute);
+
+        int hour = currentTime.getHour();
+        int minute = currentTime.getMinute();
+        int currDay = currentTime.getDayOfMonth();
+        int currMonth = currentTime.getMonthValue();
+        int currYear = currentTime.getYear();
+
+        // If current time is at least 24 hours ahead, perform completed goals deletion
+        var minus24 = currentTime.minusHours(24);
+        if(minus24.isAfter(previous)){
+            activityModel.deleteCompleted();
+        }
+        else if (minus24.isEqual(previous)){
+            activityModel.deleteCompleted();
+        }
+        else if (currentTime.isBefore(previous));
+        else if (currDay > lastDay) {
+            if ((lastDay + 1) < currDay) {
+                activityModel.deleteCompleted();
+            } else {
+                if (hour >= 2) {
+                    activityModel.deleteCompleted();
+                }
+            }
+        }
+        else {
+            if ((hour >= 2)
+                && (lastOpenedHour <= 2)) {
+                activityModel.deleteCompleted();
+            }
+        }
+        activityModel.deleteTime();
+        activityModel.appendTime(currentTime);
+
+
+        // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
-            System.out.println("clicked");
             var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
 
+        // Observer to check whether or not goals is empty to display the ListView or TextView
         activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
             if (Boolean.TRUE.equals(isGoalsEmpty)) {
-//                activityModel.getGoals().observe(text -> view.emptyGoals.setText(R.string.emptyGoalsText));
                 view.emptyGoals.setText(R.string.emptyGoalsText);
                 view.emptyGoals.setVisibility(View.VISIBLE);
                 view.listGoals.setVisibility(View.INVISIBLE);
             } else {
                 view.emptyGoals.setVisibility(View.INVISIBLE);
                 view.listGoals.setVisibility(View.VISIBLE);
-                view.listGoals.setBackgroundColor(60);
             }
 
         });
 
+        // Listener for taps/clicks on each list item
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
             Goal goal = adapter.getItem(position);
             assert goal != null;
+            // If the tapped goal is incomplete, make it complete
             if (!goal.isComplete()){
                 goal.makeComplete();
                 activityModel.removeGoalIncomplete(goal.id());
                 activityModel.appendComplete(goal);
-//                adapter.removeComplete(goal);
-//                adapter.remove(goal);
-//                adapter.add(goal);
-//                adapter.addComplete(goal);
-//                adapter.notifyDataSetChanged();
             }
+            // If goal is complete make incomplete
             else{
                 goal.makeInComplete();
                 activityModel.removeGoalComplete(goal.id());
                 activityModel.prependIncomplete(goal);
-//                adapter.removeComplete(goal);
-//                adapter.remove(goal);
-//                adapter.insert(goal, 0);
-//                adapter.prependIncomplete(goal);
-//                adapter.notifyDataSetChanged();
             }
         });
 
@@ -145,56 +202,4 @@ public class MainFragment extends Fragment {
         return view.getRoot();
     }
 
-
-
-//    /*Code got from:
-//https://www.geeksforgeeks.org/how-to-get-current-time-and-date-in-android/
-//How to Get Current Time and Date in Android?
-//Captured at 2/09/2024
-//Used for copying code to capture the date, and changed the format to fit our format
-//Copied code start-
-//SimpleDateFormat sdf = new SimpleDateFormat("'Date\n'dd-MM-yyyy '\n\nand\n\nTime\n'HH:mm:ss z");
-//String currentDateAndTime = sdf.format(new Date());
-//-end
-//*/
-//    SimpleDateFormat date = new SimpleDateFormat("EEEE MM/dd", Locale.getDefault());
-//    String currentDate = date.format(new Date());
-//        view.dateText.setText(currentDate);
-//
-//    //To test the empty goal text
-//        view.emptyGoals.setText(R.string.emptyGoalsText);
-//
-//    var addButton = view.imageButton;
-//    // This triggers the popup for keyboard
-//        addButton.setOnClickListener(v -> {
-//        // Functionality for keyboard and input popup
-//    });
-            /*
-        Temporary object goalList with instance variable List<Goals>
-        if (goalList.size() == 0){
-            view.emptyGoals.setVisibility(View.VISIBLE);
-            view.listGoals.setVisibility(View.INVISIBLE);
-        } else {
-            view.emptyGoals.setVisibility(View.INVISIBLE);
-            view.listGoals.setVisibility(View.VISIBLE);
-
-            // code for displaying goals in ListView
-            // use ArrayAdapter
-
-        }
-         */
-
-    //current placeholder idea for showing the goal list and empty goal list situation
-        /* subject to changes
-        ArrayList<String> glist;
-        glist = new ArrayList<String>();
-        glist.add("Goal 1");
-        glist.add("Goal 2");
-        if (glist.size() == 0){
-            view.emptyGoals.setText(R.string.emptyGoalsText);
-        }
-        else{
-            view.listGoals.setText(glist);
-        }
-        */
 }

@@ -1,39 +1,49 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.util.List;
-
-import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
 
+/**
+ * Interface to describe the attribute and behavior of a goal repository/list
+ */
 public interface GoalRepository {
-    // DataSource getter used for testing
-
-    // Potentially useful for UI Implementation
-    Integer count();
 
     // getting a SimpleSubject to a goal based on its id
+
+    /**
+     * Find specific goal subject given a goal id
+     * @param id = id of goal to find
+     * @return a subject of the goal given a specific id
+     */
     Subject<Goal> find(int id);
 
-    // get all Goals, Incomplete and Complete
+    /**
+     * Returns a subject of a list of all the goals
+     * @return subject of a list of all the goals
+     */
     Subject<List<Goal>> findAll();
 
-    // add a goal to the list
-    void save(Goal goal);
 
-    // adds a set of goals to the list
-    void save(List<Goal> goals);
-
-    // markAsIncomplete
+    /**
+     * Removes a goal with a specific id from the list
+     * @param id of goal to remove
+     */
     void remove(int id);
 
-    /*
-        WILL BE USEFUL FOR SHIFTING GOALS, but not exactly these methods
-         */
+    /**
+     * Appends a goal to the back of the list
+     * @param goal to be appended
+     */
     void append(Goal goal);
 
+    /**
+     * Prepends goal to the front of the list
+     * @param goal to be prepended
+     */
     void prepend(Goal goal);
 
-    void markAsComplete(Goal goal);
-
-    void markAsIncomplete(Goal goal);
+    /**
+     * Removes all the goals in the list
+     */
+    void deleteCompleted();
 }

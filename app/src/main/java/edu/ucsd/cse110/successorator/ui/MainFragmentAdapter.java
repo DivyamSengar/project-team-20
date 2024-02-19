@@ -1,6 +1,5 @@
 package edu.ucsd.cse110.successorator.ui;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.content.Context;
 import android.graphics.Paint;
@@ -8,86 +7,54 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import org.w3c.dom.Text;
-
-import java.awt.font.TextAttribute;
-import java.text.AttributedCharacterIterator;
-import java.text.AttributedString;
-import java.text.CharacterIterator;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import edu.ucsd.cse110.successorator.MainViewModel;
-import edu.ucsd.cse110.successorator.R;
-import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
-import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.databinding.GoalListItemBinding;
 
+/**
+ * Adapter class for the MainFragment, connects goals to the items of the ListView
+ */
 public class MainFragmentAdapter extends ArrayAdapter<Goal> {
-//    private List<Goal> completedGoals;
-//
-//    private List<Goal> incompletedGoals;
-    private List<Goal> goals;
+
+    /**
+     * Constructor for the main fragment adapter
+     *
+     * @param context - application resources
+     * @param goals - goals that are to be added to the ListView
+     */
     public MainFragmentAdapter(Context context, List<Goal> goals) {
         super(context, 0, new ArrayList<>(goals));
-//        super(context, 0, new ArrayList<>(Stream.concat(incompletedGoals.stream(),
-//                completedGoals.stream()).collect(Collectors.toList())));
-//        this.completedGoals = completedGoals;
-//        this.incompletedGoals = incompletedGoals;
-        this.goals = goals;
     }
+
+    /**
+     * Adds an object to the backing list of the adapter
+     *
+     * @param object - object to be added to the backing list of the adapter
+     */
     @Override
     public void add(@Nullable Goal object) {
         super.add(object);
     }
 
-//    public void addComplete(Goal object){
-//        completedGoals.add(object);
-//        super.clear();
-//        super.addAll(incompletedGoals);
-//        super.addAll(completedGoals);
-//    }
-//
-//    public void prependIncomplete(Goal object){
-//        incompletedGoals.add(0, object);
-//        super.clear();
-//        super.addAll(incompletedGoals);
-//        super.addAll(completedGoals);
-//    }
-//    public void removeComplete(Goal goal){
-//        completedGoals.remove(goal);
-//        super.clear();
-//        super.addAll(incompletedGoals);
-//        super.addAll(completedGoals);
-//    }
-//
-//    public void removeIncomplete(Goal goal){
-//        incompletedGoals.remove(goal);
-//        super.clear();
-//        super.addAll(incompletedGoals);
-//        super.addAll(completedGoals);
-//    }
-
-
+    /**
+     * Gets the view for a specific item to go on the ListView
+     *
+     * @param position - position of the list item
+     * @param convertView - recycled view
+     * @param parent - the ViewGroup that the returned view will be attached to
+     * @return The root of the binding view
+     */
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        System.out.println("hi");
         var goal = getItem(position);
         assert goal != null;
-        System.out.println("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-        System.out.println(goal);
 
+        // Binds the data to the ListView
         GoalListItemBinding binding;
         if (convertView != null) {
             binding = GoalListItemBinding.bind(convertView);
@@ -96,13 +63,15 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
             var layoutInflater = LayoutInflater.from(getContext());
             binding = GoalListItemBinding.inflate(layoutInflater, parent, false);
         }
+
         binding.goalText.setText(goal.getText());
+
+        // Strike-through text if it is complete
         if (goal.isComplete()) {
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         } else {
             binding.goalText.setPaintFlags(0);
         }
-
 
         return binding.getRoot();
     }

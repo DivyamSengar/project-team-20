@@ -4,23 +4,41 @@ import androidx.lifecycle.Transformations;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.util.*;
 
+/**
+ * RoomGoalRepository class that implements the behavior and attributes of GoalRepository
+ */
 public class RoomGoalRepository implements GoalRepository {
     private final GoalDao goalDao;
+
+    /**
+     * RoomGoalRepository constructor to initialize its fields
+     * @param goalDao goalDao object to initialize the field with
+     */
     public RoomGoalRepository(GoalDao goalDao){
         this.goalDao = goalDao;
     }
+
+    /**
+     * This method returns a subject of a goal given a specific goal id
+     * @param id = id of goal to find
+     * @return Subject of goal given the parameter goal id
+     */
     @Override
     public Subject<Goal> find(int id){
         var entityLiveData = goalDao.findAsLiveData(id);
         var goalLiveData = Transformations.map(entityLiveData, GoalEntity::toGoal);
         return new LiveDataSubjectAdapter<>(goalLiveData);
     }
+
+    /**
+     * This methods returns a subject of a list of all the goals
+     * @return subject of the list of all the goals
+     */
     @Override
     public Subject<List<Goal>> findAll(){
         var entitiesLiveData = goalDao.findAllAsLiveData();
@@ -31,40 +49,35 @@ public class RoomGoalRepository implements GoalRepository {
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-    @Override
-    public void save(Goal goal){
-        goalDao.insert(GoalEntity.fromGoal(goal));
-    }
-    public void save(List<Goal> goals){
-        var entities = goals.stream()
-                .map(GoalEntity::fromGoal)
-                .collect(Collectors.toList());
-                goalDao.insert(entities);
-    }
 
+    /**
+     * This method appends a goal to the list of goals
+     * @param goal to be appended
+     */
     public void append(Goal goal){
         goalDao.append(GoalEntity.fromGoal(goal));
     }
 
+    /**
+     * This method prepends a goal to the list of goals
+     * @param goal to be prepended
+     */
     public void prepend(Goal goal){
         goalDao.prepend(GoalEntity.fromGoal(goal));
     }
 
+    /**
+     * This method removes a goal given a specific goal id
+     * @param id of goal to remove
+     */
     public void remove(int id){
         goalDao.delete(id);
     }
 
-    public Integer count(){
-        return goalDao.count();
-    }
-
-    public void markAsComplete(Goal goal){
-        goalDao.markComplete(goal.id());
-    }
-
-    public void markAsIncomplete(Goal goal){ goalDao.markIncomplete(goal.id());}
-
-    public void deleteCompletedGoals(){
+    /**
+     * This method clears the entire goal list
+     */
+    public void deleteCompleted(){
         goalDao.deleteComplete();
     }
 }
