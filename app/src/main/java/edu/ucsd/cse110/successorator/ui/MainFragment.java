@@ -35,11 +35,6 @@ public class MainFragment extends Fragment {
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
 
-    private TomorrowFragmentAdapter adapter2;
-
-    private PendingFragmentAdapter adapter3;
-
-    private RecurringFragmentAdapter adapter4;
     /**
      * Required empty public constructor
      */
@@ -75,9 +70,6 @@ public class MainFragment extends Fragment {
 
         // Initialize the adapter
         this.adapter = new MainFragmentAdapter(requireContext(), List.of());
-        this.adapter2 = new TomorrowFragmentAdapter(requireContext(), List.of());
-        this.adapter3 = new PendingFragmentAdapter(requireContext(), List.of());
-        this.adapter4 = new RecurringFragmentAdapter(requireContext(), List.of());
 
         // Observe goals, adapter fills the ListView
         activityModel.getGoals().observe(goal -> {
@@ -105,94 +97,44 @@ public class MainFragment extends Fragment {
 
         view.listGoals.setAdapter(adapter);
 
+        showTopBar();
+        checkGoalsIsEmpty();
+        addPlusButtonListener();
+        addGoalListeners();
+        createSpinner();
+
+
+        // Inflate the layout for this fragment
+        return view.getRoot();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
         // Show the current date at the top
         SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
-        String currentDate = date.format(new Date());
+        String currentDate = "Today, " + date.format(new Date());
 
+        view.topText.setText(currentDate);
+    }
 
+    public void showTopBar(){
+        // Show the current date at the top
+        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
+        String currentDate = "Today, " + date.format(new Date());
 
-        /*
-        https://developer.android.com/develop/ui/views/components/spinner#java
-        Source Title: Add spinners to your app
-        Date Captured: 3/5/2024 12:33 am
-        Used as a reference to have a drop down menu to switch between views via spinner
-        Handle: smhitle
-         */
-        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_item);
-        dropdownAdapter.setDropDownViewResource(R.layout.dropdown_item);
+        view.topText.setText(currentDate);
+    }
 
-        Calendar t = Calendar.getInstance();
-        t.add(Calendar.DATE, 1);
-        String tomorrow = date.format(t.getTime());
-
-        dropdownAdapter.add("Today, " + currentDate);
-        dropdownAdapter.add("Tomorrow, " + tomorrow);
-        dropdownAdapter.add("Pending");
-        dropdownAdapter.add("Recurring");
-
-        view.dropdown.setAdapter(dropdownAdapter);
-
-        // Button for developer testing, changes the date by a day
-        view.imageButton2.setOnClickListener(new View.OnClickListener(){
-            Calendar c = Calendar.getInstance();
-            Calendar c2 = Calendar.getInstance();
-
-            @Override
-            public void onClick(View v){
-                dropdownAdapter.clear();
-                c.add(Calendar.DATE, 1);
-                c2.add(Calendar.DATE, 1);
-                if (c.equals(c2)){
-                    c2.add(Calendar.DATE, 1);
-                }
-                String currentDate = date.format(c.getTime());
-                String nextDate = date.format(c2.getTime());
-                dropdownAdapter.insert("Today "+currentDate,0);
-                dropdownAdapter.insert("Tomorrow "+nextDate,1);
-                dropdownAdapter.add("Pending");
-                dropdownAdapter.add("Recurring");
-                activityModel.deleteCompleted();
-            }
-
-        });
-
-        view.dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
-                    if (id == dropdownAdapter.getItemId(0)) {
-                        view.listGoals.setAdapter(adapter);
-                        view.getRoot();
-                    }
-                    else if (id == dropdownAdapter.getItemId(1)) {
-                        view.listGoals.setAdapter(adapter2);
-                        view.getRoot();
-                    }
-                    else if (id == dropdownAdapter.getItemId(2)) {
-                        view.listGoals.setAdapter(adapter3);
-                        view.getRoot();
-                    }
-                    else if (id == dropdownAdapter.getItemId(3)) {
-                        view.listGoals.setAdapter(adapter4);
-                        view.getRoot();
-                    }
-                    else{}
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                return;
-            }
-        });
-
-
-
-
+    public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
             var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
+    }
 
+    public void checkGoalsIsEmpty(){
         // Observer to check whether or not goals is empty to display the ListView or TextView
         activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
             if (Boolean.TRUE.equals(isGoalsEmpty)) {
@@ -205,7 +147,9 @@ public class MainFragment extends Fragment {
             }
 
         });
+    }
 
+    public void addGoalListeners (){
         // Listener for taps/clicks on each list item
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
             Goal goal = adapter.getItem(position);
@@ -223,20 +167,10 @@ public class MainFragment extends Fragment {
                 activityModel.prependIncomplete(goal);
             }
         });
-
-        // Inflate the layout for this fragment
-        return view.getRoot();
     }
-    @Override
-    public void onResume(){
-        super.onResume();
 
-        // Show the current date at the top
-        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
-        String currentDate = date.format(new Date());
-
-
-
+    // TODO: Fix this so that the spinner default is empty, literally just make it look like a dropdown arrow
+    public void createSpinner(){
         /*
         https://developer.android.com/develop/ui/views/components/spinner#java
         Source Title: Add spinners to your app
@@ -244,26 +178,90 @@ public class MainFragment extends Fragment {
         Used as a reference to have a drop down menu to switch between views via spinner
         Handle: smhitle
          */
-        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_item);
-        dropdownAdapter.setDropDownViewResource(R.layout.dropdown_item);
+        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
+        dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        Calendar t = Calendar.getInstance();
-        t.add(Calendar.DATE, 1);
-        String tomorrow = date.format(t.getTime());
-
-        dropdownAdapter.add("Today, " + currentDate);
-        dropdownAdapter.add("Tomorrow, " + tomorrow);
+        dropdownAdapter.add("");
+        dropdownAdapter.add("Today");
+        dropdownAdapter.add("Tomorrow");
         dropdownAdapter.add("Pending");
         dropdownAdapter.add("Recurring");
 
         view.dropdown.setAdapter(dropdownAdapter);
+
+        view.dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+                if (position == 0) {
+                }
+                else if (position == 1) {
+                    dropdownAdapter.clear();
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, MainFragment.newInstance())
+                            .commit();
+                }
+                else if (position == 2) {
+                    dropdownAdapter.clear();
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, TomorrowFragment.newInstance())
+                            .commit();
+                }
+                else if (position == 3) {
+                    dropdownAdapter.clear();
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, PendingFragment.newInstance())
+                            .commit();
+                }
+                else if (position == 4) {
+                    dropdownAdapter.clear();
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, RecurringFragment.newInstance())
+                            .commit();
+                }
+
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                return;
+            }
+        });
     }
 
+    // TODO: Make this work
+    public void createDeveloperButton(){
+        // Show the current date at the top
+        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
+        String currentDate = date.format(new Date());
 
+        Calendar t = Calendar.getInstance();
+        t.add(Calendar.DATE, 1);
+        String tomorrow = date.format(t.getTime());
+        // Button for developer testing, changes the date by a day
+        view.imageButton2.setOnClickListener(new View.OnClickListener(){
+            Calendar c = Calendar.getInstance();
+            Calendar c2 = Calendar.getInstance();
+
+            @Override
+            public void onClick(View v){
+                c.add(Calendar.DATE, 1);
+                c2.add(Calendar.DATE, 1);
+                if (c.equals(c2)){
+                    c2.add(Calendar.DATE, 1);
+                }
+                String currentDate = date.format(c.getTime());
+                String nextDate = date.format(c2.getTime());
+                activityModel.deleteCompleted();
+            }
+        });
+    }
 }
 
 
-
+// TODO: Move this to wherever it needs to go, timekeeping
 
 /*
 

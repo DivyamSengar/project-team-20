@@ -14,6 +14,8 @@
     <string name="weekly">"Weekly on "</string>
     <string name="monthly">"Monthly "</string>
     <string name="yearly">"Yearly on "</string>
+    <string name="pending">Pending</string>
+    <string name="recurring">Recurring</string>
 
     <string-array name="views">
         <item>Today</item>
