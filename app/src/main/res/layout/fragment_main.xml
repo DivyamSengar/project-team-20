@@ -67,9 +67,10 @@
         android:id="@+id/dropdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         app:layout_constraintBottom_toTopOf="@+id/listGoals"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imageButton"
+        app:layout_constraintStart_toEndOf="@+id/hamburger_menu"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

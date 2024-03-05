@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 
@@ -34,6 +35,11 @@ public class MainFragment extends Fragment {
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
 
+    private TomorrowFragmentAdapter adapter2;
+
+    private PendingFragmentAdapter adapter3;
+
+    private RecurringFragmentAdapter adapter4;
     /**
      * Required empty public constructor
      */
@@ -69,6 +75,9 @@ public class MainFragment extends Fragment {
 
         // Initialize the adapter
         this.adapter = new MainFragmentAdapter(requireContext(), List.of());
+        this.adapter2 = new TomorrowFragmentAdapter(requireContext(), List.of());
+        this.adapter3 = new PendingFragmentAdapter(requireContext(), List.of());
+        this.adapter4 = new RecurringFragmentAdapter(requireContext(), List.of());
 
         // Observe goals, adapter fills the ListView
         activityModel.getGoals().observe(goal -> {
@@ -102,8 +111,13 @@ public class MainFragment extends Fragment {
 
         String topText = "Today, " + currentDate;
 
-        // R.layout.dropdown_item
-        //android.R.layout.simple_spinner_item
+        /*
+        https://developer.android.com/develop/ui/views/components/spinner#java
+        Source Title: Add spinners to your app
+        Date Captured: 3/5/2024 12:33 am
+        Used as a reference to have a drop down menu to switch between views via spinner
+        Handle: smhitle
+         */
         ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_item);
         dropdownAdapter.setDropDownViewResource(R.layout.dropdown_item);
 
@@ -130,6 +144,37 @@ public class MainFragment extends Fragment {
             }
 
         });
+
+        view.dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+                    if (id == dropdownAdapter.getItemId(0)) {
+                        view.listGoals.setAdapter(adapter);
+                        view.getRoot();
+                    }
+                    else if (id == dropdownAdapter.getItemId(1)) {
+                        view.listGoals.setAdapter(adapter2);
+                        view.getRoot();
+                    }
+                    else if (id == dropdownAdapter.getItemId(2)) {
+                        view.listGoals.setAdapter(adapter3);
+                        view.getRoot();
+                    }
+                    else if (id == dropdownAdapter.getItemId(3)) {
+                        view.listGoals.setAdapter(adapter4);
+                        view.getRoot();
+                    }
+                    else{}
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                return;
+            }
+        });
+
+
+
 
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
