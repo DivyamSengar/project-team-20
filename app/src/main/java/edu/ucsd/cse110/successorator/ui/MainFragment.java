@@ -103,7 +103,7 @@ public class MainFragment extends Fragment {
         String topText = "Today, " + currentDate;
 
         ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
-        dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dropdownAdapter.setDropDownViewResource(R.layout.dropdown_item);
 
         Calendar t = Calendar.getInstance();
         t.add(Calendar.DATE, 1);
