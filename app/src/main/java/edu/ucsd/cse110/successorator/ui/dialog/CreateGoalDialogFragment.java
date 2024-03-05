@@ -14,7 +14,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.Date;
+
 import edu.ucsd.cse110.successorator.MainViewModel;
+import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 
@@ -71,32 +74,11 @@ public class CreateGoalDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
 
-        /*
-        https://stackoverflow.com/questions/12937731/android-enter-key-listener
-        Source Title:
-        Date Captured: 2/17/2024 4:51 pm
-        Used as a reference to have the done/check button on the keyboard to "mark as done"
-        and capture the input to add as a goal. When typing .setOnEditorActionListener()
-        the code automatically generated, the rest was reused from previously written code
-        Handle: smhitle
-         */
-        view.goalEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
-                    // Get the input of the textEdit
-                    var input = view.goalEditText.getText().toString();
+        captureGoalInput();
+        return makeDialog();
+    }
 
-                    // Create a new Goal with the text and add it
-                    var newGoal = new Goal(null, input, false, -1);
-                    activityModel.appendIncomplete(newGoal);
-                    dismiss();
-                }
-                return false;
-            }
-        });
-
-
+    private Dialog makeDialog(){
         /*
         https://stackoverflow.com/questions/17237952/dialogfragment-and-force-to-show-keyboard
         Source Title: DialogFragment and force to show keyboard
@@ -115,6 +97,36 @@ public class CreateGoalDialogFragment extends DialogFragment {
         edit.requestFocus();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         return dialog;
+    }
+
+    private void captureGoalInput(){
+        /*
+        https://stackoverflow.com/questions/12937731/android-enter-key-listener
+        Source Title:
+        Date Captured: 2/17/2024 4:51 pm
+        Used as a reference to have the done/check button on the keyboard to "mark as done"
+        and capture the input to add as a goal. When typing .setOnEditorActionListener()
+        the code automatically generated, the rest was reused from previously written code
+        Handle: smhitle
+         */
+        view.goalEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            // Capture the input
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
+                    // Get the input of the textEdit
+                    var input = view.goalEditText.getText().toString();
+
+                    // Create a new Goal with the text and add it
+                    var newGoal = new Goal(null, input, false, -1);
+
+                    activityModel.appendIncomplete(newGoal);
+                    dismiss();
+                }
+                return false;
+            }
+        });
     }
 
     /**

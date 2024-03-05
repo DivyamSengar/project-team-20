@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 
 import java.text.SimpleDateFormat;
@@ -92,29 +93,87 @@ public class MainFragment extends Fragment {
                              @NonNull ViewGroup container,
                              @NonNull Bundle savedInstanceState) {
         this.view = FragmentMainBinding.inflate(inflater, container, false);
-        ImageButton imageButton2;
 
         view.listGoals.setAdapter(adapter);
 
         // Show the current date at the top
-        SimpleDateFormat date = new SimpleDateFormat("EEEE MM/dd", Locale.getDefault());
+        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
         String currentDate = date.format(new Date());
-        //view.dateTextSpinner.setSelection(currentDate);
 
-        imageButton2 = view.imageButton2;
+        String topText = "Today, " + currentDate;
+
+        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
+        dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        Calendar t = Calendar.getInstance();
+        t.add(Calendar.DATE, 1);
+        String tomorrow = date.format(t.getTime());
+
+        dropdownAdapter.add(topText);
+        dropdownAdapter.add("Tomorrow" + tomorrow);
+        dropdownAdapter.add("Pending");
+        dropdownAdapter.add("Recurring");
+
+        view.dropdown.setAdapter(dropdownAdapter);
+
         // Button for developer testing, changes the date by a day
-        imageButton2.setOnClickListener(new View.OnClickListener(){
+        view.imageButton2.setOnClickListener(new View.OnClickListener(){
             Calendar c = Calendar.getInstance();
 
             @Override
             public void onClick(View v){
                 c.add(Calendar.DATE, 1);
                 String currentDate = date.format(c.getTime());
-                //view.dateText.setText(currentDate);
                 activityModel.deleteCompleted();
             }
 
         });
+
+        // Show DialogFragment when button is clicked
+        view.imageButton.setOnClickListener(v -> {
+            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
+        });
+
+        // Observer to check whether or not goals is empty to display the ListView or TextView
+        activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
+            if (Boolean.TRUE.equals(isGoalsEmpty)) {
+                view.emptyGoals.setText(R.string.emptyGoalsText);
+                view.emptyGoals.setVisibility(View.VISIBLE);
+                view.listGoals.setVisibility(View.INVISIBLE);
+            } else {
+                view.emptyGoals.setVisibility(View.INVISIBLE);
+                view.listGoals.setVisibility(View.VISIBLE);
+            }
+
+        });
+
+        // Listener for taps/clicks on each list item
+        view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
+            Goal goal = adapter.getItem(position);
+            assert goal != null;
+            // If the tapped goal is incomplete, make it complete
+            if (!goal.isComplete()){
+                goal.makeComplete();
+                activityModel.removeGoalIncomplete(goal.id());
+                activityModel.appendComplete(goal);
+            }
+            // If goal is complete make incomplete
+            else{
+                goal.makeInComplete();
+                activityModel.removeGoalComplete(goal.id());
+                activityModel.prependIncomplete(goal);
+            }
+        });
+
+        // Inflate the layout for this fragment
+        return view.getRoot();
+    }
+
+}
+
+
+/*
 
         // Current time and time that the app was last opened
         LocalDateTime currentTime = LocalDateTime.now();
@@ -160,60 +219,4 @@ public class MainFragment extends Fragment {
         activityModel.deleteTime();
         activityModel.appendTime(currentTime);
 
-
-        // Show DialogFragment when button is clicked
-        view.imageButton.setOnClickListener(v -> {
-            var dialogFragment = CreateGoalDialogFragment.newInstance();
-            dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
-        });
-
-        // Observer to check whether or not goals is empty to display the ListView or TextView
-        activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
-            if (Boolean.TRUE.equals(isGoalsEmpty)) {
-                view.emptyGoals.setText(R.string.emptyGoalsText);
-                view.emptyGoals.setVisibility(View.VISIBLE);
-                view.listGoals.setVisibility(View.INVISIBLE);
-            } else {
-                view.emptyGoals.setVisibility(View.INVISIBLE);
-                view.listGoals.setVisibility(View.VISIBLE);
-            }
-
-        });
-
-        // Observer to check whether or not if we are at a particular view to display Today, Tomorrow, Pending, Recurring
-        /*activityModel.isGoalsEmpty()
-        {
-            if (Boolean.TRUE.equals(isGoalsEmpty)) {
-                view.emptyGoals.setText(R.string.emptyGoalsText);
-                view.emptyGoals.setVisibility(View.VISIBLE);
-                view.listGoals.setVisibility(View.INVISIBLE);
-            } else {
-                view.emptyGoals.setVisibility(View.INVISIBLE);
-                view.listGoals.setVisibility(View.VISIBLE);
-            }
-
-        });*/
-
-        // Listener for taps/clicks on each list item
-        view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
-            Goal goal = adapter.getItem(position);
-            assert goal != null;
-            // If the tapped goal is incomplete, make it complete
-            if (!goal.isComplete()){
-                goal.makeComplete();
-                activityModel.removeGoalIncomplete(goal.id());
-                activityModel.appendComplete(goal);
-            }
-            // If goal is complete make incomplete
-            else{
-                goal.makeInComplete();
-                activityModel.removeGoalComplete(goal.id());
-                activityModel.prependIncomplete(goal);
-            }
-        });
-
-        // Inflate the layout for this fragment
-        return view.getRoot();
-    }
-
-}
+ */

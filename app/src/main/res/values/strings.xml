@@ -9,4 +9,16 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="textview">TextView</string>
     <string name="goal_hint">Goal...</string>
+    <string name="one_time">One-Time</string>
+    <string name="daily">Daily</string>
+    <string name="weekly">"Weekly on "</string>
+    <string name="monthly">"Monthly "</string>
+    <string name="yearly">"Yearly on "</string>
+
+    <string-array name="views">
+        <item>Today</item>
+        <item>Tomorrow</item>
+        <item>Pending</item>
+        <item>Recurring</item>
+    </string-array>
 </resources>
