@@ -102,7 +102,9 @@ public class MainFragment extends Fragment {
 
         String topText = "Today, " + currentDate;
 
-        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
+        // R.layout.dropdown_item
+        //android.R.layout.simple_spinner_item
+        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_item);
         dropdownAdapter.setDropDownViewResource(R.layout.dropdown_item);
 
         Calendar t = Calendar.getInstance();
@@ -110,7 +112,7 @@ public class MainFragment extends Fragment {
         String tomorrow = date.format(t.getTime());
 
         dropdownAdapter.add(topText);
-        dropdownAdapter.add("Tomorrow" + tomorrow);
+        dropdownAdapter.add("Tomorrow, " + tomorrow);
         dropdownAdapter.add("Pending");
         dropdownAdapter.add("Recurring");
 
