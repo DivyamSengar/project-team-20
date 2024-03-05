@@ -109,7 +109,7 @@ public class MainFragment extends Fragment {
         SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
         String currentDate = date.format(new Date());
 
-        String topText = "Today, " + currentDate;
+
 
         /*
         https://developer.android.com/develop/ui/views/components/spinner#java
@@ -125,7 +125,7 @@ public class MainFragment extends Fragment {
         t.add(Calendar.DATE, 1);
         String tomorrow = date.format(t.getTime());
 
-        dropdownAdapter.add(topText);
+        dropdownAdapter.add("Today, " + currentDate);
         dropdownAdapter.add("Tomorrow, " + tomorrow);
         dropdownAdapter.add("Pending");
         dropdownAdapter.add("Recurring");
@@ -135,11 +135,22 @@ public class MainFragment extends Fragment {
         // Button for developer testing, changes the date by a day
         view.imageButton2.setOnClickListener(new View.OnClickListener(){
             Calendar c = Calendar.getInstance();
+            Calendar c2 = Calendar.getInstance();
 
             @Override
             public void onClick(View v){
+                dropdownAdapter.clear();
                 c.add(Calendar.DATE, 1);
+                c2.add(Calendar.DATE, 1);
+                if (c.equals(c2)){
+                    c2.add(Calendar.DATE, 1);
+                }
                 String currentDate = date.format(c.getTime());
+                String nextDate = date.format(c2.getTime());
+                dropdownAdapter.insert("Today "+currentDate,0);
+                dropdownAdapter.insert("Tomorrow "+nextDate,1);
+                dropdownAdapter.add("Pending");
+                dropdownAdapter.add("Recurring");
                 activityModel.deleteCompleted();
             }
 
