@@ -227,8 +227,42 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         return view.getRoot();
     }
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        // Show the current date at the top
+        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
+        String currentDate = date.format(new Date());
+
+
+
+        /*
+        https://developer.android.com/develop/ui/views/components/spinner#java
+        Source Title: Add spinners to your app
+        Date Captured: 3/5/2024 12:33 am
+        Used as a reference to have a drop down menu to switch between views via spinner
+        Handle: smhitle
+         */
+        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_item);
+        dropdownAdapter.setDropDownViewResource(R.layout.dropdown_item);
+
+        Calendar t = Calendar.getInstance();
+        t.add(Calendar.DATE, 1);
+        String tomorrow = date.format(t.getTime());
+
+        dropdownAdapter.add("Today, " + currentDate);
+        dropdownAdapter.add("Tomorrow, " + tomorrow);
+        dropdownAdapter.add("Pending");
+        dropdownAdapter.add("Recurring");
+
+        view.dropdown.setAdapter(dropdownAdapter);
+    }
+
 
 }
+
+
 
 
 /*
