@@ -99,7 +99,7 @@ public class MainFragment extends Fragment {
         // Show the current date at the top
         SimpleDateFormat date = new SimpleDateFormat("EEEE MM/dd", Locale.getDefault());
         String currentDate = date.format(new Date());
-        view.dateText.setText(currentDate);
+        //view.dateTextSpinner.setSelection(currentDate);
 
         imageButton2 = view.imageButton2;
         // Button for developer testing, changes the date by a day
@@ -110,7 +110,7 @@ public class MainFragment extends Fragment {
             public void onClick(View v){
                 c.add(Calendar.DATE, 1);
                 String currentDate = date.format(c.getTime());
-                view.dateText.setText(currentDate);
+                //view.dateText.setText(currentDate);
                 activityModel.deleteCompleted();
             }
 
@@ -179,6 +179,20 @@ public class MainFragment extends Fragment {
             }
 
         });
+
+        // Observer to check whether or not if we are at a particular view to display Today, Tomorrow, Pending, Recurring
+        /*activityModel.isGoalsEmpty()
+        {
+            if (Boolean.TRUE.equals(isGoalsEmpty)) {
+                view.emptyGoals.setText(R.string.emptyGoalsText);
+                view.emptyGoals.setVisibility(View.VISIBLE);
+                view.listGoals.setVisibility(View.INVISIBLE);
+            } else {
+                view.emptyGoals.setVisibility(View.INVISIBLE);
+                view.listGoals.setVisibility(View.VISIBLE);
+            }
+
+        });*/
 
         // Listener for taps/clicks on each list item
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
