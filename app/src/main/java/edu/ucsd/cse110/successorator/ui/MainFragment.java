@@ -35,6 +35,7 @@ public class MainFragment extends Fragment {
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
 
+
     /**
      * Required empty public constructor
      */
@@ -71,6 +72,7 @@ public class MainFragment extends Fragment {
         // Initialize the adapter
         this.adapter = new MainFragmentAdapter(requireContext(), List.of());
 
+
         // Observe goals, adapter fills the ListView
         activityModel.getGoals().observe(goal -> {
             if (goal == null) return;
@@ -102,7 +104,7 @@ public class MainFragment extends Fragment {
         addPlusButtonListener();
         addGoalListeners();
         createSpinner();
-
+        createDeveloperButton();
 
         // Inflate the layout for this fragment
         return view.getRoot();
@@ -181,7 +183,7 @@ public class MainFragment extends Fragment {
         ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
         dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        dropdownAdapter.add("");
+//        dropdownAdapter.add("");
         dropdownAdapter.add("Today");
         dropdownAdapter.add("Tomorrow");
         dropdownAdapter.add("Pending");
@@ -198,24 +200,17 @@ public class MainFragment extends Fragment {
                     dropdownAdapter.clear();
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.fragment_container, MainFragment.newInstance())
+                            .replace(R.id.fragment_container, TomorrowFragment.newInstance())
                             .commit();
                 }
                 else if (position == 2) {
                     dropdownAdapter.clear();
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.fragment_container, TomorrowFragment.newInstance())
-                            .commit();
-                }
-                else if (position == 3) {
-                    dropdownAdapter.clear();
-                    requireActivity().getSupportFragmentManager()
-                            .beginTransaction()
                             .replace(R.id.fragment_container, PendingFragment.newInstance())
                             .commit();
                 }
-                else if (position == 4) {
+                else if (position == 3) {
                     dropdownAdapter.clear();
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
@@ -235,11 +230,6 @@ public class MainFragment extends Fragment {
     public void createDeveloperButton(){
         // Show the current date at the top
         SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
-        String currentDate = date.format(new Date());
-
-        Calendar t = Calendar.getInstance();
-        t.add(Calendar.DATE, 1);
-        String tomorrow = date.format(t.getTime());
         // Button for developer testing, changes the date by a day
         view.imageButton2.setOnClickListener(new View.OnClickListener(){
             Calendar c = Calendar.getInstance();
@@ -252,8 +242,11 @@ public class MainFragment extends Fragment {
                 if (c.equals(c2)){
                     c2.add(Calendar.DATE, 1);
                 }
-                String currentDate = date.format(c.getTime());
+                String currentDate =  "Today, " + date.format(c.getTime());
                 String nextDate = date.format(c2.getTime());
+
+                view.topText.setText(currentDate);
+
                 activityModel.deleteCompleted();
             }
         });

@@ -18,6 +18,7 @@ import java.util.Locale;
 import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentPendingBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
+import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 
 public class PendingFragment extends Fragment {
     private FragmentPendingBinding view;
@@ -50,6 +51,7 @@ public class PendingFragment extends Fragment {
         createSpinner();
         showTopBar();
         addPlusButtonListener();
+        addGoalListeners();
 
         // Inflate the layout for this fragment
         return view.getRoot();
@@ -61,14 +63,14 @@ public class PendingFragment extends Fragment {
 
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
-//        view.imageButton.setOnClickListener(v -> {
-//            var dialogFragment = CreateGoalDialogFragment.newInstance();
-//            dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
-//        });
+        view.imageButton.setOnClickListener(v -> {
+            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
+        });
     }
 
-    // TODO: Modify this so that it actually adds to the correct list
-    public void addGoalListeners () {
+    // TODO: Modify this in long press
+    public void addGoalListeners() {
         // Listener for taps/clicks on each list item
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
             Goal goal = adapter.getItem(position);
@@ -95,10 +97,11 @@ public class PendingFragment extends Fragment {
         ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
         dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        dropdownAdapter.add("");
+        //dropdownAdapter.add("");
+        dropdownAdapter.add("Pending");
         dropdownAdapter.add("Today");
         dropdownAdapter.add("Tomorrow");
-        dropdownAdapter.add("Pending");
+
         dropdownAdapter.add("Recurring");
 
         view.dropdown.setAdapter(dropdownAdapter);
@@ -123,13 +126,6 @@ public class PendingFragment extends Fragment {
                             .commit();
                 }
                 else if (position == 3) {
-                    dropdownAdapter.clear();
-                    requireActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, PendingFragment.newInstance())
-                            .commit();
-                }
-                else if (position == 4) {
                     dropdownAdapter.clear();
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()

@@ -56,6 +56,8 @@ public class TomorrowFragment extends Fragment {
         createSpinner();
         showTopBar();
         addPlusButtonListener();
+        addGoalListeners();
+        createDeveloperButton();
 
         // Inflate the layout for this fragment
         return view.getRoot();
@@ -88,14 +90,14 @@ public class TomorrowFragment extends Fragment {
     // DO NOT USE THIS WE DO NOT HAVE THE CORRECT DIALOG FRAGMENT SETUP
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
-//        view.imageButton.setOnClickListener(v -> {
-//            var dialogFragment = CreateGoalDialogFragment.newInstance();
-//            dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
-//        });
+        view.imageButton.setOnClickListener(v -> {
+            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
+        });
     }
 
     // TODO: Modify this so that it actually adds to the correct list
-    public void addGoalListeners () {
+    public void addGoalListeners() {
         // Listener for taps/clicks on each list item
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
             Goal goal = adapter.getItem(position);
@@ -122,9 +124,10 @@ public class TomorrowFragment extends Fragment {
         ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
         dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        dropdownAdapter.add("");
-        dropdownAdapter.add("Today");
+//        dropdownAdapter.add("");
         dropdownAdapter.add("Tomorrow");
+        dropdownAdapter.add("Today");
+
         dropdownAdapter.add("Pending");
         dropdownAdapter.add("Recurring");
 
@@ -146,17 +149,10 @@ public class TomorrowFragment extends Fragment {
                     dropdownAdapter.clear();
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.fragment_container, TomorrowFragment.newInstance())
-                            .commit();
-                }
-                else if (position == 3) {
-                    dropdownAdapter.clear();
-                    requireActivity().getSupportFragmentManager()
-                            .beginTransaction()
                             .replace(R.id.fragment_container, PendingFragment.newInstance())
                             .commit();
                 }
-                else if (position == 4) {
+                else if (position == 3) {
                     dropdownAdapter.clear();
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
@@ -168,6 +164,29 @@ public class TomorrowFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 return;
+            }
+        });
+    }
+    public void createDeveloperButton(){
+        // Show the current date at the top
+        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
+        // Button for developer testing, changes the date by a day
+        view.imageButton2.setOnClickListener(new View.OnClickListener(){
+            Calendar c = Calendar.getInstance();
+            Calendar c2 = Calendar.getInstance();
+
+            @Override
+            public void onClick(View v){
+                c.add(Calendar.DATE, 1);
+                c2.add(Calendar.DATE, 1);
+                if (c.equals(c2)){
+                    c2.add(Calendar.DATE, 1);
+                }
+                String currentDate =  "Today, " + date.format(c.getTime());
+                String nextDate = "Tomorrow, " +date.format(c2.getTime());
+
+                view.topText.setText(nextDate);
+
             }
         });
     }
