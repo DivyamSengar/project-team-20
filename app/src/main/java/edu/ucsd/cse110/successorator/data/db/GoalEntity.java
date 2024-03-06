@@ -24,6 +24,18 @@ public class GoalEntity {
     @ColumnInfo(name = "sort_order")
             public int sort_order;
 
+    // recurring: 0 if not and then rest of fields referring to different recurring categories
+    // pending: whether pending or not
+    // date: the date to distinguish today/tomorrow and better distinguish recurrent nature
+    // for monthly, figure out what the first day of the month was and then determine it
+    @ColumnInfo(name = "pending")
+            public boolean pending;
+    @ColumnInfo(name = "recurring")
+            public String recurring;
+    // use an int array to represent the distinct counts of minutes, hours, day, month, and year
+    @ColumnInfo(name = "date")
+            public int[] date;
+
     /**
      * GoalEntity constructor to initialize its fields
      * @param id = id of the goal
@@ -31,11 +43,15 @@ public class GoalEntity {
      * @param isComplete = complete status of the goal
      * @param sort_order = int index of the sort_order of the goal
      */
-    GoalEntity(@NonNull Integer id, @NonNull String text, boolean isComplete, int sort_order){
+    GoalEntity(@NonNull Integer id, @NonNull String text, boolean isComplete,
+               int sort_order, boolean pending, String recurring, int[] date){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
         this.sort_order = sort_order;
+        this.pending = pending;
+        this.recurring = recurring;
+        this.date = date;
     }
 
     /**
@@ -44,7 +60,8 @@ public class GoalEntity {
      * @return GoalEntity object with the values of goal
      */
     public static GoalEntity fromGoal(@NonNull Goal goal){
-        return new GoalEntity(goal.id(), goal.getText(), goal.isComplete(), goal.sortOrder());
+        return new GoalEntity(goal.id(), goal.getText(), goal.isComplete(), goal.sortOrder(),
+                goal.isPending(), goal.getRecurring(), goal.getDate());
     }
 
     /**
@@ -52,6 +69,6 @@ public class GoalEntity {
      * @return goal representation of this object
      */
     public @NonNull Goal toGoal(){
-        return new Goal(id, text, isComplete, sort_order);
+        return new Goal(id, text, isComplete, sort_order, pending, recurring, date);
     }
 }

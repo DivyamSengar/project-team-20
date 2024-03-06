@@ -15,6 +15,9 @@ public class Goal implements Serializable {
     private @NonNull String text;
     private @NonNull boolean isComplete;
     private int sortOrder;
+    private boolean pending;
+    private String recurring;
+    private int[] date;
 
     /**
      * Goal constructor to initialize the fields of goal
@@ -23,11 +26,15 @@ public class Goal implements Serializable {
      * @param isComplete = boolean status of whether the goal is complete or incomplete
      * @param sortOrder = index of goal in the List according the sorted order
      */
-    public Goal(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete, int sortOrder){
+    public Goal(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete,
+                int sortOrder, boolean pending, String recurring, int[] date){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
         this.sortOrder = sortOrder;
+        this.pending = pending;
+        this.recurring = recurring;
+        this.date = date;
     }
 
     /**
@@ -65,6 +72,10 @@ public class Goal implements Serializable {
     /**
      * Method changes the status of the current goal to complete
      */
+    public boolean isPending(){ return this.pending;}
+
+    public @NonNull String getRecurring(){return this.recurring;}
+    public int[] getDate(){return this.date;}
     public void makeComplete(){
 
         this.isComplete = true;
@@ -76,6 +87,9 @@ public class Goal implements Serializable {
     public void makeInComplete(){
         this.isComplete = false;
     }
+    public void changePending() {this.pending = !this.pending;}
+    public void setRecurring(String recurring){this.recurring = recurring;}
+    public void setDate(int[] date){this.date=date;}
 
     /**
      * Methods overrides the equals method in order to compare two goal objects

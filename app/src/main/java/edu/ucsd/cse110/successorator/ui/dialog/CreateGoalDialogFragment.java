@@ -14,6 +14,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.time.LocalDateTime;
+
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
@@ -86,8 +88,14 @@ public class CreateGoalDialogFragment extends DialogFragment {
                 if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
                     // Get the input of the textEdit
                     var input = view.goalEditText.getText().toString();
-
+                    // get whether it's pending/get the view
+                    // get whether it's recurring and if so which type
+                    // get current system time
+                    LocalDateTime currentTime = LocalDateTime.now();
+                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
+                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
                     // Create a new Goal with the text and add it
+                    // need to get the current date, decide whether it's pending, and decide whether it's recurring
                     var newGoal = new Goal(null, input, false, -1);
                     activityModel.appendIncomplete(newGoal);
                     dismiss();
