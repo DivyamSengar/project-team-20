@@ -30,6 +30,7 @@ import edu.ucsd.cse110.successorator.lib.domain.Goal;
 public class CreateGoalDialogFragment extends DialogFragment {
     private MainViewModel activityModel;
     private FragmentDialogCreateGoalBinding view;
+    private static String viewType;
 
     /**
      * Required empty public constructor
@@ -42,7 +43,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
      *
      * @return Fragment - returns a new fragment instance for MainFragment
      */
-    public static CreateGoalDialogFragment newInstance(){
+    public static CreateGoalDialogFragment newInstance(String vType){
+        viewType = vType;
         var fragment = new CreateGoalDialogFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -94,12 +96,25 @@ public class CreateGoalDialogFragment extends DialogFragment {
                     // get whether it's pending/get the view
                     // get whether it's recurring and if so which type
                     // get current system time
+
                     LocalDateTime currentTime = LocalDateTime.now();
-                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
-                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
                     // Create a new Goal with the text and add it
                     // need to get the current date, decide whether it's pending, and decide whether it's recurring
-                    var newGoal = new Goal(null, input, false, -1, false, null,
+                    boolean pending = false;
+                    String recurring = null;
+                    if(viewType.equals("tomorrow")){
+                        currentTime = currentTime.plusDays(1);
+                    } else if(viewType.equals("pending")){
+                        pending = true;
+                    } else if(viewType.equals("recurring")){
+                        //need to instantiate the recurring field based on the OnClick which will determine whether the goal is daily, weekly, monthly, yearly
+                    }
+
+                    //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
+                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
+                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
+
+                    var newGoal = new Goal(null, input, false, -1, pending, recurring,
                             date[0], date[1], date[2], date[3], date[4]);
                     activityModel.appendIncomplete(newGoal);
                     dismiss();
@@ -151,11 +166,23 @@ public class CreateGoalDialogFragment extends DialogFragment {
                     // Get the input of the textEdit
                     var input = view.goalEditText.getText().toString();
                     LocalDateTime currentTime = LocalDateTime.now();
-                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
-                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
                     // Create a new Goal with the text and add it
                     // need to get the current date, decide whether it's pending, and decide whether it's recurring
-                    var newGoal = new Goal(null, input, false, -1, false, null,
+                    boolean pending = false;
+                    String recurring = null;
+                    if(viewType.equals("tomorrow")){
+                        currentTime = currentTime.plusDays(1);
+                    } else if(viewType.equals("pending")){
+                        pending = true;
+                    } else if(viewType.equals("recurring")){
+                        //need to instantiate the recurring field based on the OnClick which will determine whether the goal is daily, weekly, monthly, yearly
+                    }
+
+                    //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
+                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
+                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
+
+                    var newGoal = new Goal(null, input, false, -1, pending, recurring,
                             date[0], date[1], date[2], date[3], date[4]);
                     // Create a new Goal with the text and add it
                     activityModel.appendIncomplete(newGoal);

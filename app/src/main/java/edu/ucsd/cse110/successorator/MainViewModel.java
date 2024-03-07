@@ -142,6 +142,52 @@ public class MainViewModel extends ViewModel {
 
     }
 
+    public void rollover() {
+        // Current time and time that the app was last opened
+        LocalDateTime currentTime = LocalDateTime.now();
+        int lastOpenedHour = getFields()[3];
+        int lastOpenedMinute = getFields()[4];
+        int lastDay = getFields()[2];
+        int lastMonth = getFields()[1];
+        int lastYear = getFields()[0];
+
+        LocalDateTime previous = LocalDateTime.of(lastYear, lastMonth,
+                lastDay, lastOpenedHour, lastOpenedMinute);
+
+        int hour = currentTime.getHour();
+        int minute = currentTime.getMinute();
+        int currDay = currentTime.getDayOfMonth();
+        int currMonth = currentTime.getMonthValue();
+        int currYear = currentTime.getYear();
+
+        // If current time is at least 24 hours ahead, perform completed goals deletion
+        var minus24 = currentTime.minusHours(24);
+        if(minus24.isAfter(previous)){
+            deleteCompleted();
+        }
+        else if (minus24.isEqual(previous)){
+            deleteCompleted();
+        }
+        else if (currentTime.isBefore(previous));
+        else if (currDay > lastDay) {
+            if ((lastDay + 1) < currDay) {
+                deleteCompleted();
+            } else {
+                if (hour >= 2) {
+                    deleteCompleted();
+                }
+            }
+        }
+        else {
+            if ((hour >= 2)
+                    && (lastOpenedHour <= 2)) {
+                deleteCompleted();
+            }
+        }
+        deleteTime();
+        appendTime(currentTime);
+    }
+
     /**
      * Getter for the Subject of all goals, both incomplete and complete
      *
@@ -150,6 +196,22 @@ public class MainViewModel extends ViewModel {
     public Subject<List<Goal>> getGoals() {
         return goals;
     }
+
+    public Subject<List<Goal>> getPendingGoals() {return goalRepositoryIncomplete.getPendingGoals();}
+
+    public Subject<List<Goal>> getRecurringGoalsIncomplete() {
+        return goalRepositoryIncomplete.getRecurringGoals();
+    }
+
+    public Subject<List<Goal>> getRecurringGoalsComplete() {
+        return goalRepositoryComplete.getRecurringGoals();
+    }
+
+
+    public Subject<List<Goal>> getGoalsByDayIncomplete(int year, int month, int day) {return goalRepositoryIncomplete.getGoalsByDay(year, month, day);}
+
+    public Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getGoalsByDay(year, month, day);}
+
 
     /**
      * Checks if list of goals is empty

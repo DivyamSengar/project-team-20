@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
+import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.util.*;
@@ -42,6 +43,39 @@ public class RoomGoalRepository implements GoalRepository {
     @Override
     public Subject<List<Goal>> findAll(){
         var entitiesLiveData = goalDao.findAllAsLiveData();
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getPendingGoals() {
+        var entitiesLiveData = goalDao.getPending();
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getRecurringGoals() {
+        var entitiesLiveData = goalDao.getRecurring();
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getGoalsByDay(int year, int month, int day) {
+        var entitiesLiveData = goalDao.getByDay(year, month, day);
         var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
             return entities.stream()
                     .map(GoalEntity::toGoal)

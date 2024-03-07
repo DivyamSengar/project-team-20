@@ -62,7 +62,7 @@ public class RecurringFragment extends Fragment {
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
-            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            var dialogFragment = CreateGoalDialogFragment.newInstance("recurring");
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
     }

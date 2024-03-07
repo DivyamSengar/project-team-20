@@ -88,6 +88,16 @@ public interface GoalDao {
     @Query("DELETE from Goals WHERE isComplete = true")
     void deleteComplete();
 
+    @Query("SELECT * from Goals WHERE Pending = true")
+    LiveData<List<GoalEntity>> getPending();
+
+    @Query("SELECT * from Goals WHERE year = :year AND month = :month AND day = :day")
+    LiveData<List<GoalEntity>> getByDay(int year, int month, int day);
+
+    @Query("SELECT * from Goals WHERE recurring != null")
+    LiveData<List<GoalEntity>> getRecurring();
+
+
     /**
      * Append a goal to the list
      * @param goal goal to append

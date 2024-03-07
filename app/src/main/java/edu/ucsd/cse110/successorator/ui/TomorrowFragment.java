@@ -91,7 +91,7 @@ public class TomorrowFragment extends Fragment {
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
-            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            var dialogFragment = CreateGoalDialogFragment.newInstance("tomorrow");
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
     }

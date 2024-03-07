@@ -81,6 +81,7 @@ public class MainFragment extends Fragment {
             adapter.notifyDataSetChanged();
         });
 
+
     }
 
     /**
@@ -100,6 +101,9 @@ public class MainFragment extends Fragment {
         view.listGoals.setAdapter(adapter);
 
         showTopBar();
+
+        activityModel.rollover();
+
         checkGoalsIsEmpty();
         addPlusButtonListener();
         addGoalListeners();
@@ -118,6 +122,7 @@ public class MainFragment extends Fragment {
         String currentDate = "Today, " + date.format(new Date());
 
         view.topText.setText(currentDate);
+        activityModel.rollover();
     }
 
     public void showTopBar(){
@@ -131,7 +136,7 @@ public class MainFragment extends Fragment {
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
-            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            var dialogFragment = CreateGoalDialogFragment.newInstance("today");
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
     }

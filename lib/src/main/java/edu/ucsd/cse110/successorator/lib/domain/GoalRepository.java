@@ -23,6 +23,11 @@ public interface GoalRepository {
      */
     Subject<List<Goal>> findAll();
 
+    Subject<List<Goal>> getPendingGoals();
+
+    Subject<List<Goal>> getRecurringGoals();
+
+    Subject<List<Goal>> getGoalsByDay(int year, int month, int day);
 
     /**
      * Removes a goal with a specific id from the list
