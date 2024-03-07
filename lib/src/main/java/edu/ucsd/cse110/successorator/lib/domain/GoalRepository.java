@@ -29,6 +29,10 @@ public interface GoalRepository {
 
     Subject<List<Goal>> getGoalsByDay(int year, int month, int day);
 
+    Subject<List<Goal>> getRecurringGoalsByDay(int year, int month, int day);
+
+    Subject<List<Goal>> getGoalsLessThanOrEqualToDay(int year, int month, int day);
+
     /**
      * Removes a goal with a specific id from the list
      * @param id of goal to remove

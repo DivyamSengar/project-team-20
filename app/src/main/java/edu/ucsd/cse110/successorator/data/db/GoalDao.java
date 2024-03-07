@@ -94,8 +94,14 @@ public interface GoalDao {
     @Query("SELECT * from Goals WHERE year = :year AND month = :month AND day = :day")
     LiveData<List<GoalEntity>> getByDay(int year, int month, int day);
 
+    @Query("SELECT * from Goals WHERE year <= :year AND month <= :month AND day <= :day")
+    LiveData<List<GoalEntity>> getLessThanOrEqualToDay(int year, int month, int day);
+
     @Query("SELECT * from Goals WHERE recurring != null")
     LiveData<List<GoalEntity>> getRecurring();
+
+    @Query("SELECT * from Goals WHERE recurring != null AND year = :year AND month = :month AND day = :day")
+    LiveData<List<GoalEntity>> getRecurringByDay(int year, int month, int day);
 
 
     /**

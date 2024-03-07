@@ -142,6 +142,33 @@ public class MainViewModel extends ViewModel {
 
     }
 
+    /**
+     * Things to Implement:
+     *
+     * As is stated by the assumptions doc, if a recurring goals is “rolled over” when incomplete,
+     * then that is fine (it should rollover into the following days), but if it passes its repeat
+     * period (for example, 7 days later for a weekly goal), then one should not see the goal twice,
+     * but rather just see it once. Based on this, for recurring goals that are being rolled over, we
+     * need to check if they are passing their boundary/repeating date and if so, just add/change the
+     * date to adjust to the boundary. For example, if I Made a weekly goal on mar 1st and it rolled
+     * over because of incompletion until mar 8th, then we should adjust the date of that goal in the
+     * database to be mar 8th, instead of keeping it as mar 1st as planned.
+     *
+     * We need to adjust the rollover as well, so that if goals are incomplete, they are simply rolled
+     * over to the next day, but you don’t add to the date until they are completed and rolled over if
+     * they are recurrent goals (or until they pass their boundary period as described above). We don’t add to t
+     *
+     * The date for one time goals, because they don’t repeat. So, for the rollover, for one-time goals,
+     * they are eventually just deleted, for recurrent goals, they are deleted and then readded with new dates,
+     * where they are added either after they have been completed/deleted with the requisite new recurrent date
+     * or if they pass their critical boundary/repeat stage, then they are deleted and readded with their new date
+     * (with the new date simply being the previously stored date + the recurrent period/length). So, for recurrent
+     * goals, if they are incomplete and rollover, we just store them with their date of instantiation/what date
+     * they had based on their schedule and update it later to match the next recurrent date based on whether they
+     * passed that date boundary or whether they completed before it.
+     *
+     * For Rollover/in general, we show date less than or equal to today for the today view (based on the rollover logic above)
+     */
     public void rollover() {
         // Current time and time that the app was last opened
         LocalDateTime currentTime = LocalDateTime.now();
@@ -211,6 +238,10 @@ public class MainViewModel extends ViewModel {
     public Subject<List<Goal>> getGoalsByDayIncomplete(int year, int month, int day) {return goalRepositoryIncomplete.getGoalsByDay(year, month, day);}
 
     public Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getGoalsByDay(year, month, day);}
+
+    public Subject<List<Goal>> getGoalsLessThanOrEqualToDayIncomplete(int year, int month, int day) {return goalRepositoryIncomplete.getGoalsLessThanOrEqualToDay(year, month, day);}
+
+    public Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getRecurringGoalsByDay(year, month, day);}
 
 
     /**
