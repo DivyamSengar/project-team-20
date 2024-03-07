@@ -13,7 +13,7 @@ import edu.ucsd.cse110.successorator.lib.domain.Goal;
 public class GoalEntity {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    public Integer id = null;
+    public Integer id;
 
     @ColumnInfo(name = "text")
     public String text;
@@ -33,8 +33,20 @@ public class GoalEntity {
     @ColumnInfo(name = "recurring")
             public String recurring;
     // use an int array to represent the distinct counts of minutes, hours, day, month, and year
-    @ColumnInfo(name = "date")
-            public int[] date;
+    @ColumnInfo(name = "hour")
+    public int hour;
+
+    @ColumnInfo(name = "day")
+    public int day;
+
+    @ColumnInfo(name = "minutes")
+    public int minutes;
+
+    @ColumnInfo(name = "month")
+    public int month;
+
+    @ColumnInfo(name = "year")
+    public int year;
 
     /**
      * GoalEntity constructor to initialize its fields
@@ -44,14 +56,19 @@ public class GoalEntity {
      * @param sort_order = int index of the sort_order of the goal
      */
     GoalEntity(@NonNull Integer id, @NonNull String text, boolean isComplete,
-               int sort_order, boolean pending, String recurring, int[] date){
+               int sort_order, boolean pending, String recurring, int minutes,
+               int hour, int day, int month, int year){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
         this.sort_order = sort_order;
         this.pending = pending;
         this.recurring = recurring;
-        this.date = date;
+        this.minutes = minutes;
+        this.hour = hour;
+        this.day = day;
+        this.month = month;
+        this.year = year;
     }
 
     /**
@@ -61,7 +78,8 @@ public class GoalEntity {
      */
     public static GoalEntity fromGoal(@NonNull Goal goal){
         return new GoalEntity(goal.id(), goal.getText(), goal.isComplete(), goal.sortOrder(),
-                goal.isPending(), goal.getRecurring(), goal.getDate());
+                goal.isPending(), goal.getRecurring(), goal.getMinutes(), goal.getHour(),
+                goal.getDay(), goal.getMonth(), goal.getYear());
     }
 
     /**
@@ -69,6 +87,6 @@ public class GoalEntity {
      * @return goal representation of this object
      */
     public @NonNull Goal toGoal(){
-        return new Goal(id, text, isComplete, sort_order, pending, recurring, date);
+        return new Goal(id, text, isComplete, sort_order, pending, recurring, minutes, hour, day, month, year);
     }
 }

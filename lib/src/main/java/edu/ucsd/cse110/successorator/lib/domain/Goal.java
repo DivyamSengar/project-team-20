@@ -11,13 +11,17 @@ import androidx.annotation.Nullable;
  */
 public class Goal implements Serializable {
 
-    private final @Nullable Integer id;
+    private final Integer id;
     private @NonNull String text;
     private @NonNull boolean isComplete;
     private int sortOrder;
     private boolean pending;
     private String recurring;
-    private int[] date;
+    private int minutes;
+    private int hour;
+    private int day;
+    private int month;
+    private int year;
 
     /**
      * Goal constructor to initialize the fields of goal
@@ -27,14 +31,19 @@ public class Goal implements Serializable {
      * @param sortOrder = index of goal in the List according the sorted order
      */
     public Goal(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete,
-                int sortOrder, boolean pending, String recurring, int[] date){
+                int sortOrder, boolean pending, String recurring, int minutes,
+                int hour, int day, int month, int year){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
         this.sortOrder = sortOrder;
         this.pending = pending;
         this.recurring = recurring;
-        this.date = date;
+        this.minutes = minutes;
+        this.hour = hour;
+        this.day=day;
+        this.month=month;
+        this.year=year;
     }
 
     /**
@@ -75,7 +84,27 @@ public class Goal implements Serializable {
     public boolean isPending(){ return this.pending;}
 
     public @NonNull String getRecurring(){return this.recurring;}
-    public int[] getDate(){return this.date;}
+
+    public int getMinutes() {
+        return minutes;
+    }
+
+    public int getHour() {
+        return hour;
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
     public void makeComplete(){
 
         this.isComplete = true;
@@ -89,7 +118,13 @@ public class Goal implements Serializable {
     }
     public void changePending() {this.pending = !this.pending;}
     public void setRecurring(String recurring){this.recurring = recurring;}
-    public void setDate(int[] date){this.date=date;}
+    public void setDate(int minutes, int hour, int day, int month, int year){
+        this.minutes=minutes;
+        this.day = day;
+        this.hour = hour;
+        this.month = month;
+        this.year=year;
+    }
 
     /**
      * Methods overrides the equals method in order to compare two goal objects

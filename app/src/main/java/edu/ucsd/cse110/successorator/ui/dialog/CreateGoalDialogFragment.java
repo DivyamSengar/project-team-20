@@ -99,7 +99,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
                             currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
                     // Create a new Goal with the text and add it
                     // need to get the current date, decide whether it's pending, and decide whether it's recurring
-                    var newGoal = new Goal(null, input, false, -1, false, null, null);
+                    var newGoal = new Goal(null, input, false, -1, false, null,
+                            date[0], date[1], date[2], date[3], date[4]);
                     activityModel.appendIncomplete(newGoal);
                     dismiss();
                 }
@@ -149,10 +150,14 @@ public class CreateGoalDialogFragment extends DialogFragment {
                 if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
                     // Get the input of the textEdit
                     var input = view.goalEditText.getText().toString();
-
+                    LocalDateTime currentTime = LocalDateTime.now();
+                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
+                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
                     // Create a new Goal with the text and add it
-                    var newGoal = new Goal(null, input, false, -1, false, null, null);
-
+                    // need to get the current date, decide whether it's pending, and decide whether it's recurring
+                    var newGoal = new Goal(null, input, false, -1, false, null,
+                            date[0], date[1], date[2], date[3], date[4]);
+                    // Create a new Goal with the text and add it
                     activityModel.appendIncomplete(newGoal);
                     dismiss();
                 }

@@ -96,7 +96,8 @@ public interface GoalDao {
     @Transaction
     default int append(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
-                getMaxSortOrder()+1, goal.pending, goal.recurring, goal.date);
+                getMaxSortOrder()+1, goal.pending, goal.recurring,
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year);
         return Math.toIntExact(insert(newGoalEntity));
     }
 
@@ -108,7 +109,8 @@ public interface GoalDao {
     @Transaction
     default int prepend(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
-                getMinSortOrder()-1, goal.pending, goal.recurring, goal.date);
+                getMinSortOrder()-1, goal.pending, goal.recurring,
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year);
         return Math.toIntExact(insert(newGoalEntity));
     }
 }
