@@ -41,6 +41,8 @@ public class MainViewModel extends ViewModel {
     private MutableSubject<List<Goal>> goals;
     private MutableSubject<Boolean> isGoalsEmpty;
 
+    //private MutableSubject<> whichView;
+
     private MutableSubject<List<Goal>> goalsCompleted;
 
     private MutableSubject<List<Goal>> goalsIncompleted;
@@ -157,6 +159,11 @@ public class MainViewModel extends ViewModel {
     public Subject<Boolean> isGoalsEmpty() {
         return isGoalsEmpty;
     }
+
+    /*public Subject<Boolean> whichView() {
+        return whichView;
+    }
+    */
 
     /**
      * Removes a specified goal from the repository of completed goals
