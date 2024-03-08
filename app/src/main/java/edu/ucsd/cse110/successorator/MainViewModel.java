@@ -187,6 +187,33 @@ public class MainViewModel extends ViewModel {
         int currMonth = currentTime.getMonthValue();
         int currYear = currentTime.getYear();
 
+        //Handling Rollover for Recurring
+        List<Goal> recurringIncompleteGoals = getRecurringGoalsIncomplete().getValue();  // Get list
+        for (Goal goal : recurringIncompleteGoals) {
+            LocalDateTime boundary = getBoundaryRecurringDate(goal);
+            if(boundary.isBefore(currentTime)) {
+                goal.setDate(boundary.getMinute(), boundary.getHour(), boundary.getDayOfMonth(), boundary.getMonthValue(), boundary.getYear());
+            } else {
+                if(goal.isComplete()){
+                    goal.makeInComplete();
+                    goal.setDate(boundary.getMinute(), boundary.getHour(), boundary.getDayOfMonth(), boundary.getMonthValue(), boundary.getYear());
+                } else {
+                    //do nothing because goal will automatically rollover as it is incomplete
+                }
+            }
+            if(goal.getRecurring().equals("daily")){
+
+            } else if(goal.getRecurring().equals("weekly")) {
+
+            } else if(goal.getRecurring().equals("monthly")) {
+
+            } else if(goal.getRecurring().equals("yearly")) {
+
+            }
+
+        }
+
+
         // If current time is at least 24 hours ahead, perform completed goals deletion
         var minus24 = currentTime.minusHours(24);
         if(minus24.isAfter(previous)){
@@ -215,6 +242,20 @@ public class MainViewModel extends ViewModel {
         appendTime(currentTime);
     }
 
+    private LocalDateTime getBoundaryRecurringDate(Goal goal){
+        LocalDateTime goal_Time = LocalDateTime.of(goal.getYear(),
+                goal.getMonth(), goal.getDay(), goal.getHour(), goal.getMinutes());
+        if(goal.getRecurring() == "daily"){
+            return goal_Time.plusDays(1);
+        } else if(goal.getRecurring() == "weekly") {
+            return goal_Time.plusDays(7);
+        } else if(goal.getRecurring() == "monthly") {
+            return goal_Time.plusMonths(1);
+        } else if(goal.getRecurring() == "yearly") {
+            return goal_Time.plusYears(1);
+        }
+    }
+
     /**
      * Getter for the Subject of all goals, both incomplete and complete
      *
@@ -233,7 +274,6 @@ public class MainViewModel extends ViewModel {
     public Subject<List<Goal>> getRecurringGoalsComplete() {
         return goalRepositoryComplete.getRecurringGoals();
     }
-
 
     public Subject<List<Goal>> getGoalsByDayIncomplete(int year, int month, int day) {return goalRepositoryIncomplete.getGoalsByDay(year, month, day);}
 
