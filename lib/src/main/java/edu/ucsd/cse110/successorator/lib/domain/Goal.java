@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
@@ -124,6 +125,49 @@ public class Goal implements Serializable {
         this.hour = hour;
         this.month = month;
         this.year=year;
+    }
+
+    /* returns the boundary/recurring date if it is a recurring goal,
+    else it returns the same date to indicate that it is a one-time goal
+    */
+    public LocalDateTime getBoundaryRecurringDate(){
+        LocalDateTime goal_Time = LocalDateTime.of(this.getYear(),
+                this.getMonth(), this.getDay(),  0, 0);
+        if(this.getRecurring().equals("daily")){
+            return goal_Time.plusDays(1);
+        } else if(this.getRecurring().equals("weekly")) {
+            return goal_Time.plusWeeks(1);
+            /* this monthly is likely incorrect given that the monthly option is supposed to be for
+             recurring days of the week, not just going to the same date in the next month
+            */
+        } else if(this.getRecurring().equals("monthly")) {
+            return goal_Time.plusMonths(1);
+        } else if(this.getRecurring().equals("yearly")) {
+            return goal_Time.plusYears(1);
+        }
+        else return goal_Time;
+    }
+    /*updates  recurring goals to their next recurring date
+
+     */
+    public Goal updateRecurring(){
+        LocalDateTime goal_Time = LocalDateTime.of(this.getYear(),
+                this.getMonth(), this.getDay(), this.getHour(), this.getMinutes());
+        if(this.getRecurring().equals("daily")){
+            goal_Time = goal_Time.plusDays(1);
+        } else if(this.getRecurring().equals("weekly")) {
+            goal_Time = goal_Time.plusWeeks(1);
+            /* this monthly is likely incorrect given that the monthly option is supposed to be for
+             recurring days of the week, not just going to the same date in the next month
+            */
+        } else if(this.getRecurring().equals("monthly")) {
+            goal_Time = goal_Time.plusMonths(1);
+        } else if(this.getRecurring().equals("yearly")) {
+            goal_Time = goal_Time.plusYears(1);
+        }
+        this.setDate(goal_Time.getMinute(), goal_Time.getHour(), goal_Time.getDayOfMonth(),
+                goal_Time.getMonthValue(), goal_Time.getYear());
+        return this;
     }
 
     /**

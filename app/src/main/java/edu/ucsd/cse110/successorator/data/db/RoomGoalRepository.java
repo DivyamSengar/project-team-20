@@ -65,6 +65,9 @@ public class RoomGoalRepository implements GoalRepository {
     @Override
     public Subject<List<Goal>> getRecurringGoals() {
         var entitiesLiveData = goalDao.getRecurring();
+        if (entitiesLiveData.getValue() == null || entitiesLiveData.getValue().isEmpty()){
+            return new SimpleSubject<List<Goal>>();
+        }
         var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
             return entities.stream()
                     .map(GoalEntity::toGoal)
@@ -84,6 +87,9 @@ public class RoomGoalRepository implements GoalRepository {
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
 
+    /*
+    need to use this to display goals for today
+     */
     @Override
     public Subject<List<Goal>> getGoalsLessThanOrEqualToDay(int year, int month, int day) {
         var entitiesLiveData = goalDao.getLessThanOrEqualToDay(year, month, day);

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -172,11 +173,11 @@ public class MainViewModel extends ViewModel {
     public void rollover() {
         // Current time and time that the app was last opened
         LocalDateTime currentTime = LocalDateTime.now();
-        int lastOpenedHour = getFields()[3];
-        int lastOpenedMinute = getFields()[4];
-        int lastDay = getFields()[2];
-        int lastMonth = getFields()[1];
-        int lastYear = getFields()[0];
+        int lastOpenedHour = this.getFields()[3];
+        int lastOpenedMinute = this.getFields()[4];
+        int lastDay = this.getFields()[2];
+        int lastMonth =this.getFields()[1];
+        int lastYear = this.getFields()[0];
 
         LocalDateTime previous = LocalDateTime.of(lastYear, lastMonth,
                 lastDay, lastOpenedHour, lastOpenedMinute);
@@ -187,74 +188,56 @@ public class MainViewModel extends ViewModel {
         int currMonth = currentTime.getMonthValue();
         int currYear = currentTime.getYear();
 
-        //Handling Rollover for Recurring
-        List<Goal> recurringIncompleteGoals = getRecurringGoalsIncomplete().getValue();  // Get list
-        for (Goal goal : recurringIncompleteGoals) {
-            LocalDateTime boundary = getBoundaryRecurringDate(goal);
-            if(boundary.isBefore(currentTime)) {
-                goal.setDate(boundary.getMinute(), boundary.getHour(), boundary.getDayOfMonth(), boundary.getMonthValue(), boundary.getYear());
-            } else {
-                if(goal.isComplete()){
-                    goal.makeInComplete();
-                    goal.setDate(boundary.getMinute(), boundary.getHour(), boundary.getDayOfMonth(), boundary.getMonthValue(), boundary.getYear());
-                } else {
-                    //do nothing because goal will automatically rollover as it is incomplete
-                }
-            }
-            if(goal.getRecurring().equals("daily")){
-
-            } else if(goal.getRecurring().equals("weekly")) {
-
-            } else if(goal.getRecurring().equals("monthly")) {
-
-            } else if(goal.getRecurring().equals("yearly")) {
-
-            }
-
-        }
-
-
         // If current time is at least 24 hours ahead, perform completed goals deletion
         var minus24 = currentTime.minusHours(24);
         if(minus24.isAfter(previous)){
-            deleteCompleted();
+            this.deleteCompleted();
+            IncompleteRecurrentRollover();
         }
         else if (minus24.isEqual(previous)){
-            deleteCompleted();
+            this.deleteCompleted();
+            IncompleteRecurrentRollover();
         }
         else if (currentTime.isBefore(previous));
         else if (currDay > lastDay) {
             if ((lastDay + 1) < currDay) {
-                deleteCompleted();
+                this.deleteCompleted();
+                IncompleteRecurrentRollover();
             } else {
                 if (hour >= 2) {
-                    deleteCompleted();
+                    this.deleteCompleted();
+                    IncompleteRecurrentRollover();
                 }
             }
         }
         else {
             if ((hour >= 2)
                     && (lastOpenedHour <= 2)) {
-                deleteCompleted();
+                this.deleteCompleted();
+                IncompleteRecurrentRollover();
             }
         }
-        deleteTime();
-        appendTime(currentTime);
+        this.deleteTime();
+        this.appendTime(currentTime);
     }
+    // updates dates of boundary recurring incomplete goals if necessary
+    public void IncompleteRecurrentRollover(){
+        var list = getRecurringGoalsIncomplete();
+        if (list.getValue() == null || list.getValue().isEmpty()){
+            return;
+        }
+        LocalDateTime today = LocalDateTime.now();
+        for (var goal : list.getValue()){
+            if (today.isBefore(goal.getBoundaryRecurringDate())){
 
-    private LocalDateTime getBoundaryRecurringDate(Goal goal){
-        LocalDateTime goal_Time = LocalDateTime.of(goal.getYear(),
-                goal.getMonth(), goal.getDay(), goal.getHour(), goal.getMinutes());
-        if(goal.getRecurring() == "daily"){
-            return goal_Time.plusDays(1);
-        } else if(goal.getRecurring() == "weekly") {
-            return goal_Time.plusDays(7);
-        } else if(goal.getRecurring() == "monthly") {
-            return goal_Time.plusMonths(1);
-        } else if(goal.getRecurring() == "yearly") {
-            return goal_Time.plusYears(1);
+            }
+            else {
+                goal.updateRecurring();
+            }
         }
     }
+
+
 
     /**
      * Getter for the Subject of all goals, both incomplete and complete
@@ -279,7 +262,12 @@ public class MainViewModel extends ViewModel {
 
     public Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getGoalsByDay(year, month, day);}
 
-    public Subject<List<Goal>> getGoalsLessThanOrEqualToDayIncomplete(int year, int month, int day) {return goalRepositoryIncomplete.getGoalsLessThanOrEqualToDay(year, month, day);}
+    public Subject<List<Goal>> getGoalsLessThanOrEqualToDay(int year, int month, int day) {
+        SimpleSubject<List<Goal>> first = (SimpleSubject<List<Goal>>) goalRepositoryIncomplete.getGoalsLessThanOrEqualToDay(year, month, day);
+        SimpleSubject<List<Goal>> second = (SimpleSubject<List<Goal>>) goalRepositoryComplete.getGoalsLessThanOrEqualToDay(year, month, day);
+        first.getValue().addAll(second.getValue());
+        return first;
+    }
 
     public Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getRecurringGoalsByDay(year, month, day);}
 
@@ -346,10 +334,27 @@ public class MainViewModel extends ViewModel {
     }
 
     /**
-     * Deletes all of the completed goals
+     * Deletes all of the one-time completed goals and updates any
+     * recurring completed goals to their next recurring date as incomplete goals
+     *
+     * NEW ASSUMPTION (IMPORTANT): When doing the rollover, should the recurring goals get added
+     * first or should the incompleted goals get rolld over first? The order of the goals changes based on this
      */
     public void deleteCompleted(){
+        var recGoals = goalRepositoryComplete.getRecurringGoals();
+        if (recGoals.getValue() == null || recGoals.getValue().isEmpty()){
+            goalRepositoryComplete.deleteCompleted();
+            return;
+        }
+        ArrayList<Goal> toAdd = new ArrayList<>();
+        for (var goal : recGoals.getValue()){
+            goal.makeInComplete();
+            toAdd.add(goal.updateRecurring());
+        }
         goalRepositoryComplete.deleteCompleted();
+        for (var goal : toAdd){
+            goalRepositoryComplete.append(goal);
+        }
     }
 
     /**

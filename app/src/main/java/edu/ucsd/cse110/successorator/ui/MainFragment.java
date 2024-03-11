@@ -74,6 +74,12 @@ public class MainFragment extends Fragment {
 
 
         // Observe goals, adapter fills the ListView
+
+        /* UDPATE! Need to fix this! We want each fragment to have its own view, so for example,
+        today view should call getGoalsLessThanOrEqualToDay() with today's date as argument,
+        tomorrow view should call getGoalsbyDay on tomorrow's date, and recurring and pending should call
+        get recurring/pending goals respectively. Remember, we want the different views to have the correct goals displayed
+        */
         activityModel.getGoals().observe(goal -> {
             if (goal == null) return;
             adapter.clear();
