@@ -14,6 +14,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.time.LocalDateTime;
+
 import java.util.Date;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
@@ -28,6 +30,7 @@ import edu.ucsd.cse110.successorator.lib.domain.Goal;
 public class CreateGoalDialogFragment extends DialogFragment {
     private MainViewModel activityModel;
     private FragmentDialogCreateGoalBinding view;
+    private static String viewType;
 
     /**
      * Required empty public constructor
@@ -40,7 +43,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
      *
      * @return Fragment - returns a new fragment instance for MainFragment
      */
-    public static CreateGoalDialogFragment newInstance(){
+    public static CreateGoalDialogFragment newInstance(String vType){
+        viewType = vType;
         var fragment = new CreateGoalDialogFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -74,6 +78,50 @@ public class CreateGoalDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
 
+        /*
+        https://stackoverflow.com/questions/12937731/android-enter-key-listener
+        Source Title:
+        Date Captured: 2/17/2024 4:51 pm
+        Used as a reference to have the done/check button on the keyboard to "mark as done"
+        and capture the input to add as a goal. When typing .setOnEditorActionListener()
+        the code automatically generated, the rest was reused from previously written code
+        Handle: smhitle
+         */
+        view.goalEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
+                    // Get the input of the textEdit
+                    var input = view.goalEditText.getText().toString();
+                    // get whether it's pending/get the view
+                    // get whether it's recurring and if so which type
+                    // get current system time
+
+                    LocalDateTime currentTime = LocalDateTime.now();
+                    // Create a new Goal with the text and add it
+                    // need to get the current date, decide whether it's pending, and decide whether it's recurring
+                    boolean pending = false;
+                    String recurring = null;
+                    if(viewType.equals("tomorrow")){
+                        currentTime = currentTime.plusDays(1);
+                    } else if(viewType.equals("pending")){
+                        pending = true;
+                    } else if(viewType.equals("recurring")){
+                        //need to instantiate the recurring field based on the OnClick which will determine whether the goal is daily, weekly, monthly, yearly
+                    }
+
+                    //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
+                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
+                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
+
+                    var newGoal = new Goal(null, input, false, -1, pending, recurring,
+                            date[0], date[1], date[2], date[3], date[4]);
+                    activityModel.appendIncomplete(newGoal);
+                    dismiss();
+                }
+                return false;
+            }
+        });
         captureGoalInput();
         return makeDialog();
     }
@@ -117,10 +165,26 @@ public class CreateGoalDialogFragment extends DialogFragment {
                 if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
                     // Get the input of the textEdit
                     var input = view.goalEditText.getText().toString();
-
+                    LocalDateTime currentTime = LocalDateTime.now();
                     // Create a new Goal with the text and add it
-                    var newGoal = new Goal(null, input, false, -1);
+                    // need to get the current date, decide whether it's pending, and decide whether it's recurring
+                    boolean pending = false;
+                    String recurring = null;
+                    if(viewType.equals("tomorrow")){
+                        currentTime = currentTime.plusDays(1);
+                    } else if(viewType.equals("pending")){
+                        pending = true;
+                    } else if(viewType.equals("recurring")){
+                        //need to instantiate the recurring field based on the OnClick which will determine whether the goal is daily, weekly, monthly, yearly
+                    }
 
+                    //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
+                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
+                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
+
+                    var newGoal = new Goal(null, input, false, -1, pending, recurring,
+                            date[0], date[1], date[2], date[3], date[4]);
+                    // Create a new Goal with the text and add it
                     activityModel.appendIncomplete(newGoal);
                     dismiss();
                 }

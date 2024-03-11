@@ -74,12 +74,19 @@ public class MainFragment extends Fragment {
 
 
         // Observe goals, adapter fills the ListView
+
+        /* UDPATE! Need to fix this! We want each fragment to have its own view, so for example,
+        today view should call getGoalsLessThanOrEqualToDay() with today's date as argument,
+        tomorrow view should call getGoalsbyDay on tomorrow's date, and recurring and pending should call
+        get recurring/pending goals respectively. Remember, we want the different views to have the correct goals displayed
+        */
         activityModel.getGoals().observe(goal -> {
             if (goal == null) return;
             adapter.clear();
             adapter.addAll(new ArrayList<>(goal));
             adapter.notifyDataSetChanged();
         });
+
 
     }
 
@@ -100,6 +107,9 @@ public class MainFragment extends Fragment {
         view.listGoals.setAdapter(adapter);
 
         showTopBar();
+
+        activityModel.rollover();
+
         checkGoalsIsEmpty();
         addPlusButtonListener();
         addGoalListeners();
@@ -118,6 +128,7 @@ public class MainFragment extends Fragment {
         String currentDate = "Today, " + date.format(new Date());
 
         view.topText.setText(currentDate);
+        activityModel.rollover();
     }
 
     public void showTopBar(){
@@ -131,7 +142,7 @@ public class MainFragment extends Fragment {
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
-            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            var dialogFragment = CreateGoalDialogFragment.newInstance("today");
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
     }

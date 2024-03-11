@@ -64,7 +64,7 @@ public class PendingFragment extends Fragment {
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
-            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            var dialogFragment = CreateGoalDialogFragment.newInstance("pending");
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
     }
