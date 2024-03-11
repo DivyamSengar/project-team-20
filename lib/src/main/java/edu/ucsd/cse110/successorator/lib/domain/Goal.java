@@ -127,6 +127,16 @@ public class Goal implements Serializable {
         this.year=year;
     }
 
+    public Goal withId(int id) {
+        return new Goal(id, this.text, this.isComplete, this.sortOrder, this.pending, this.recurring,
+                this.minutes, this.hour, this.day, this.month, this.year);
+    }
+
+    public Goal withSortOrder(int sortOrder) {
+        return new Goal(this.id, this.text, this.isComplete, sortOrder, this.pending, this.recurring,
+                this.minutes, this.hour, this.day, this.month, this.year);
+    }
+
     /* returns the boundary/recurring date if it is a recurring goal,
     else it returns the same date to indicate that it is a one-time goal
     */
