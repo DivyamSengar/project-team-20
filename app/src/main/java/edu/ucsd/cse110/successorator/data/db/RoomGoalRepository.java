@@ -77,6 +77,62 @@ public class RoomGoalRepository implements GoalRepository {
     }
 
     @Override
+    public Subject<List<Goal>> getRecurringGoalsIncomplete() {
+        var entitiesLiveData = goalDao.getRecurringIncomplete();
+        if (entitiesLiveData.getValue() == null || entitiesLiveData.getValue().isEmpty()){
+            return new SimpleSubject<List<Goal>>();
+        }
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getRecurringGoalsComplete() {
+        var entitiesLiveData = goalDao.getRecurringComplete();
+        if (entitiesLiveData.getValue() == null || entitiesLiveData.getValue().isEmpty()){
+            return new SimpleSubject<List<Goal>>();
+        }
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getGoalsByDayIncomplete(int year, int month, int day) {
+        var entitiesLiveData = goalDao.getByDayIncomplete(year, month, day);
+        if (entitiesLiveData.getValue() == null || entitiesLiveData.getValue().isEmpty()){
+            return new SimpleSubject<List<Goal>>();
+        }
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day) {
+        var entitiesLiveData = goalDao.getByDayComplete(year, month, day);
+        if (entitiesLiveData.getValue() == null || entitiesLiveData.getValue().isEmpty()){
+            return new SimpleSubject<List<Goal>>();
+        }
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
     public Subject<List<Goal>> getGoalsByDay(int year, int month, int day) {
         var entitiesLiveData = goalDao.getByDay(year, month, day);
         var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
@@ -104,6 +160,17 @@ public class RoomGoalRepository implements GoalRepository {
     @Override
     public Subject<List<Goal>> getRecurringGoalsByDay(int year, int month, int day) {
         var entitiesLiveData = goalDao.getRecurringByDay(year, month, day);
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day) {
+        var entitiesLiveData = goalDao.getRecurringByDayComplete(year, month, day);
         var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
             return entities.stream()
                     .map(GoalEntity::toGoal)
@@ -141,4 +208,15 @@ public class RoomGoalRepository implements GoalRepository {
     public void deleteCompleted(){
         goalDao.deleteComplete();
     }
+
+    public boolean isGoalsEmpty(){ return goalDao.isGoalsEmpty(); }
+
+    public void removeGoalComplete(int id){ goalDao.removeGoalComplete(id); }
+
+    public void removeGoalIncomplete(int id){ goalDao.removeGoalIncomplete(id); }
+
+    public void appendComplete(Goal goal){ goalDao.appendComplete(GoalEntity.fromGoal(goal)); }
+
+    public void appendIncomplete(Goal goal){ goalDao.appendIncomplete(GoalEntity.fromGoal(goal)); }
+
 }

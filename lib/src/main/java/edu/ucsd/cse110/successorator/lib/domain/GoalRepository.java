@@ -27,11 +27,29 @@ public interface GoalRepository {
 
     Subject<List<Goal>> getRecurringGoals();
 
+    Subject<List<Goal>> getRecurringGoalsIncomplete();
+
+    Subject<List<Goal>> getRecurringGoalsComplete();
+
+    Subject<List<Goal>> getGoalsByDayIncomplete(int year, int month, int day);
+
+    Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day);
+
+
     Subject<List<Goal>> getGoalsByDay(int year, int month, int day);
 
     Subject<List<Goal>> getRecurringGoalsByDay(int year, int month, int day);
+    Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day);
 
     Subject<List<Goal>> getGoalsLessThanOrEqualToDay(int year, int month, int day);
+
+    void removeGoalComplete(int id);
+    void removeGoalIncomplete(int id);
+
+    void appendComplete(Goal goal);
+
+    void appendIncomplete(Goal goal);
+    boolean isGoalsEmpty();
 
     /**
      * Removes a goal with a specific id from the list
