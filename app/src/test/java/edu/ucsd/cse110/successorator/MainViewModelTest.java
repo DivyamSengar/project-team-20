@@ -47,6 +47,10 @@ public class MainViewModelTest extends TestCase {
     }
 
     public void testRollover() {
+        // insert some tasks
+        // ADVCNACEED TGHE DAY or call ROLLOVER
+        // what do yuou expect
+
     }
 
     public void testIncompleteRecurrentRollover() {
