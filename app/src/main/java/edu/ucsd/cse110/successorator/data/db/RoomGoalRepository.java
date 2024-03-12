@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.successorator.data.db;
 import androidx.lifecycle.Transformations;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -218,5 +219,6 @@ public class RoomGoalRepository implements GoalRepository {
     public void appendComplete(Goal goal){ goalDao.appendComplete(GoalEntity.fromGoal(goal)); }
 
     public void appendIncomplete(Goal goal){ goalDao.appendIncomplete(GoalEntity.fromGoal(goal)); }
+
 
 }

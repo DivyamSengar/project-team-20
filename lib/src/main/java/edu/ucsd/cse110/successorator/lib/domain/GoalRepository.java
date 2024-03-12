@@ -1,5 +1,6 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
 
@@ -50,6 +51,7 @@ public interface GoalRepository {
 
     void appendIncomplete(Goal goal);
     boolean isGoalsEmpty();
+
 
     /**
      * Removes a goal with a specific id from the list
