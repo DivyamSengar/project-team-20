@@ -15,19 +15,32 @@ import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.SimpleGoalRepository;
+import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
+import edu.ucsd.cse110.successorator.lib.util.Subject;
 
 public class MainViewModelTest extends TestCase {
 
     DataSource dataSource = DataSource.fromDefault();
-    GoalRepository goals = new SimpleGoalRepository(dataSource);
-
+    GoalRepository goalsIncomplete = new SimpleGoalRepository(dataSource);
+    GoalRepository goalsComplete = new SimpleGoalRepository(dataSource);
+    TimeKeeper timeKeeper;
+    MainViewModel mvm = new MainViewModel(goalsComplete, goalsIncomplete, timeKeeper);
 
     @Before
     public void setup(){
+        Goal goal1 = new Goal(1, "do homework", false, 0, true, "monthly", 0, 4, 30, 3, 2024);
+        Goal goal2 = new Goal(2, "clean room", false, 1, true, "monthly", 0, 4, 30, 3, 2024);
+
+        goalsIncomplete.append(goal1);
+        goalsIncomplete.append(goal2);
 
     }
 
     public void testRollover() {
+        // insert some tasks
+        // ADVCNACEED TGHE DAY or call ROLLOVER
+        // what do yuou expect
+
     }
 
     public void testIncompleteRecurrentRollover() {

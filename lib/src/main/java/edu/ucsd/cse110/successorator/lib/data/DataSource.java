@@ -38,17 +38,17 @@ public class DataSource {
     public DataSource() {}
 
     public final static List<Goal> DEFAULT_GOALS = List.of(
-            new Goal(1, "do homework", false, 0, true, "monthly", 0, 4, 30, 3, 2024),
-            new Goal(2, "clean room", false, 1, true, "monthly", 0, 4, 30, 3, 2024),
-            new Goal(3, "play basketball", false, 2, true, "monthly", 0, 4, 30, 3, 2024),
-            new Goal(4, "do smn", false, 3, true, "monthly", 0, 4, 30, 3, 2024)
+//            new Goal(1, "do homework", false, 0, true, "monthly", 0, 4, 30, 3, 2024),
+//            new Goal(2, "clean room", false, 1, true, "monthly", 0, 4, 30, 3, 2024),
+//            new Goal(3, "play basketball", false, 2, true, "monthly", 0, 4, 30, 3, 2024),
+//            new Goal(4, "do smn", false, 3, true, "monthly", 0, 4, 30, 3, 2024)
     );
 
     public static DataSource fromDefault() {
         var data = new DataSource();
-        for (int i = 0; i < 4; i++) {
-            data.putGoalEntry(DEFAULT_GOALS.get(i));
-        }
+//        for (int i = 0; i < DEFAULT_GOALS.size(); i++) {
+//            data.putGoalEntry(DEFAULT_GOALS.get(i));
+//        }
         return data;
     }
 
@@ -202,5 +202,12 @@ public class DataSource {
                 .map(Goal::sortOrder)
                 .max(Integer::compareTo)
                 .orElse(Integer.MIN_VALUE);
+    }
+
+    public List<Goal> getGoalsForDay(int year, int month, int day) {
+        // Filter goals for the specified day
+        return goals.stream()
+                .filter(goal -> goal.getYear() == year && goal.getMonth() == month && goal.getDay() == day)
+                .collect(Collectors.toList());
     }
 }
