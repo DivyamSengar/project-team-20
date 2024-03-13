@@ -1,19 +1,27 @@
 package edu.ucsd.cse110.successorator.ui;
 
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -57,6 +65,8 @@ public class PendingFragment extends Fragment {
             adapter.addAll(new ArrayList<>(goal));
             adapter.notifyDataSetChanged();
         });
+
+
     }
 
     @Override
@@ -76,6 +86,93 @@ public class PendingFragment extends Fragment {
         return view.getRoot();
     }
 
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add("Move to today");
+        menu.add("Move to tomorrow");
+        menu.add("Finish");
+        menu.add("Delete");
+    }
+//    @Override
+//    public boolean onContextItemSelected(@NonNull MenuItem item) {
+//        return super.onContextItemSelected(item);
+//    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Goal goal = adapter.getItem(info.position);
+
+//        if (item.getTitle().equals("Move to today")) {
+//
+//        } else if (item.getTitle().equals("Move to tomorrow")) {
+//
+//        } else if (item.getTitle().equals("Finish")) {
+//
+//        } else if (item.getTitle().equals("Delete")) {
+//
+//        }
+//
+//        return true;
+        return true;
+    }
+
+    private void showPopupMenu(View view, Goal goal) {
+        PopupMenu popupMenu = new PopupMenu(requireContext(), view);
+        popupMenu.inflate(R.menu.pending_goal_context_menu);
+        popupMenu.setOnMenuItemClickListener(item -> {
+//            switch (item.getItemId()) {
+//                case :
+//                    moveToToday(goal);
+//                    return true;
+//                case R.id.move_to_tomorrow:
+//                    moveToTomorrow(goal);
+//                    return true;
+//                case R.id.finish:
+//                    finishGoal(goal);
+//                    return true;
+//                case R.id.delete:
+//                    deleteGoal(goal);
+//                    return true;
+//                default:
+//                    return false;
+//            }
+            if (item.getTitle().equals("Move to today")) {
+
+            } else if (item.getTitle().equals("Move to tomorrow")) {
+
+            } else if (item.getTitle().equals("Finish")) {
+
+            } else if (item.getTitle().equals("Delete")) {
+
+            }
+
+            return true;
+        });
+        popupMenu.show();
+    }
+
+
+    // TODO: Modify this in long press
+    public void addGoalListeners() {
+        view.listGoals.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                Goal goal = adapter.getItem(position);
+//                view.showContextMenu(); // Show the context menu for the long-clicked view
+//                return true;
+//            }
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Goal goal = adapter.getItem(position);
+                showPopupMenu(view, goal);
+                return true;
+            }
+        });
+    }
+
     public void showTopBar(){
         view.topText.setText(R.string.pending);
     }
@@ -88,10 +185,48 @@ public class PendingFragment extends Fragment {
         });
     }
 
-    // TODO: Modify this in long press
-    public void addGoalListeners() {
+//    // TODO: Modify this in long press
+//    public void addGoalListeners() {
+//
+//    }
 
+    private void moveToToday(Goal goal) {
+//        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+//        LocalDateTime goalDateTime = goal.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//
+//        long daysToAdd = ChronoUnit.DAYS.between(goalDateTime, now) + 1;
+//        LocalDateTime newDate = now.plusDays(daysToAdd);
+//
+//        goal.setDate(Date.from(newDate.atZone(ZoneId.systemDefault()).toInstant()));
+//        adapter.notifyItemChanged(adapter.getPosition(goal));
     }
+
+    private void moveToTomorrow(Goal goal) {
+//        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+//        LocalDateTime goalDateTime = goal.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//
+//        long daysToAdd = ChronoUnit.DAYS.between(goalDateTime, now) + 2;
+//        LocalDateTime newDate = now.plusDays(daysToAdd);
+//
+//        goal.setDate(Date.from(newDate.atZone(ZoneId.systemDefault()).toInstant()));
+//        adapter.notifyItemChanged(adapter.getPosition(goal));
+    }
+
+    private void finishGoal(Goal goal) {
+        // Implement your logic to mark the goal as finished
+        // For example, updating the goal's status
+//        goal.setFinished(true);
+//
+//        // Notify the adapter of the change
+//        adapter.notifyItemChanged(adapter.getPosition(goal));
+    }
+
+    private void deleteGoal(Goal goal) {
+        // Implement your logic to delete the goal
+        // For example, removing the goal from the list and notifying the adapter
+//        activityModel.removeGoalComplete(goal.id());
+    }
+
 
     public void createSpinner(){
         /*
@@ -145,6 +280,7 @@ public class PendingFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
                 return;
             }
+
         });
     }
 }
