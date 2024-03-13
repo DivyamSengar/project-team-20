@@ -409,6 +409,25 @@ public class MainViewModel extends ViewModel {
 
     public Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getRecurringGoalsByDay(year, month, day);}
 
+    public Subject<List<Goal>> getContext(Subject<List<Goal>> listOfGoals, int context){
+        MutableSubject<List<Goal>> contextGoals = new SimpleSubject<>();
+        listOfGoals.observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .filter(goal -> goal.getContext() == context)
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+
+            contextGoals.setValue(goalList);
+
+        });
+
+        return contextGoals;
+    }
+
     public Subject<List<Goal>> getContextHome() {
         MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
         MutableSubject<List<Goal>> complete = new SimpleSubject<>();
