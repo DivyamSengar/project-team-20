@@ -10,8 +10,12 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.databinding.GoalListItemBinding;
 
@@ -65,6 +69,20 @@ public class MainFragmentAdapter extends ArrayAdapter<Goal> {
         }
 
         binding.goalText.setText(goal.getText());
+
+        if (goal.getContext() == 1){
+            binding.goalContextIcon.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.home_context_icon));
+            binding.goalContextIcon.setText("H");
+        } else if (goal.getContext() == 2){
+            binding.goalContextIcon.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.work_context_icon));
+            binding.goalContextIcon.setText("W");
+        } else if (goal.getContext() == 3){
+            binding.goalContextIcon.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.school_context_icon));
+            binding.goalContextIcon.setText("S");
+        } else if (goal.getContext() == 4){
+            binding.goalContextIcon.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.errand_context_icon));
+            binding.goalContextIcon.setText("E");
+        }
 
         // Strike-through text if it is complete
         if (goal.isComplete()) {

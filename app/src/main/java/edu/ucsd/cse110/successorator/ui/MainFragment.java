@@ -26,6 +26,7 @@ import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
+import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
 
 /**
  * MainFragment is the main fragment for the application
@@ -115,6 +116,7 @@ public class MainFragment extends Fragment {
 
         checkGoalsIsEmpty();
         addPlusButtonListener();
+        addFocusModeListener();
         addGoalListeners();
         createSpinner();
         createDeveloperButton();
@@ -147,6 +149,13 @@ public class MainFragment extends Fragment {
         view.imageButton.setOnClickListener(v -> {
             var dialogFragment = CreateGoalDialogFragment.newInstance("today");
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
+        });
+    }
+
+    public void addFocusModeListener(){
+        view.hamburgerMenu.setOnClickListener(v -> {
+            var dialogFragment = FocusModeDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
         });
     }
 

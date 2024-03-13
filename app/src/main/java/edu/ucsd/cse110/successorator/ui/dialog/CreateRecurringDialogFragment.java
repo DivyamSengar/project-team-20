@@ -72,7 +72,6 @@ public class CreateRecurringDialogFragment extends DialogFragment {
          */
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder
-                .setTitle("Enter Most Important Thing")
                 .setView(view.getRoot())
                 .setNegativeButton("Cancel", this::onNegativeButtonClick);
         Dialog dialog = dialogBuilder.create();
@@ -98,6 +97,7 @@ public class CreateRecurringDialogFragment extends DialogFragment {
                 var input = view.goalEditText.getText().toString();
                 // Create a new Goal with the text and add it
                 String recurring = null;
+                int contextOption = 0;
 
                 // check which recurrence option was selected
                 if (view.dailyBtn.isChecked()){
@@ -108,6 +108,16 @@ public class CreateRecurringDialogFragment extends DialogFragment {
                     recurring = "monthly";
                 } else if (view.yearlyBtn.isChecked()) {
                     recurring = "yearly";
+                }
+
+                if (view.homeBtn.isChecked()){
+                    contextOption = 1;
+                } else if (view.workBtn.isChecked()){
+                    contextOption = 2;
+                } else if (view.schoolBtn.isChecked()){
+                    contextOption = 3;
+                } else if (view.errandBtn.isChecked()){
+                    contextOption = 4;
                 }
                 
                 var dateInput = view.startingDate.getText().toString();
@@ -123,7 +133,7 @@ public class CreateRecurringDialogFragment extends DialogFragment {
                     int[] date = {localDateTime.getMinute(), localDateTime.getHour(),
                             localDateTime.getDayOfMonth(), localDateTime.getMonthValue(), localDateTime.getYear()};
                     var newGoal = new Goal(null, input, false, -1, false, recurring,
-                            date[0], date[1], date[2], date[3], date[4]);
+                            date[0], date[1], date[2], date[3], date[4], contextOption);
                     // Create a new Goal with the text and add it
                     activityModel.appendIncomplete(newGoal);
                     dismiss();

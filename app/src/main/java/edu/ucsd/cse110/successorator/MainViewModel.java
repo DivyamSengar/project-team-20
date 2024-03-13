@@ -300,7 +300,7 @@ public class MainViewModel extends ViewModel {
                         .collect(Collectors.toList());
             }
             incomplete.setValue(goalList);
-            System.out.println("incomp recurring size" + incomplete.getValue().size());
+//            System.out.println("incomp recurring size" + incomplete.getValue().size());
         });
 
         goalRepositoryComplete.getRecurringGoals().observe(goals -> {
@@ -311,7 +311,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Complete size" + goalList.size());
+//            System.out.println("Complete size" + goalList.size());
             complete.setValue(goalList);
         });
 
@@ -338,7 +338,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println("Recurring size" + recurring.getValue().size());
+//            System.out.println("Recurring size" + recurring.getValue().size());
         });
 
         return recurring;
@@ -360,7 +360,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Incomplete size" + goalList.size());
+//            System.out.println("Incomplete size" + goalList.size());
             incomplete.setValue(goalList);
         });
 
@@ -372,7 +372,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Complete size" + goalList.size());
+//            System.out.println("Complete size" + goalList.size());
             complete.setValue(goalList);
         });
 
@@ -387,7 +387,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(goalsForDay.getValue().size());
+//            System.out.println(goalsForDay.getValue().size());
         });
 
         complete.observe(goals -> {
@@ -401,7 +401,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(goalsForDay.getValue().size());
+//            System.out.println(goalsForDay.getValue().size());
         });
 
         return goalsForDay;
@@ -422,7 +422,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Incomplete size" + goalList.size());
+//            System.out.println("Incomplete size" + goalList.size());
             incomplete.setValue(goalList);
         });
 
@@ -434,7 +434,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Complete size" + goalList.size());
+//            System.out.println("Complete size" + goalList.size());
             complete.setValue(goalList);
         });
 
@@ -449,7 +449,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(contextHome.getValue().size());
+//            System.out.println(contextHome.getValue().size());
         });
 
         complete.observe(goals -> {
@@ -463,7 +463,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(contextHome.getValue().size());
+//            System.out.println(contextHome.getValue().size());
         });
 
         return contextHome;
@@ -482,7 +482,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Incomplete size" + goalList.size());
+//            System.out.println("Incomplete size" + goalList.size());
             incomplete.setValue(goalList);
         });
 
@@ -494,7 +494,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Complete size" + goalList.size());
+//            System.out.println("Complete size" + goalList.size());
             complete.setValue(goalList);
         });
 
@@ -509,7 +509,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(contextWork.getValue().size());
+//            System.out.println(contextWork.getValue().size());
         });
 
         complete.observe(goals -> {
@@ -523,7 +523,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(contextWork.getValue().size());
+//            System.out.println(contextWork.getValue().size());
         });
 
         return contextWork;
@@ -542,7 +542,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Incomplete size" + goalList.size());
+//            System.out.println("Incomplete size" + goalList.size());
             incomplete.setValue(goalList);
         });
 
@@ -554,7 +554,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Complete size" + goalList.size());
+//            System.out.println("Complete size" + goalList.size());
             complete.setValue(goalList);
         });
 
@@ -569,7 +569,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(contextSchool.getValue().size());
+//            System.out.println(contextSchool.getValue().size());
         });
 
         complete.observe(goals -> {
@@ -583,7 +583,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(contextSchool.getValue().size());
+//            System.out.println(contextSchool.getValue().size());
         });
 
         return contextSchool;
@@ -602,7 +602,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Incomplete size" + goalList.size());
+//            System.out.println("Incomplete size" + goalList.size());
             incomplete.setValue(goalList);
         });
 
@@ -614,7 +614,7 @@ public class MainViewModel extends ViewModel {
                         .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Complete size" + goalList.size());
+//            System.out.println("Complete size" + goalList.size());
             complete.setValue(goalList);
         });
 
@@ -629,7 +629,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(contextErrands.getValue().size());
+//            System.out.println(contextErrands.getValue().size());
         });
 
         complete.observe(goals -> {
@@ -643,7 +643,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(contextErrands.getValue().size());
+//            System.out.println(contextErrands.getValue().size());
         });
 
         return contextErrands;
