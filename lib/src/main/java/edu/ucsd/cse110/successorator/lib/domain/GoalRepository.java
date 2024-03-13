@@ -27,6 +27,14 @@ public interface GoalRepository {
 
     Subject<List<Goal>> getRecurringGoals();
 
+    Subject<List<Goal>> getContextHome();
+
+    Subject<List<Goal>> getContextWork();
+
+    Subject<List<Goal>> getContextSchool();
+
+    Subject<List<Goal>> getContextErrands();
+
     Subject<List<Goal>> getGoalsByDay(int year, int month, int day);
 
     Subject<List<Goal>> getRecurringGoalsByDay(int year, int month, int day);

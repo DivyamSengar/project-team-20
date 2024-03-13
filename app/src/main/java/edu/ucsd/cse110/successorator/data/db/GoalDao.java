@@ -103,6 +103,17 @@ public interface GoalDao {
     @Query("SELECT * from Goals WHERE recurring != null AND year = :year AND month = :month AND day = :day")
     LiveData<List<GoalEntity>> getRecurringByDay(int year, int month, int day);
 
+    @Query("SELECT * from Goals WHERE context = 1")
+    LiveData<List<GoalEntity>> getContextHome();
+
+    @Query("SELECT * from Goals WHERE context = 2")
+    LiveData<List<GoalEntity>> getContextWork();
+
+    @Query("SELECT * from Goals WHERE context = 3")
+    LiveData<List<GoalEntity>> getContextSchool();
+
+    @Query("SELECT * from Goals WHERE context = 4")
+    LiveData<List<GoalEntity>> getContextErrands();
 
     /**
      * Append a goal to the list
@@ -113,7 +124,7 @@ public interface GoalDao {
     default int append(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
                 getMaxSortOrder()+1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context);
         return Math.toIntExact(insert(newGoalEntity));
     }
 
@@ -126,7 +137,7 @@ public interface GoalDao {
     default int prepend(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
                 getMinSortOrder()-1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context);
         return Math.toIntExact(insert(newGoalEntity));
     }
 }

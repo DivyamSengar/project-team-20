@@ -48,6 +48,9 @@ public class GoalEntity {
     @ColumnInfo(name = "year")
     public int year;
 
+    @ColumnInfo(name = "context")
+    public int context;
+
     /**
      * GoalEntity constructor to initialize its fields
      * @param id = id of the goal
@@ -57,7 +60,7 @@ public class GoalEntity {
      */
     GoalEntity(@NonNull Integer id, @NonNull String text, boolean isComplete,
                int sort_order, boolean pending, String recurring, int minutes,
-               int hour, int day, int month, int year){
+               int hour, int day, int month, int year, int context){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
@@ -69,6 +72,7 @@ public class GoalEntity {
         this.day = day;
         this.month = month;
         this.year = year;
+        this.context = context;
     }
 
     /**
@@ -79,7 +83,7 @@ public class GoalEntity {
     public static GoalEntity fromGoal(@NonNull Goal goal){
         return new GoalEntity(goal.id(), goal.getText(), goal.isComplete(), goal.sortOrder(),
                 goal.isPending(), goal.getRecurring(), goal.getMinutes(), goal.getHour(),
-                goal.getDay(), goal.getMonth(), goal.getYear());
+                goal.getDay(), goal.getMonth(), goal.getYear(), goal.getContext());
     }
 
     /**
@@ -87,6 +91,6 @@ public class GoalEntity {
      * @return goal representation of this object
      */
     public @NonNull Goal toGoal(){
-        return new Goal(id, text, isComplete, sort_order, pending, recurring, minutes, hour, day, month, year);
+        return new Goal(id, text, isComplete, sort_order, pending, recurring, minutes, hour, day, month, year, context);
     }
 }

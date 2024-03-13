@@ -124,6 +124,51 @@ public class RoomGoalRepository implements GoalRepository {
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
+
+    @Override
+    public Subject<List<Goal>> getContextHome() {
+        var entitiesLiveData = goalDao.getContextHome();
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getContextWork() {
+        var entitiesLiveData = goalDao.getContextWork();
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getContextSchool() {
+        var entitiesLiveData = goalDao.getContextSchool();
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> getContextErrands() {
+        var entitiesLiveData = goalDao.getContextErrands();
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
     /**
      * This method appends a goal to the list of goals
      * @param goal to be appended

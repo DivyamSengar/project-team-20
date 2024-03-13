@@ -86,7 +86,7 @@ public class MainViewModel extends ViewModel {
             else if (newGoals.size() == 0);
             else {
                 orderedGoals = newGoals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
 
@@ -101,7 +101,7 @@ public class MainViewModel extends ViewModel {
             else if (newGoals.size() == 0);
             else {
                 orderedGoals = newGoals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
             goalsIncompleted.setValue(orderedGoals);
@@ -256,7 +256,7 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
             incomplete.setValue(goalList);
@@ -296,7 +296,7 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
             incomplete.setValue(goalList);
@@ -308,7 +308,7 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
             System.out.println("Complete size" + goalList.size());
@@ -357,7 +357,7 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
             System.out.println("Incomplete size" + goalList.size());
@@ -369,7 +369,7 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
             System.out.println("Complete size" + goalList.size());
@@ -409,6 +409,245 @@ public class MainViewModel extends ViewModel {
 
     public Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getRecurringGoalsByDay(year, month, day);}
 
+    public Subject<List<Goal>> getContextHome() {
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> contextHome = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getContextHome().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getContextHome().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            contextHome.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(contextHome.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            contextHome.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(contextHome.getValue().size());
+        });
+
+        return contextHome;
+    }
+
+    public Subject<List<Goal>> getContextWork() {
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> contextWork = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getContextWork().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getContextWork().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            contextWork.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(contextWork.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            contextWork.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(contextWork.getValue().size());
+        });
+
+        return contextWork;
+    }
+
+    public Subject<List<Goal>> getContextSchool() {
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> contextSchool = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getContextSchool().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getContextSchool().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            contextSchool.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(contextSchool.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            contextSchool.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(contextSchool.getValue().size());
+        });
+
+        return contextSchool;
+    }
+
+    public Subject<List<Goal>> getContextErrands() {
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> contextErrands = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getContextErrands().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getContextErrands().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            contextErrands.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(contextErrands.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            contextErrands.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(contextErrands.getValue().size());
+        });
+
+        return contextErrands;
+    }
 
     /**
      * Checks if list of goals is empty

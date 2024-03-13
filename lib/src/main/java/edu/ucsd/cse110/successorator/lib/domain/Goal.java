@@ -23,6 +23,7 @@ public class Goal implements Serializable {
     private int day;
     private int month;
     private int year;
+    private int context;
 
     /**
      * Goal constructor to initialize the fields of goal
@@ -33,7 +34,7 @@ public class Goal implements Serializable {
      */
     public Goal(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete,
                 int sortOrder, boolean pending, String recurring, int minutes,
-                int hour, int day, int month, int year){
+                int hour, int day, int month, int year, int context){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
@@ -45,6 +46,7 @@ public class Goal implements Serializable {
         this.day=day;
         this.month=month;
         this.year=year;
+        this.context = context;
     }
 
     /**
@@ -105,6 +107,8 @@ public class Goal implements Serializable {
     public int getYear() {
         return year;
     }
+
+    public int getContext() {return context;}
 
     public void makeComplete(){
 
