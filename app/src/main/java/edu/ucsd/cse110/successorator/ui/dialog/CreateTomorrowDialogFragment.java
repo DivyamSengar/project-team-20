@@ -1,5 +1,7 @@
 package edu.ucsd.cse110.successorator.ui.dialog;
 
+import static java.lang.Integer.parseInt;
+
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -15,8 +17,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.Locale;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
@@ -75,16 +79,16 @@ public class CreateTomorrowDialogFragment extends DialogFragment {
         edit.requestFocus();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
-        String[] daysOfWeek = {"M", "Tu", "W", "Th", "F", "Sa", "Su"};
-        String[] postfix = {"st", "nd", "rd", "th"};
-
-        var tomorrow = Calendar.getInstance();
-        tomorrow.add(Calendar.DAY_OF_MONTH, 1);
-
-        String weeklyText = "Weekly on " + daysOfWeek[tomorrow.get(Calendar.DAY_OF_WEEK) - 1];
+        SimpleDateFormat daysOfWeek = new SimpleDateFormat("E", Locale.getDefault());
+        SimpleDateFormat dayofMonth = new SimpleDateFormat("F", Locale.getDefault());
+        SimpleDateFormat dayofYear = new SimpleDateFormat("MM/dd", Locale.getDefault());
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DATE, 1);
+        String[] postfix = {"st", "nd", "rd", "th","th","th"};
+        String weeklyText = "Weekly on " + daysOfWeek.format(c.getTime());
         // not entirely sure if this is correct or not
-        String monthlyText = "Monthly on " + (tomorrow.get(Calendar.WEEK_OF_MONTH)) + postfix[tomorrow.get(Calendar.WEEK_OF_MONTH) - 1] + " " + daysOfWeek[tomorrow.get(Calendar.DAY_OF_WEEK) - 1];
-        String yearlyText = "Yearly on " + (tomorrow.get(Calendar.MONTH) + 1) + "/" + tomorrow.get(Calendar.DATE);
+        String monthlyText = "Monthly on " + (dayofMonth.format(c.getTime())) + postfix[parseInt((dayofMonth.format(c.getTime()))) -1] + " " + daysOfWeek.format(c.getTime());;
+        String yearlyText = "Yearly on " + (dayofYear.format(c.getTime()));
 
         view.oneTimeBtn.setText("One-time");
         view.dailyBtn.setText("Daily");
