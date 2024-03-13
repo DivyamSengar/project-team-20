@@ -104,17 +104,6 @@ public class PendingFragment extends Fragment {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Goal goal = adapter.getItem(info.position);
 
-//        if (item.getTitle().equals("Move to today")) {
-//
-//        } else if (item.getTitle().equals("Move to tomorrow")) {
-//
-//        } else if (item.getTitle().equals("Finish")) {
-//
-//        } else if (item.getTitle().equals("Delete")) {
-//
-//        }
-//
-//        return true;
         return true;
     }
 
@@ -122,30 +111,15 @@ public class PendingFragment extends Fragment {
         PopupMenu popupMenu = new PopupMenu(requireContext(), view);
         popupMenu.inflate(R.menu.pending_goal_context_menu);
         popupMenu.setOnMenuItemClickListener(item -> {
-//            switch (item.getItemId()) {
-//                case :
-//                    moveToToday(goal);
-//                    return true;
-//                case R.id.move_to_tomorrow:
-//                    moveToTomorrow(goal);
-//                    return true;
-//                case R.id.finish:
-//                    finishGoal(goal);
-//                    return true;
-//                case R.id.delete:
-//                    deleteGoal(goal);
-//                    return true;
-//                default:
-//                    return false;
-//            }
             if (item.getTitle().equals("Move to today")) {
-
+                moveToToday(goal);
+//                deleteGoal(goal);
             } else if (item.getTitle().equals("Move to tomorrow")) {
 
             } else if (item.getTitle().equals("Finish")) {
 
             } else if (item.getTitle().equals("Delete")) {
-
+                deleteGoal(goal);
             }
 
             return true;
@@ -157,13 +131,6 @@ public class PendingFragment extends Fragment {
     // TODO: Modify this in long press
     public void addGoalListeners() {
         view.listGoals.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//            @Override
-//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//                Goal goal = adapter.getItem(position);
-//                view.showContextMenu(); // Show the context menu for the long-clicked view
-//                return true;
-//            }
-
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Goal goal = adapter.getItem(position);
@@ -185,20 +152,31 @@ public class PendingFragment extends Fragment {
         });
     }
 
-//    // TODO: Modify this in long press
-//    public void addGoalListeners() {
-//
-//    }
+    public void removeGoal(Goal goal) {
+        activityModel.removeGoalIncomplete(goal.id());
+        adapter.remove(goal);
+        activityModel.appendIncomplete(goal);
+        adapter.notifyDataSetChanged();
+    }
 
     private void moveToToday(Goal goal) {
-//        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
-//        LocalDateTime goalDateTime = goal.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-//
-//        long daysToAdd = ChronoUnit.DAYS.between(goalDateTime, now) + 1;
-//        LocalDateTime newDate = now.plusDays(daysToAdd);
-//
-//        goal.setDate(Date.from(newDate.atZone(ZoneId.systemDefault()).toInstant()));
-//        adapter.notifyItemChanged(adapter.getPosition(goal));
+        // Update the goal's date
+        goal.setDate(LocalDateTime.now().getMinute(),
+                LocalDateTime.now().getHour(),
+                LocalDateTime.now().getDayOfMonth(),
+                LocalDateTime.now().getMonthValue(),
+                LocalDateTime.now().getYear());
+
+        // Remove the goal from the pending goals
+
+        goal.changePending();
+        removeGoal(goal);
+
+        // Get the MainFragment and add the goal
+        MainFragment mainFragment = (MainFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
+        if (mainFragment != null) {
+            mainFragment.addGoals(goal);
+        }
     }
 
     private void moveToTomorrow(Goal goal) {
@@ -224,7 +202,8 @@ public class PendingFragment extends Fragment {
     private void deleteGoal(Goal goal) {
         // Implement your logic to delete the goal
         // For example, removing the goal from the list and notifying the adapter
-//        activityModel.removeGoalComplete(goal.id());
+        activityModel.removeGoalIncomplete(goal.id());
+        adapter.notifyDataSetChanged();
     }
 
 

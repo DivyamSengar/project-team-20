@@ -23,6 +23,7 @@ public class PendingFragmentAdapter extends ArrayAdapter<Goal> {
     @Override
     public void add(@Nullable Goal object) {super.add(object);}
 
+
     public int getPosition(Goal goal) {
         return (Integer) super.getPosition(goal);
     }

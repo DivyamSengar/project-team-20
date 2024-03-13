@@ -92,6 +92,12 @@ public class MainFragment extends Fragment {
                 });
     }
 
+    public void addGoals(Goal goal) {
+        activityModel.appendIncomplete(goal);
+        adapter.addAll(goal);
+        adapter.notifyDataSetChanged();
+    }
+
     /**
      * Method that runs when the View is created
      *
