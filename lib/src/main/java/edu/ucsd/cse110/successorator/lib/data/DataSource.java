@@ -41,7 +41,7 @@ public class DataSource {
             new Goal(1, "do smn", false, 3, true, "monthly", 0, 4, 30, 3, 2024),
             new Goal(2, "clean room", false, 1, true, "null", 0, 4, 30, 3, 2024),
             new Goal(3, "play basketball", true, 2, false, "daily", 0, 4, 30, 3, 2024),
-            new Goal(4, "do homework", true, 0, true, "daily", 0, 4, 30, 2, 2024)
+            new Goal(4, "do homework", true, 0, true, "daily", 0, 4, 30, 4, 2024)
     );
 
     public static DataSource fromDefault() {

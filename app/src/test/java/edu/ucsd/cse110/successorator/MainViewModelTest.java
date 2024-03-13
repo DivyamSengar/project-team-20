@@ -9,8 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 import edu.ucsd.cse110.successorator.lib.data.DataSource;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
@@ -48,18 +50,18 @@ public class MainViewModelTest {
 
     @Test
     public void testRollover() {
-        // insert some tasks
-        // ADVCNACEED TGHE DAY or call ROLLOVER
-        // what do yuou expect
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime localDateTime1 = now.plusMonths(5);
-        timeKeeper.setDateTime(localDateTime1);
+        mvm.timeKeeper.setDateTime(now.plusDays(30));
         mvm.rollover();
-        Assert.assertEquals(0, mvm.getGoals().getValue().size());
+        Assert.assertEquals(8, mvm.getGoals().getValue().size());
     }
 
     @Test
     public void testIncompleteRecurrentRollover() {
+        LocalDateTime now = LocalDateTime.now();
+        mvm.timeKeeper.setDateTime(now.plusDays(5));
+        mvm.rollover();
+        Assert.assertEquals(3, mvm.getRecurringGoalsIncomplete().getValue().size());
     }
 
     @Test
@@ -100,7 +102,7 @@ public class MainViewModelTest {
 
     @Test
     public void testGetGoalsLessThanOrEqualToDay() {
-        Subject<List<Goal>> ds = goals.getGoalsLessThanOrEqualToDay(2024, 3, 30);
+        Subject<List<Goal>> ds = goals.getGoalsLessThanOrEqualToDay(2024, 4, 30);
         Assert.assertEquals(4, ds.getValue().size());
     }
 
