@@ -98,6 +98,11 @@ public class RoomGoalRepository implements GoalRepository {
                     .map(GoalEntity::toGoal)
                     .collect(Collectors.toList());
         });
+        if (goalsLiveData.getValue() != null){
+            System.out.println("Goals as live data" + goalsLiveData.getValue().size());
+        } else {
+            System.out.println("No items found");
+        }
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
 

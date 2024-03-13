@@ -9,18 +9,23 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentPendingBinding;
 import edu.ucsd.cse110.successorator.databinding.FragmentRecurringBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
+import edu.ucsd.cse110.successorator.ui.dialog.CreateRecurringDialogFragment;
 
 public class RecurringFragment extends Fragment {
     private FragmentRecurringBinding view;
     private RecurringFragmentAdapter adapter;
+    private MainViewModel activityModel;
 
     public RecurringFragment(){
     }
@@ -36,8 +41,20 @@ public class RecurringFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        var modelOwner = requireActivity();
+        var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
+        var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
+        this.activityModel = modelProvider.get(MainViewModel.class);
+
         // Initialize the adapter
         this.adapter = new RecurringFragmentAdapter(requireContext(), List.of());
+
+        activityModel.getRecurringGoals().observe(goal -> {
+            if (goal == null) return;
+            adapter.clear();
+            adapter.addAll(new ArrayList<>(goal));
+            adapter.notifyDataSetChanged();
+        });
     }
 
     @Override
@@ -45,6 +62,8 @@ public class RecurringFragment extends Fragment {
                              @NonNull ViewGroup container,
                              @NonNull Bundle savedInstanceState) {
         this.view = FragmentRecurringBinding.inflate(inflater, container, false);
+
+        view.listGoals.setAdapter(adapter);
 
         createSpinner();
         showTopBar();
@@ -62,7 +81,7 @@ public class RecurringFragment extends Fragment {
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
-            var dialogFragment = CreateGoalDialogFragment.newInstance("recurring");
+            var dialogFragment = CreateRecurringDialogFragment.newInstance();
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
     }
@@ -70,18 +89,7 @@ public class RecurringFragment extends Fragment {
     // TODO: Modify this in long press
     public void addGoalListeners () {
         // Listener for taps/clicks on each list item
-        view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
-            Goal goal = adapter.getItem(position);
-            assert goal != null;
-            // If the tapped goal is incomplete, make it complete
-            if (!goal.isComplete()) {
-                goal.makeComplete();
-            }
-            // If goal is complete make incomplete
-            else {
-                goal.makeInComplete();
-            }
-        });
+
     }
 
     public void createSpinner(){

@@ -9,22 +9,28 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
 import edu.ucsd.cse110.successorator.databinding.FragmentTomorrowBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
+import edu.ucsd.cse110.successorator.ui.dialog.CreateTomorrowDialogFragment;
 
 public class TomorrowFragment extends Fragment {
     private FragmentTomorrowBinding view;
     private TomorrowFragmentAdapter adapter;
+
+    private MainViewModel activityModel;
 
     /**
      * Required empty public constructor
@@ -43,8 +49,25 @@ public class TomorrowFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        var modelOwner = requireActivity();
+        var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
+        var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
+        this.activityModel = modelProvider.get(MainViewModel.class);
+
         // Initialize the adapter
         this.adapter = new TomorrowFragmentAdapter(requireContext(), List.of());
+
+        var tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DAY_OF_MONTH, 1);
+        System.out.println("Tomorrow date" + tomorrow.get(Calendar.YEAR) + " " + (tomorrow.get(Calendar.MONTH) + 1) + " " + tomorrow.get(Calendar.DAY_OF_MONTH));
+        activityModel.getGoalsLessThanOrEqualToDay(tomorrow.get(Calendar.YEAR), (tomorrow.get(Calendar.MONTH) + 1), tomorrow.get(Calendar.DAY_OF_MONTH))
+                .observe(goal -> {
+                    if (goal == null) return;
+                    System.out.println("Tomorrow adapter" + goal.size());
+                    adapter.clear();
+                    adapter.addAll(new ArrayList<>(goal));
+                    adapter.notifyDataSetChanged();
+                });
     }
 
     @Override
@@ -52,6 +75,8 @@ public class TomorrowFragment extends Fragment {
                              @NonNull ViewGroup container,
                              @NonNull Bundle savedInstanceState) {
         this.view = FragmentTomorrowBinding.inflate(inflater, container, false);
+
+        view.listGoals.setAdapter(adapter);
 
         createSpinner();
         showTopBar();
@@ -87,16 +112,14 @@ public class TomorrowFragment extends Fragment {
         view.topText.setText(tomorrow);
     }
 
-    // DO NOT USE THIS WE DO NOT HAVE THE CORRECT DIALOG FRAGMENT SETUP
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
-            var dialogFragment = CreateGoalDialogFragment.newInstance("tomorrow");
+            var dialogFragment = CreateTomorrowDialogFragment.newInstance();
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
     }
 
-    // TODO: Modify this so that it actually adds to the correct list
     public void addGoalListeners() {
         // Listener for taps/clicks on each list item
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {

@@ -41,12 +41,6 @@
         app:layout_constraintTop_toBottomOf="@+id/goal_edit_text">
 
         <RadioButton
-            android:id="@+id/one_time_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="RadioButton" />
-
-        <RadioButton
             android:id="@+id/daily_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,4 +64,28 @@
             android:layout_height="wrap_content"
             android:text="RadioButton" />
     </RadioGroup>
+
+    <EditText
+        android:id="@+id/starting_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="MM/DD/YYYY"
+        android:inputType="date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/starting_text" />
+
+    <TextView
+        android:id="@+id/starting_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Starting:"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recurrence_radio_group" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

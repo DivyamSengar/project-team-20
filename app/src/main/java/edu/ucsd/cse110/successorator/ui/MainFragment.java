@@ -80,14 +80,16 @@ public class MainFragment extends Fragment {
         tomorrow view should call getGoalsbyDay on tomorrow's date, and recurring and pending should call
         get recurring/pending goals respectively. Remember, we want the different views to have the correct goals displayed
         */
-        activityModel.getGoals().observe(goal -> {
-            if (goal == null) return;
-            adapter.clear();
-            adapter.addAll(new ArrayList<>(goal));
-            adapter.notifyDataSetChanged();
-        });
 
-
+        var today = Calendar.getInstance();
+        activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR), (today.get(Calendar.MONTH) + 1), today.get(Calendar.DAY_OF_MONTH))
+                .observe(goal -> {
+                    if (goal == null) return;
+                    System.out.println("My size is " + goal.size());
+                    adapter.clear();
+                    adapter.addAll(new ArrayList<>(goal));
+                    adapter.notifyDataSetChanged();
+                });
     }
 
     /**
@@ -104,6 +106,7 @@ public class MainFragment extends Fragment {
                              @NonNull Bundle savedInstanceState) {
         this.view = FragmentMainBinding.inflate(inflater, container, false);
 
+        // Set the list's adapter
         view.listGoals.setAdapter(adapter);
 
         showTopBar();
@@ -182,7 +185,6 @@ public class MainFragment extends Fragment {
         });
     }
 
-    // TODO: Fix this so that the spinner default is empty, literally just make it look like a dropdown arrow
     public void createSpinner(){
         /*
         https://developer.android.com/develop/ui/views/components/spinner#java
@@ -237,7 +239,6 @@ public class MainFragment extends Fragment {
         });
     }
 
-    // TODO: Make this work
     public void createDeveloperButton(){
         // Show the current date at the top
         SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
@@ -263,54 +264,3 @@ public class MainFragment extends Fragment {
         });
     }
 }
-
-
-// TODO: Move this to wherever it needs to go, timekeeping
-
-/*
-
-        // Current time and time that the app was last opened
-        LocalDateTime currentTime = LocalDateTime.now();
-        int lastOpenedHour = activityModel.getFields()[3];
-        int lastOpenedMinute = activityModel.getFields()[4];
-        int lastDay = activityModel.getFields()[2];
-        int lastMonth =activityModel.getFields()[1];
-        int lastYear = activityModel.getFields()[0];
-
-        LocalDateTime previous = LocalDateTime.of(lastYear, lastMonth,
-                lastDay, lastOpenedHour, lastOpenedMinute);
-
-        int hour = currentTime.getHour();
-        int minute = currentTime.getMinute();
-        int currDay = currentTime.getDayOfMonth();
-        int currMonth = currentTime.getMonthValue();
-        int currYear = currentTime.getYear();
-
-        // If current time is at least 24 hours ahead, perform completed goals deletion
-        var minus24 = currentTime.minusHours(24);
-        if(minus24.isAfter(previous)){
-            activityModel.deleteCompleted();
-        }
-        else if (minus24.isEqual(previous)){
-            activityModel.deleteCompleted();
-        }
-        else if (currentTime.isBefore(previous));
-        else if (currDay > lastDay) {
-            if ((lastDay + 1) < currDay) {
-                activityModel.deleteCompleted();
-            } else {
-                if (hour >= 2) {
-                    activityModel.deleteCompleted();
-                }
-            }
-        }
-        else {
-            if ((hour >= 2)
-                && (lastOpenedHour <= 2)) {
-                activityModel.deleteCompleted();
-            }
-        }
-        activityModel.deleteTime();
-        activityModel.appendTime(currentTime);
-
- */

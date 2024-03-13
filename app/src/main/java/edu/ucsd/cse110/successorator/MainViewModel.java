@@ -7,6 +7,7 @@ import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLI
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,8 +42,6 @@ public class MainViewModel extends ViewModel {
     public final TimeKeeper timeKeeper;
     private MutableSubject<List<Goal>> goals;
     private MutableSubject<Boolean> isGoalsEmpty;
-
-    //private MutableSubject<> whichView;
 
     private MutableSubject<List<Goal>> goalsCompleted;
 
@@ -248,7 +247,32 @@ public class MainViewModel extends ViewModel {
         return goals;
     }
 
-    public Subject<List<Goal>> getPendingGoals() {return goalRepositoryIncomplete.getPendingGoals();}
+    public Subject<List<Goal>> getPendingGoals() {
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> pendingGoals = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getPendingGoals().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            incomplete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+            List<Goal> goalList = List.of();
+
+            pendingGoals.setValue(Stream.concat(goals.stream(), goalList.stream())
+                    .collect(Collectors.toList())
+            );
+        });
+
+        return pendingGoals;
+    }
 
     public Subject<List<Goal>> getRecurringGoalsIncomplete() {
         return goalRepositoryIncomplete.getRecurringGoals();
@@ -262,11 +286,125 @@ public class MainViewModel extends ViewModel {
 
     public Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getGoalsByDay(year, month, day);}
 
+    public Subject<List<Goal>> getRecurringGoals(){
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> recurring = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getRecurringGoals().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            incomplete.setValue(goalList);
+            System.out.println("incomp recurring size" + incomplete.getValue().size());
+        });
+
+        goalRepositoryComplete.getRecurringGoals().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            recurring.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            recurring.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println("Recurring size" + recurring.getValue().size());
+        });
+
+        return recurring;
+    }
+
     public Subject<List<Goal>> getGoalsLessThanOrEqualToDay(int year, int month, int day) {
-        SimpleSubject<List<Goal>> first = (SimpleSubject<List<Goal>>) goalRepositoryIncomplete.getGoalsLessThanOrEqualToDay(year, month, day);
-        SimpleSubject<List<Goal>> second = (SimpleSubject<List<Goal>>) goalRepositoryComplete.getGoalsLessThanOrEqualToDay(year, month, day);
-        first.getValue().addAll(second.getValue());
-        return first;
+//        var first = goalRepositoryIncomplete.getGoalsLessThanOrEqualToDay(year, month, day);
+//        var second = goalRepositoryComplete.getGoalsLessThanOrEqualToDay(year, month, day);
+
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> goalsForDay = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getGoalsByDay(year, month, day).observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getGoalsByDay(year, month, day).observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            goalsForDay.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(goalsForDay.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            goalsForDay.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+            System.out.println(goalsForDay.getValue().size());
+        });
+
+        return goalsForDay;
     }
 
     public Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getRecurringGoalsByDay(year, month, day);}
