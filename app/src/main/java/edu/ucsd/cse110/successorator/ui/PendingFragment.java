@@ -113,11 +113,10 @@ public class PendingFragment extends Fragment {
         popupMenu.setOnMenuItemClickListener(item -> {
             if (item.getTitle().equals("Move to today")) {
                 moveToToday(goal);
-//                deleteGoal(goal);
             } else if (item.getTitle().equals("Move to tomorrow")) {
-
+                moveToTomorrow(goal);
             } else if (item.getTitle().equals("Finish")) {
-
+                finishGoal(goal);
             } else if (item.getTitle().equals("Delete")) {
                 deleteGoal(goal);
             }
@@ -175,33 +174,45 @@ public class PendingFragment extends Fragment {
         // Get the MainFragment and add the goal
         MainFragment mainFragment = (MainFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
         if (mainFragment != null) {
-            mainFragment.addGoals(goal);
+            mainFragment.addGoalIncomplete(goal);
         }
     }
 
     private void moveToTomorrow(Goal goal) {
-//        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
-//        LocalDateTime goalDateTime = goal.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-//
-//        long daysToAdd = ChronoUnit.DAYS.between(goalDateTime, now) + 2;
-//        LocalDateTime newDate = now.plusDays(daysToAdd);
-//
-//        goal.setDate(Date.from(newDate.atZone(ZoneId.systemDefault()).toInstant()));
-//        adapter.notifyItemChanged(adapter.getPosition(goal));
+        goal.setDate(LocalDateTime.now().getMinute(),
+                LocalDateTime.now().getHour(),
+                LocalDateTime.now().plusDays(1).getDayOfMonth(),
+                LocalDateTime.now().getMonthValue(),
+                LocalDateTime.now().getYear());
+
+        goal.changePending();
+        removeGoal(goal);
+
+        TomorrowFragment tomorrowFragment = (TomorrowFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
+        if (tomorrowFragment != null){
+            tomorrowFragment.addGoalIncomplete(goal);
+        }
     }
 
     private void finishGoal(Goal goal) {
-        // Implement your logic to mark the goal as finished
-        // For example, updating the goal's status
-//        goal.setFinished(true);
-//
-//        // Notify the adapter of the change
-//        adapter.notifyItemChanged(adapter.getPosition(goal));
+        goal.setDate(LocalDateTime.now().getMinute(),
+                LocalDateTime.now().getHour(),
+                LocalDateTime.now().getDayOfMonth(),
+                LocalDateTime.now().getMonthValue(),
+                LocalDateTime.now().getYear());
+
+        goal.changePending();
+        goal.makeComplete();
+        removeGoal(goal);
+
+        // Get the MainFragment and add the goal
+        MainFragment mainFragment = (MainFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
+        if (mainFragment != null) {
+            mainFragment.addGoalComplete(goal);
+        }
     }
 
     private void deleteGoal(Goal goal) {
-        // Implement your logic to delete the goal
-        // For example, removing the goal from the list and notifying the adapter
         activityModel.removeGoalIncomplete(goal.id());
         adapter.notifyDataSetChanged();
     }

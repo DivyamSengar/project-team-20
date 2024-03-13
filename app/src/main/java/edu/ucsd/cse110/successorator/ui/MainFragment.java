@@ -92,10 +92,16 @@ public class MainFragment extends Fragment {
                 });
     }
 
-    public void addGoals(Goal goal) {
+    public void addGoalIncomplete(Goal goal) {
         activityModel.appendIncomplete(goal);
         adapter.addAll(goal);
         adapter.notifyDataSetChanged();
+    }
+
+    public void addGoalComplete(Goal goal) {
+        goal.makeComplete();
+        activityModel.removeGoalIncomplete(goal.id());
+        activityModel.appendComplete(goal);
     }
 
     /**
@@ -124,6 +130,7 @@ public class MainFragment extends Fragment {
         addGoalListeners();
         createSpinner();
         createDeveloperButton();
+
 
         // Inflate the layout for this fragment
         return view.getRoot();
