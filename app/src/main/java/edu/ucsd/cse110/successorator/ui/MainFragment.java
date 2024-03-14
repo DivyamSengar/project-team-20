@@ -100,8 +100,10 @@ public class MainFragment extends Fragment {
 
     public void addGoalComplete(Goal goal) {
         goal.makeComplete();
-        activityModel.removeGoalIncomplete(goal.id());
+//        activityModel.removeGoalIncomplete(goal.id());
         activityModel.appendComplete(goal);
+        adapter.addAll(goal);
+        adapter.notifyDataSetChanged();
     }
 
     /**

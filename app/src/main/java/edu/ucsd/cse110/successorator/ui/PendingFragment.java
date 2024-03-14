@@ -94,10 +94,6 @@ public class PendingFragment extends Fragment {
         menu.add("Finish");
         menu.add("Delete");
     }
-//    @Override
-//    public boolean onContextItemSelected(@NonNull MenuItem item) {
-//        return super.onContextItemSelected(item);
-//    }
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
@@ -151,10 +147,17 @@ public class PendingFragment extends Fragment {
         });
     }
 
-    public void removeGoal(Goal goal) {
+    public void removeGoalComplete(Goal goal) {
         activityModel.removeGoalIncomplete(goal.id());
         adapter.remove(goal);
         activityModel.appendIncomplete(goal);
+        adapter.notifyDataSetChanged();
+    }
+
+    public void removeGoalIncomplete(Goal goal) {
+        activityModel.removeGoalIncomplete(goal.id());
+        adapter.remove(goal);
+        activityModel.appendComplete(goal);
         adapter.notifyDataSetChanged();
     }
 
@@ -169,7 +172,7 @@ public class PendingFragment extends Fragment {
         // Remove the goal from the pending goals
 
         goal.changePending();
-        removeGoal(goal);
+        removeGoalComplete(goal);
 
         // Get the MainFragment and add the goal
         MainFragment mainFragment = (MainFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
@@ -186,7 +189,7 @@ public class PendingFragment extends Fragment {
                 LocalDateTime.now().getYear());
 
         goal.changePending();
-        removeGoal(goal);
+        removeGoalComplete(goal);
 
         TomorrowFragment tomorrowFragment = (TomorrowFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
         if (tomorrowFragment != null){
@@ -203,7 +206,7 @@ public class PendingFragment extends Fragment {
 
         goal.changePending();
         goal.makeComplete();
-        removeGoal(goal);
+        removeGoalIncomplete(goal);
 
         // Get the MainFragment and add the goal
         MainFragment mainFragment = (MainFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
