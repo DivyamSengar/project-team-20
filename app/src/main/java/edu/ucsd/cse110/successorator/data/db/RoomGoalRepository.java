@@ -66,14 +66,22 @@ public class RoomGoalRepository implements GoalRepository {
     @Override
     public Subject<List<Goal>> getRecurringGoals() {
         var entitiesLiveData = goalDao.getRecurring();
-        if (entitiesLiveData.getValue() == null || entitiesLiveData.getValue().isEmpty()){
-            return new SimpleSubject<List<Goal>>();
-        }
+//        if (entitiesLiveData.getValue() == null || entitiesLiveData.getValue().isEmpty()){
+//            System.out.println("Hello world");
+//            return new SimpleSubject<List<Goal>>();
+//        } else {
+//            System.out.println("Testing" + entitiesLiveData.getValue().size());
+//        }
         var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
             return entities.stream()
                     .map(GoalEntity::toGoal)
                     .collect(Collectors.toList());
         });
+        if (goalsLiveData.getValue() != null){
+            System.out.println("Testing" + goalsLiveData.getValue().size());
+        } else {
+            System.out.println("No recurring items found");
+        }
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
 
