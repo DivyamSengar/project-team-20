@@ -230,7 +230,7 @@ public class PendingFragment extends Fragment {
 
     public void addFocusModeListener(){
         view.hamburgerMenu.setOnClickListener(v -> {
-            var dialogFragment = FocusModeDialogFragment.newInstance();
+            var dialogFragment = FocusModeDialogFragment.newInstance((FocusModeListener) this);
             dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
             this.context = dialogFragment.getFocusContext();
         });
