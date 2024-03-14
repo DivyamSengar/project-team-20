@@ -7,4 +7,7 @@ public interface ContextRepository {
      void removeContext();
 
      int getContext();
-}
+      void setContextWithBoolean(int context, boolean update);
+     boolean getCurrentUpdateValue();
+
+     }

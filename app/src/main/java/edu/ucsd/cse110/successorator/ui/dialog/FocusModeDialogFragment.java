@@ -4,10 +4,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.time.Instant;
@@ -17,11 +19,15 @@ import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
+import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentFocusModeBinding;
+import edu.ucsd.cse110.successorator.ui.MainFragment;
+
 public class FocusModeDialogFragment extends DialogFragment {
     private FragmentFocusModeBinding view;
 
     private MainViewModel activityModel;
+
 
 //    private int whichView;
 
@@ -30,7 +36,6 @@ public class FocusModeDialogFragment extends DialogFragment {
 
     private int focusContext;
     FocusModeDialogFragment(){
-
     }
 
     public static FocusModeDialogFragment newInstance() {
@@ -54,8 +59,12 @@ public class FocusModeDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         this.view = FragmentFocusModeBinding.inflate(getLayoutInflater());
 
-        focusContext = getFocusInput();
+        getFocusInput();
         System.out.println(focusContext + "did it happen ???");
+
+//        radioGroup = view.getRoot().findViewById(R.id.main_radio_group);
+//        radioGroup.setOnCheckedChangeListener(this);
+
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle("Focus Mode")
@@ -65,17 +74,15 @@ public class FocusModeDialogFragment extends DialogFragment {
                 .create();
     }
 
-    private int getFocusInput(){
-        AtomicInteger context = new AtomicInteger();
+    private void getFocusInput(){
         view.homeContextBtn.setOnCheckedChangeListener((view, isChecked) -> {
             if (isChecked){
                 this.focusContext = 1;
-                context.set(1);
                 // filter the contexts based on home
                 System.out.println("Home checked");
                 System.out.println("in dialog" + focusContext);
                 activityModel.removeContext();
-                activityModel.setContext(1);
+                activityModel.setContextWithBoolean(1, true);
                 dismiss();
 
 //                return 1;
@@ -85,12 +92,11 @@ public class FocusModeDialogFragment extends DialogFragment {
         view.workContextBtn.setOnCheckedChangeListener((view, isChecked) -> {
             if (isChecked){
                 this.focusContext = 2;
-                context.set(2);
                 // filter the contexts based on work
                 System.out.println("work checked");
                 System.out.println("in dialog" + focusContext);
                 activityModel.removeContext();
-                activityModel.setContext(2);
+                activityModel.setContextWithBoolean(2, true);
                 dismiss();
             } else {}
         });
@@ -98,12 +104,11 @@ public class FocusModeDialogFragment extends DialogFragment {
         view.schoolContextBtn.setOnCheckedChangeListener((view, isChecked) -> {
             if (isChecked){
                 this.focusContext = 3;
-                context.set(3);
                 // filter the contexts based on school
                 System.out.println("school checked");
                 System.out.println("in dialog" + focusContext);
                 activityModel.removeContext();
-                activityModel.setContext(3);
+                activityModel.setContextWithBoolean(3, true);
                 dismiss();
             } else {}
         });
@@ -111,18 +116,17 @@ public class FocusModeDialogFragment extends DialogFragment {
         view.errandContextBtn.setOnCheckedChangeListener((view, isChecked) -> {
             if (isChecked){
                 this.focusContext = 4;
-                context.set(4);
                 // filter the contexts based on errands
                 System.out.println("errand checked");
                 System.out.println("in dialog" + focusContext);
                 activityModel.removeContext();
-                activityModel.setContext(4);
+                activityModel.setContextWithBoolean(4, true);
                 dismiss();
             } else {}
         });
 
         System.out.println("did it happen");
-        return context.get();
+
     }
 
     private void onNegativeButtonClick(DialogInterface dialog, int which){
@@ -130,12 +134,53 @@ public class FocusModeDialogFragment extends DialogFragment {
         this.focusContext = 0;
         System.out.println("in dialog" + focusContext);
         activityModel.removeContext();
-        activityModel.setContext(0);
+        activityModel.setContextWithBoolean(0, true);
         dialog.dismiss();
     }
 
     public int getFocusContext() {
         return focusContext;
     }
+
+//    public void onCheckedChanged(RadioGroup group, int checkedId) {
+//        switch (checkedId) {
+//            case R.id.homeContextBtn:
+//                focusContext = 1;
+//                // filter the contexts based on home
+//                System.out.println("Home checked");
+//                System.out.println("in dialog" + focusContext);
+//                activityModel.removeContext();
+//                activityModel.setContext(1);
+//                updateView(focusContext);
+//                break;
+//            case R.id.workContextBtn:
+//                focusContext = 2;
+//                // filter the contexts based on work
+//                System.out.println("work checked");
+//                System.out.println("in dialog" + focusContext);
+//                activityModel.removeContext();
+//                activityModel.setContext(2);
+//                updateView(focusContext);
+//                break;
+//            case R.id.schoolContextBtn:
+//                focusContext = 3;
+//                // filter the contexts based on school
+//                System.out.println("school checked");
+//                System.out.println("in dialog" + focusContext);
+//                activityModel.removeContext();
+//                activityModel.setContext(3);
+//                updateView(focusContext);
+//                break;
+//            case R.id.errandContextBtn:
+//                focusContext = 4;
+//                // filter the contexts based on errands
+//                System.out.println("errand checked");
+//                System.out.println("in dialog" + focusContext);
+//                activityModel.removeContext();
+//                activityModel.setContext(4);
+//                updateView(focusContext);
+//                break;
+//        }
+//    }
 
 }

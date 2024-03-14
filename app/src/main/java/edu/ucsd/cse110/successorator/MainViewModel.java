@@ -506,7 +506,8 @@ public class MainViewModel extends ViewModel {
     public Subject<List<Goal>> getContext(Subject<List<Goal>> listOfGoals, int context){
         // if there is no context set in focus mode or the cancel button has been hit, then don't sort by anything
         if (context == 0) return listOfGoals;
-        MutableSubject<List<Goal>> contextGoals = new SimpleSubject<>();
+        MutableSubject<List<Goal>> contextGoals = new SimpleSubject<List<Goal>>();
+        contextGoals.setValue(List.of());
         listOfGoals.observe(goals -> {
             List<Goal> goalList = List.of();
             if (goals == null){}
@@ -944,6 +945,14 @@ public class MainViewModel extends ViewModel {
 
     public void setContext(int context){
         contextRepository.setContext(context);
+    }
+
+    public void setContextWithBoolean(int context, boolean update){
+        contextRepository.setContextWithBoolean(context, update);
+    }
+
+    public boolean getCurrUpdateValue(){
+        return contextRepository.getCurrentUpdateValue();
     }
 
     public void removeContext(){

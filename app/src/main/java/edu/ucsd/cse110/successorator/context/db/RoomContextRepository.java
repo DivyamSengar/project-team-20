@@ -10,7 +10,14 @@ public class RoomContextRepository implements ContextRepository {
     }
 
     public void setContext(int context){
-        contextDao.insertContext(new ContextEntity(context));
+        contextDao.insertContext(new ContextEntity(0, context, false));
+    }
+
+    public void setContextWithBoolean(int context, boolean update){
+        contextDao.insertContext(new ContextEntity(0, context, update));
+    }
+    public boolean getCurrentUpdateValue(){
+        return contextDao.getUpdateValue();
     }
 
     public void removeContext(){

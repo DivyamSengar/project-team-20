@@ -19,6 +19,10 @@ public interface ContextDao {
     @Query("SELECT COUNT(*) FROM Context")
     int count();
 
+    @Query("SELECT `update` FROM Context")
+    boolean getUpdateValue();
+
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insertContext(ContextEntity context);
 

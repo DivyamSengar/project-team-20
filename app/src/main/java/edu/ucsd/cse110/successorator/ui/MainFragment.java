@@ -95,8 +95,10 @@ public class MainFragment extends Fragment {
         Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
         Calendar today = Calendar.getInstance();
         today.setTimeInMillis(instant.toEpochMilli());
+        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
         activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
-                        (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)), activityModel.getCurrentContextValue())
+                        (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
+                        activityModel.getCurrentContextValue())
                 .observe(goal -> {
                     if (goal == null) return;
                     System.out.println("My size is " + goal.size());
@@ -134,12 +136,14 @@ public class MainFragment extends Fragment {
         createSpinner();
         createDeveloperButton();
 
+
         // Inflate the layout for this fragment
         return view.getRoot();
     }
 
     @Override
     public void onResume(){
+        System.out.println("resumed??");
         super.onResume();
         // Show the current date at the top
         SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
@@ -147,6 +151,22 @@ public class MainFragment extends Fragment {
 
         view.topText.setText(currentDate);
         activityModel.rollover();
+
+        LocalDateTime current = activityModel.getTodayTime();
+        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
+        Calendar today = Calendar.getInstance();
+        today.setTimeInMillis(instant.toEpochMilli());
+        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
+        activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
+                                (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
+                        activityModel.getCurrentContextValue())
+                .observe(goal -> {
+                    if (goal == null) return;
+                    System.out.println("My size is " + goal.size());
+                    adapter.clear();
+                    adapter.addAll(new ArrayList<>(goal));
+                    adapter.notifyDataSetChanged();
+                });
     }
 
     public void showTopBar(){
@@ -170,11 +190,81 @@ public class MainFragment extends Fragment {
             var dialogFragment = FocusModeDialogFragment.newInstance();
             System.out.println(dialogFragment.getFocusContext() + "printed here");
             dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
-            System.out.println(dialogFragment.getFocusContext() + "printed here");
-            this.context = dialogFragment.getFocusContext();
-            System.out.println(context);
+            LocalDateTime current = activityModel.getTodayTime();
+            Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
+            Calendar today = Calendar.getInstance();
+            today.setTimeInMillis(instant.toEpochMilli());
+//        while (!activityModel.getCurrUpdateValue()){}
+            System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
+            activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
+                                    (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
+                            activityModel.getCurrentContextValue())
+                    .observe(goal -> {
+                        if (goal == null) {
+                            System.out.println("way too early?");
+                            return;
+                        }
+                        System.out.println("My size is " + goal.size());
+                        adapter.clear();
+                        adapter.addAll(new ArrayList<>(goal));
+                        adapter.notifyDataSetChanged();
+                    });
+//        int context = activityModel.getCurrentContextValue();
+//        activityModel.removeContext();
+//        activityModel.setContextWithBoolean(context, false);
+
         });
+
+        }
+
+
+    public void updateGoals() {
+        LocalDateTime current = activityModel.getTodayTime();
+        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
+        Calendar today = Calendar.getInstance();
+        today.setTimeInMillis(instant.toEpochMilli());
+//        while (!activityModel.getCurrUpdateValue()){}
+        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
+        activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
+                                (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
+                        activityModel.getCurrentContextValue())
+                .observe(goal -> {
+                    if (goal == null) {
+                        System.out.println("way too early?");
+                        return;
+                    }
+                    System.out.println("My size is " + goal.size());
+                    adapter.clear();
+                    adapter.addAll(new ArrayList<>(goal));
+                    adapter.notifyDataSetChanged();
+                });
     }
+
+
+//        view.hamburgerMenu.onScreenStateChanged(v -> {
+//            LocalDateTime current = activityModel.getTodayTime();
+//            Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
+//            Calendar today = Calendar.getInstance();
+//            today.setTimeInMillis(instant.toEpochMilli());
+//            System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
+//            activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
+//                                    (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
+//                            activityModel.getCurrentContextValue())
+//                    .observe(goal -> {
+//                        if (goal == null) {
+//                            System.out.println("way too early?");
+//                            return;
+//                        }
+//                        System.out.println("My size is " + goal.size());
+//                        adapter.clear();
+//                        adapter.addAll(new ArrayList<>(goal));
+//                        adapter.notifyDataSetChanged();
+//                    });
+//            view.hamburgerMenu.onWindowFocusChanged();
+//        });
+
+
+
 
     public void checkGoalsIsEmpty(){
         // Observer to check whether or not goals is empty to display the ListView or TextView
