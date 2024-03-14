@@ -63,4 +63,11 @@ public interface GoalRepository {
      * Removes all the goals in the list
      */
     void deleteCompleted(int year, int month, int day);
+
+
+    Subject<List<Goal>> findListOfGoalsById(int id);
+
+    void InsertWithSortOrder(Goal goal, int sortOrder);
+
+    void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, String recurring);
 }

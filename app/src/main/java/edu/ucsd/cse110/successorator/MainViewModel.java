@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
+import edu.ucsd.cse110.successorator.data.db.GoalEntity;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
@@ -34,10 +35,15 @@ public class MainViewModel extends ViewModel {
                         var app = (SuccessoratorApplication) creationExtras.get(APPLICATION_KEY);
                         assert app != null;
                         return new MainViewModel(app.getGoalRepositoryComplete(),
-                                app.getGoalRepositoryIncomplete(), app.getTimeKeeper());
+                                app.getGoalRepositoryIncomplete(), app.getGoalRepositoryRecurring(),
+                                app.getTimeKeeper(), app.getTodayTime());
                     });
     private final GoalRepository goalRepositoryComplete;
+
+    private  LocalDateTime todayTime;
     private final GoalRepository goalRepositoryIncomplete;
+
+    private  final GoalRepository goalRepositoryRecurring;
 
     public final TimeKeeper timeKeeper;
     private MutableSubject<List<Goal>> goals;
@@ -59,11 +65,13 @@ public class MainViewModel extends ViewModel {
      * @param timeKeeper -
      */
     public MainViewModel(GoalRepository goalRepositoryComplete,
-                         GoalRepository goalRepositoryIncomplete, TimeKeeper timeKeeper) {
+                         GoalRepository goalRepositoryIncomplete, GoalRepository goalRepositoryRecurring, TimeKeeper timeKeeper, LocalDateTime todayTime) {
 
         this.goalRepositoryComplete = goalRepositoryComplete;
         this.goalRepositoryIncomplete = goalRepositoryIncomplete;
+        this.goalRepositoryRecurring = goalRepositoryRecurring;
         this.timeKeeper = timeKeeper;
+        this.todayTime = todayTime;
 
         // Observables
         this.goals = new SimpleSubject<>();
@@ -232,6 +240,8 @@ public class MainViewModel extends ViewModel {
             }
             else {
                 goal.updateRecurring();
+                goalRepositoryIncomplete.remove(goal.id());
+                goalRepositoryIncomplete.append(goal);
             }
         }
     }
@@ -289,7 +299,7 @@ public class MainViewModel extends ViewModel {
         var complete = getGoalsByDayComplete(year, month, day);
         var incomplete = getGoalsByDayIncomplete(year, month, day);
         var incompleteList = incomplete.getValue();
-        incompleteList.addAll(complete.getValue());
+        if (complete.getValue() != null) incompleteList.addAll(complete.getValue());
         return incomplete;
     }
     public Subject<List<Goal>> getRecurringGoals(){
@@ -762,6 +772,7 @@ public class MainViewModel extends ViewModel {
         }
     }
 
+
     /**
      * Appends a time to the time database
      *
@@ -787,4 +798,68 @@ public class MainViewModel extends ViewModel {
         return timeKeeper.getFields();
     }
 
+
+    public void removeGoalFromRecurringList (int id){
+        List<Goal> listOfGoalsWithId = goalRepositoryRecurring.findListOfGoalsById(id).getValue();
+        for (var goal : listOfGoalsWithId){
+            int newSortOrder = goal.sortOrder();
+            if (goal.isComplete()){
+                removeGoalComplete(id);
+                InsertWithSortOrderAndRecurringToRecurringListComplete(goal, newSortOrder, null);
+            }
+            if (!goal.isComplete()){
+                removeGoalIncomplete(id);
+                InsertWithSortOrderAndRecurringToRecurringListIncomplete(goal, newSortOrder, null);
+            }
+        }
+        goalRepositoryRecurring.remove(id);
+    }
+
+    public void appendToRecurringList(Goal goal){
+        goalRepositoryRecurring.append(goal);
+    }
+
+    public Subject<List<Goal>> getGoalsFromRecurringList(){
+        System.out.println("it printed bruh");
+        var goalSubject = goalRepositoryRecurring.findAll();
+        var goalList = goalSubject.getValue();
+        if (goalList == null) {
+            System.out.println("early return");
+            var toReturn = new SimpleSubject<List<Goal>>();
+            toReturn.setValue(List.of());
+            return toReturn;
+        }
+        goalList.stream()
+                .sorted(Comparator.comparingInt(Goal::getYear).thenComparing(Goal::getMonth)
+                        .thenComparing(Goal::getDay).thenComparing(Goal::getHour).thenComparing(Goal::getMinutes))
+                .collect(Collectors.toList());
+        for (var goal: goalSubject.getValue()){
+            System.out.println(goal.getText());
+        }
+        System.out.println("It's empty");
+        return goalSubject;
+    }
+
+
+    public void InsertWithSortOrderToRecurringListComplete(Goal goal, int sortOrder){
+        goalRepositoryComplete.InsertWithSortOrder(goal, sortOrder);
+    }
+
+    public void InsertWithSortOrderToRecurringListIncomplete(Goal goal, int sortOrder){
+        goalRepositoryIncomplete.InsertWithSortOrder(goal, sortOrder);
+    }
+
+    public void InsertWithSortOrderAndRecurringToRecurringListComplete(Goal goal, int sortOrder, String recurring){
+        goalRepositoryComplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
+    }
+    public void InsertWithSortOrderAndRecurringToRecurringListIncomplete(Goal goal, int sortOrder, String recurring){
+        goalRepositoryIncomplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
+    }
+    public LocalDateTime getTodayTime() {
+        return todayTime;
+    }
+
+    public void updateTodayTime(){
+        this.todayTime = todayTime.plusDays(1);
+    }
 }

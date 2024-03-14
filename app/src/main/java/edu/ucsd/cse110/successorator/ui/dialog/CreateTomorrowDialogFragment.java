@@ -144,6 +144,9 @@ public class CreateTomorrowDialogFragment extends DialogFragment {
                         date[0], date[1], date[2], date[3], date[4], contextOption);
                 // Create a new Goal with the text and add it
                 activityModel.appendIncomplete(newGoal);
+                if (recurring != null){
+                    activityModel.appendToRecurringList(newGoal);
+                }
                 dismiss();
             }
         });

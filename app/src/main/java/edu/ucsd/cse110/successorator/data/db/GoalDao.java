@@ -115,6 +115,10 @@ public interface GoalDao {
     @Query("SELECT * from Goals WHERE context = 4")
     LiveData<List<GoalEntity>> getContextErrands();
 
+
+    @Query("SELECT * FROM Goals WHERE id = :id")
+    LiveData<List<GoalEntity>> findListOfGoalsById(int id);
+
     /**
      * Append a goal to the list
      * @param goal goal to append
@@ -140,4 +144,21 @@ public interface GoalDao {
                 goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context);
         return Math.toIntExact(insert(newGoalEntity));
     }
+
+    @Transaction
+    default int InsertWithSortOrder(GoalEntity goal, int sortOrder){
+        var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
+                sortOrder, goal.pending, goal.recurring,
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context);
+        return Math.toIntExact(insert(newGoalEntity));
+    }
+
+    @Transaction
+    default int InsertWithSortOrderAndRecurring(GoalEntity goal, int sortOrder, String recurring){
+        var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
+                sortOrder, goal.pending, recurring,
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context);
+        return Math.toIntExact(insert(newGoalEntity));
+    }
+
 }

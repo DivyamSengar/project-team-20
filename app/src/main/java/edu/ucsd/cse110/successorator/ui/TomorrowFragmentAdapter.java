@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.successorator.ui;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,12 @@ public class TomorrowFragmentAdapter extends ArrayAdapter<Goal> {
         } else if (goal.getContext() == 4){
             binding.goalContextIcon.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.errand_context_icon));
             binding.goalContextIcon.setText("E");
+        }
+        // Strike-through text if it is complete
+        if (goal.isComplete()) {
+            binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            binding.goalText.setPaintFlags(0);
         }
 
         return binding.getRoot();

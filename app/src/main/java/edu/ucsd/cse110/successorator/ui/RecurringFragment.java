@@ -52,7 +52,7 @@ public class RecurringFragment extends Fragment {
         // Initialize the adapter
         this.adapter = new RecurringFragmentAdapter(requireContext(), List.of());
 
-        activityModel.getContext(activityModel.getRecurringGoals(), context).observe(goal -> {
+        activityModel.getContext(activityModel.getGoalsFromRecurringList(), context).observe(goal -> {
             if (goal == null) return;
             adapter.clear();
             adapter.addAll(new ArrayList<>(goal));
@@ -70,6 +70,7 @@ public class RecurringFragment extends Fragment {
 
         createSpinner();
         showTopBar();
+        activityModel.rollover();
         addPlusButtonListener();
         addFocusModeListener();
         addGoalListeners();
@@ -80,6 +81,11 @@ public class RecurringFragment extends Fragment {
 
     public void showTopBar(){
         view.topText.setText(R.string.recurring);
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+        activityModel.rollover();
     }
 
     public void addPlusButtonListener(){

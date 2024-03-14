@@ -64,7 +64,7 @@ public class TomorrowFragment extends Fragment {
         tomorrow.add(Calendar.DAY_OF_MONTH, 1);
         System.out.println("Tomorrow date" + tomorrow.get(Calendar.YEAR) + " " + (tomorrow.get(Calendar.MONTH)) + " " + tomorrow.get(Calendar.DAY_OF_MONTH));
         activityModel.getContext(activityModel.getGoalsByDay(tomorrow.get(Calendar.YEAR),
-                        (tomorrow.get(Calendar.MONTH) ), tomorrow.get(Calendar.DAY_OF_MONTH)), context)
+                        (tomorrow.get(Calendar.MONTH) +1), tomorrow.get(Calendar.DAY_OF_MONTH)), context)
                 .observe(goal -> {
                     if (goal == null) return;
                     System.out.println("Tomorrow adapter" + goal.size());
@@ -84,6 +84,7 @@ public class TomorrowFragment extends Fragment {
 
         createSpinner();
         showTopBar();
+        activityModel.rollover();
         addPlusButtonListener();
         addFocusModeListener();
         addGoalListeners();
@@ -102,6 +103,7 @@ public class TomorrowFragment extends Fragment {
         Calendar t = Calendar.getInstance();
         t.add(Calendar.DATE, 1);
         String tomorrow = "Tomorrow, " + date.format(t.getTime());
+        activityModel.rollover();
 
         view.topText.setText(tomorrow);
     }
@@ -116,6 +118,7 @@ public class TomorrowFragment extends Fragment {
 
         view.topText.setText(tomorrow);
     }
+
 
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
@@ -133,10 +136,14 @@ public class TomorrowFragment extends Fragment {
             // If the tapped goal is incomplete, make it complete
             if (!goal.isComplete()) {
                 goal.makeComplete();
+                activityModel.removeGoalIncomplete(goal.id());
+                activityModel.appendComplete(goal);
             }
             // If goal is complete make incomplete
             else {
                 goal.makeInComplete();
+                activityModel.removeGoalComplete(goal.id());
+                activityModel.prependIncomplete(goal);
             }
         });
     }

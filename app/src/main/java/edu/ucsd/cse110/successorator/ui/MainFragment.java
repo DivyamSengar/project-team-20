@@ -14,7 +14,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -82,10 +84,12 @@ public class MainFragment extends Fragment {
         tomorrow view should call getGoalsbyDay on tomorrow's date, and recurring and pending should call
         get recurring/pending goals respectively. Remember, we want the different views to have the correct goals displayed
         */
-
-        var today = Calendar.getInstance();
+        LocalDateTime current = activityModel.getTodayTime();
+        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
+        Calendar today = Calendar.getInstance();
+        today.setTimeInMillis(instant.toEpochMilli());
         activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
-                        (today.get(Calendar.MONTH)), today.get(Calendar.DAY_OF_MONTH)), context)
+                        (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)), context)
                 .observe(goal -> {
                     if (goal == null) return;
                     System.out.println("My size is " + goal.size());

@@ -21,7 +21,11 @@ public class SuccessoratorApplication extends Application {
 
     private GoalRepository goalRepositoryIncomplete;
 
+    private GoalRepository goalRepositoryRecurring;
+
     private TimeKeeper timeKeeper;
+
+    private LocalDateTime todayTime;
 
     /**
      * Initializes the databases for the application upon application creation
@@ -52,6 +56,12 @@ public class SuccessoratorApplication extends Application {
                 .build();
         this.timeKeeper = new RoomTimeKeeper(database3.timeDao());
 
+        var database4 = Room.databaseBuilder(getApplicationContext(),
+                        SuccessoratorDatabase.class, "successorator-database4")
+                .allowMainThreadQueries()
+                .build();
+        this.goalRepositoryRecurring = new RoomGoalRepository(database4.goalDao());
+
         // Initalize a default value into the time keeper database
         var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
 
@@ -63,6 +73,7 @@ public class SuccessoratorApplication extends Application {
                     .putBoolean("isFirstRun", false)
                     .apply();
         }
+        this.todayTime = LocalDateTime.now();
     }
 
     /**
@@ -83,6 +94,8 @@ public class SuccessoratorApplication extends Application {
         return goalRepositoryIncomplete;
     }
 
+    public GoalRepository getGoalRepositoryRecurring(){ return goalRepositoryRecurring;}
+
     /**
      * Getter for the app's TimeKeeper
      *
@@ -91,4 +104,6 @@ public class SuccessoratorApplication extends Application {
     public TimeKeeper getTimeKeeper() {
         return timeKeeper;
     }
+
+    public LocalDateTime getTodayTime(){ return todayTime;}
 }

@@ -4,6 +4,8 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
+import edu.ucsd.cse110.successorator.lib.domain.Goal;
+
 public class SimpleSubject<T> implements MutableSubject<T> {
     private @Nullable T value = null;
     private final List<Observer<T>> observers = new java.util.ArrayList<>();
@@ -56,4 +58,9 @@ public class SimpleSubject<T> implements MutableSubject<T> {
             observer.onChanged(value);
         }
     }
+
+//    public Subject<List<Goal>> findListOfGoalsById(int id){
+//        return new SimpleSubject<List<Goal>>();
+//    }
+
 }

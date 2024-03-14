@@ -199,4 +199,24 @@ public class RoomGoalRepository implements GoalRepository {
     public void deleteCompleted(int year, int month, int day){
         goalDao.deleteComplete(year, month, day);
     }
+    @Override
+    public Subject<List<Goal>> findListOfGoalsById(int id){
+        var entitiesLiveData = goalDao.findListOfGoalsById(id);
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+
+    }
+    @Override
+  public void InsertWithSortOrder(Goal goal, int sortOrder){
+        goalDao.InsertWithSortOrder(GoalEntity.fromGoal(goal), sortOrder);
+    }
+
+    @Override
+    public void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, String recurring){
+        goalDao.InsertWithSortOrderAndRecurring(GoalEntity.fromGoal(goal), sortOrder, recurring);
+    }
 }

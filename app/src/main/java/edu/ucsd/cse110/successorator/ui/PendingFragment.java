@@ -73,12 +73,18 @@ public class PendingFragment extends Fragment {
 
         createSpinner();
         showTopBar();
+        activityModel.rollover();
         addPlusButtonListener();
         addFocusModeListener();
         addGoalListeners();
 
         // Inflate the layout for this fragment
         return view.getRoot();
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+        activityModel.rollover();
     }
 
     public void showTopBar(){
