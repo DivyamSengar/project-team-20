@@ -136,6 +136,13 @@ public class CreateRecurringDialogFragment extends DialogFragment {
                             date[0], date[1], date[2], date[3], date[4], contextOption);
                     // Create a new Goal with the text and add it
                     activityModel.appendIncomplete(newGoal);
+                    LocalDateTime today = LocalDateTime.now();
+                    if (recurring.equals("daily") && localDateTime.isEqual(today)){
+                        LocalDateTime tomorrow = today.plusDays(1);
+                        newGoal.setDate(tomorrow.getMinute(), tomorrow.getHour(),
+                                tomorrow.getDayOfMonth(), tomorrow.getMonthValue(), tomorrow.getYear());
+                        activityModel.appendIncomplete(newGoal);
+                    }
                     dismiss();
                 } catch (ParseException e){
 

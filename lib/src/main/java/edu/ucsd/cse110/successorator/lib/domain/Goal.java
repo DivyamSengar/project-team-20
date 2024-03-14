@@ -188,7 +188,7 @@ public class Goal implements Serializable {
             temp = temp.plusWeeks(1);
             tempOrdinal = (temp.getDayOfMonth()-1)/7 + 1;
         }
-
+        return temp;
 
     }
 

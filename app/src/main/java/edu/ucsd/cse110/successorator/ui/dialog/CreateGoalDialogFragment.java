@@ -207,11 +207,17 @@ public class CreateGoalDialogFragment extends DialogFragment {
                 //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
                 int[] date = {currentTime.getMinute(), currentTime.getHour(),
                         currentTime.getDayOfMonth(), currentTime.getMonthValue(), currentTime.getYear()};
-
                 var newGoal = new Goal(null, input, false, -1, false, recurring,
                         date[0], date[1], date[2], date[3], date[4], contextOption);
                 // Create a new Goal with the text and add it
                 activityModel.appendIncomplete(newGoal);
+                if (recurring.equals("daily")){
+                    LocalDateTime tomorrow = currentTime.plusDays(1);
+                    newGoal.setDate(tomorrow.getMinute(), tomorrow.getHour(),
+                            tomorrow.getDayOfMonth(), tomorrow.getMonthValue(), tomorrow.getYear());
+                    activityModel.appendIncomplete(newGoal);
+                }
+
                 dismiss();
             }
         });
