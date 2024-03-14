@@ -113,7 +113,6 @@ public class MainViewModel extends ViewModel {
             else if (newGoals.size() == 0);
             else {
                 orderedGoals = newGoals.stream()
-                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
 

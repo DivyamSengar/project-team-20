@@ -188,7 +188,6 @@ public class MainFragment extends Fragment {
             assert goal != null;
             // If the tapped goal is incomplete, make it complete
             if (!goal.isComplete()){
-                goal.makeComplete();
                 activityModel.removeGoalIncomplete(goal.id());
                 activityModel.appendComplete(goal);
             }
