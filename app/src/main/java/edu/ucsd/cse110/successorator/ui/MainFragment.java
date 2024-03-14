@@ -3,6 +3,7 @@ package edu.ucsd.cse110.successorator.ui;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -37,6 +38,12 @@ public class MainFragment extends Fragment {
     private MainViewModel activityModel;
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
+
+
+
+    public int getThisContext() {
+        return context;
+    }
 
     private int context = 0;
 
@@ -161,8 +168,11 @@ public class MainFragment extends Fragment {
     public void addFocusModeListener(){
         view.hamburgerMenu.setOnClickListener(v -> {
             var dialogFragment = FocusModeDialogFragment.newInstance();
+            System.out.println(dialogFragment.getFocusContext() + "printed here");
             dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
+            System.out.println(dialogFragment.getFocusContext() + "printed here");
             this.context = dialogFragment.getFocusContext();
+            System.out.println(context);
         });
     }
 
@@ -188,6 +198,7 @@ public class MainFragment extends Fragment {
             assert goal != null;
             // If the tapped goal is incomplete, make it complete
             if (!goal.isComplete()){
+                goal.makeComplete();
                 activityModel.removeGoalIncomplete(goal.id());
                 activityModel.appendComplete(goal);
             }

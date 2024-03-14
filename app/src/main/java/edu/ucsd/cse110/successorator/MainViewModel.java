@@ -59,6 +59,7 @@ public class MainViewModel extends ViewModel {
 
     private MutableSubject<List<Goal>> recurringGoals;
 
+    private MutableSubject<List<Goal>> FocusList;
     /**
      * Constructor for MainViewModel
      *
@@ -314,11 +315,64 @@ public class MainViewModel extends ViewModel {
 
     public Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getGoalsByDay(year, month, day);}
     public Subject<List<Goal>> getGoalsByDay(int year, int month, int day){
-        var complete = getGoalsByDayComplete(year, month, day);
-        var incomplete = getGoalsByDayIncomplete(year, month, day);
-        var incompleteList = incomplete.getValue();
-        if (complete.getValue() != null) incompleteList.addAll(complete.getValue());
-        return incomplete;
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> goalsForDay = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getGoalsByDay(year, month, day).observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getGoalsByDay(year, month, day).observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Incomplete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            goalsForDay.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(goalsForDay.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            goalsForDay.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(goalsForDay.getValue().size());
+        });
+
+        return goalsForDay;
+
     }
     public Subject<List<Goal>> getRecurringGoals(){
         MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
@@ -386,7 +440,7 @@ public class MainViewModel extends ViewModel {
         MutableSubject<List<Goal>> complete = new SimpleSubject<>();
         MutableSubject<List<Goal>> goalsForDay = new SimpleSubject<>();
 
-        goalRepositoryIncomplete.getGoalsByDay(year, month, day).observe(goals -> {
+        goalRepositoryIncomplete.getGoalsLessThanOrEqualToDay(year, month, day).observe(goals -> {
             List<Goal> goalList = List.of();
             if (goals == null){}
             else if (goals.size() == 0){} else {
@@ -398,7 +452,7 @@ public class MainViewModel extends ViewModel {
             incomplete.setValue(goalList);
         });
 
-        goalRepositoryComplete.getGoalsByDay(year, month, day).observe(goals -> {
+        goalRepositoryComplete.getGoalsLessThanOrEqualToDay(year, month, day).observe(goals -> {
             List<Goal> goalList = List.of();
             if (goals == null){}
             else if (goals.size() == 0){} else {
@@ -460,9 +514,9 @@ public class MainViewModel extends ViewModel {
             contextGoals.setValue(goalList);
 
         });
-
         return contextGoals;
     }
+
 
     public Subject<List<Goal>> getContextHome() {
         MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
