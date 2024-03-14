@@ -196,7 +196,7 @@ public class RoomGoalRepository implements GoalRepository {
     /**
      * This method clears the entire goal list
      */
-    public void deleteCompleted(){
-        goalDao.deleteComplete();
+    public void deleteCompleted(int year, int month, int day){
+        goalDao.deleteComplete(year, month, day);
     }
 }

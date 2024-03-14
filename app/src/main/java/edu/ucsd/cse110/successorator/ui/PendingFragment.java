@@ -23,11 +23,15 @@ import edu.ucsd.cse110.successorator.databinding.FragmentPendingBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.CreatePendingDialogFragment;
+import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
 
 public class PendingFragment extends Fragment {
     private FragmentPendingBinding view;
     private PendingFragmentAdapter adapter;
     private MainViewModel activityModel;
+
+    private int context = 0;
+
 
     public PendingFragment(){
     }
@@ -51,7 +55,7 @@ public class PendingFragment extends Fragment {
         // Initialize the adapter
         this.adapter = new PendingFragmentAdapter(requireContext(), List.of());
 
-        activityModel.getPendingGoals().observe(goal -> {
+        activityModel.getContext(activityModel.getPendingGoals(), context).observe(goal -> {
             if (goal == null) return;
             adapter.clear();
             adapter.addAll(new ArrayList<>(goal));
@@ -70,6 +74,7 @@ public class PendingFragment extends Fragment {
         createSpinner();
         showTopBar();
         addPlusButtonListener();
+        addFocusModeListener();
         addGoalListeners();
 
         // Inflate the layout for this fragment
@@ -91,6 +96,14 @@ public class PendingFragment extends Fragment {
     // TODO: Modify this in long press
     public void addGoalListeners() {
 
+    }
+
+    public void addFocusModeListener(){
+        view.hamburgerMenu.setOnClickListener(v -> {
+            var dialogFragment = FocusModeDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
+            this.context = dialogFragment.getFocusContext();
+        });
     }
 
     public void createSpinner(){

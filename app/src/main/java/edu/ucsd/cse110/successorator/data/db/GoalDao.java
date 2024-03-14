@@ -85,8 +85,8 @@ public interface GoalDao {
     /**
      * Delete goals with isComplete being true
      */
-    @Query("DELETE from Goals WHERE isComplete = true")
-    void deleteComplete();
+    @Query("DELETE from Goals WHERE isComplete = true AND year <= :year AND month <= :month AND day <= :day" )
+    void deleteComplete(int year, int month, int day);
 
     @Query("SELECT * from Goals WHERE Pending = true")
     LiveData<List<GoalEntity>> getPending();

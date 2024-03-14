@@ -36,6 +36,7 @@ public class MainFragment extends Fragment {
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
 
+    private int context = 0;
 
     /**
      * Required empty public constructor
@@ -83,7 +84,8 @@ public class MainFragment extends Fragment {
         */
 
         var today = Calendar.getInstance();
-        activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR), (today.get(Calendar.MONTH) + 1), today.get(Calendar.DAY_OF_MONTH))
+        activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
+                        (today.get(Calendar.MONTH)), today.get(Calendar.DAY_OF_MONTH)), context)
                 .observe(goal -> {
                     if (goal == null) return;
                     System.out.println("My size is " + goal.size());
@@ -156,6 +158,7 @@ public class MainFragment extends Fragment {
         view.hamburgerMenu.setOnClickListener(v -> {
             var dialogFragment = FocusModeDialogFragment.newInstance();
             dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
+            this.context = dialogFragment.getFocusContext();
         });
     }
 

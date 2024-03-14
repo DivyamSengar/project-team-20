@@ -21,11 +21,14 @@ import edu.ucsd.cse110.successorator.databinding.FragmentRecurringBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateRecurringDialogFragment;
+import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
 
 public class RecurringFragment extends Fragment {
     private FragmentRecurringBinding view;
     private RecurringFragmentAdapter adapter;
     private MainViewModel activityModel;
+
+    private int context = 0;
 
     public RecurringFragment(){
     }
@@ -49,7 +52,7 @@ public class RecurringFragment extends Fragment {
         // Initialize the adapter
         this.adapter = new RecurringFragmentAdapter(requireContext(), List.of());
 
-        activityModel.getRecurringGoals().observe(goal -> {
+        activityModel.getContext(activityModel.getRecurringGoals(), context).observe(goal -> {
             if (goal == null) return;
             adapter.clear();
             adapter.addAll(new ArrayList<>(goal));
@@ -68,6 +71,7 @@ public class RecurringFragment extends Fragment {
         createSpinner();
         showTopBar();
         addPlusButtonListener();
+        addFocusModeListener();
         addGoalListeners();
 
         // Inflate the layout for this fragment
@@ -90,6 +94,14 @@ public class RecurringFragment extends Fragment {
     public void addGoalListeners () {
         // Listener for taps/clicks on each list item
 
+    }
+
+    public void addFocusModeListener(){
+        view.hamburgerMenu.setOnClickListener(v -> {
+            var dialogFragment = FocusModeDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
+            this.context = dialogFragment.getFocusContext();
+        });
     }
 
     public void createSpinner(){

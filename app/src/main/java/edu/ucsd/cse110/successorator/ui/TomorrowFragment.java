@@ -25,12 +25,15 @@ import edu.ucsd.cse110.successorator.databinding.FragmentTomorrowBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateTomorrowDialogFragment;
+import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
 
 public class TomorrowFragment extends Fragment {
     private FragmentTomorrowBinding view;
     private TomorrowFragmentAdapter adapter;
 
     private MainViewModel activityModel;
+
+    private int context = 0;
 
     /**
      * Required empty public constructor
@@ -59,8 +62,9 @@ public class TomorrowFragment extends Fragment {
 
         var tomorrow = Calendar.getInstance();
         tomorrow.add(Calendar.DAY_OF_MONTH, 1);
-        System.out.println("Tomorrow date" + tomorrow.get(Calendar.YEAR) + " " + (tomorrow.get(Calendar.MONTH) + 1) + " " + tomorrow.get(Calendar.DAY_OF_MONTH));
-        activityModel.getGoalsLessThanOrEqualToDay(tomorrow.get(Calendar.YEAR), (tomorrow.get(Calendar.MONTH) + 1), tomorrow.get(Calendar.DAY_OF_MONTH))
+        System.out.println("Tomorrow date" + tomorrow.get(Calendar.YEAR) + " " + (tomorrow.get(Calendar.MONTH)) + " " + tomorrow.get(Calendar.DAY_OF_MONTH));
+        activityModel.getContext(activityModel.getGoalsByDay(tomorrow.get(Calendar.YEAR),
+                        (tomorrow.get(Calendar.MONTH) ), tomorrow.get(Calendar.DAY_OF_MONTH)), context)
                 .observe(goal -> {
                     if (goal == null) return;
                     System.out.println("Tomorrow adapter" + goal.size());
@@ -81,6 +85,7 @@ public class TomorrowFragment extends Fragment {
         createSpinner();
         showTopBar();
         addPlusButtonListener();
+        addFocusModeListener();
         addGoalListeners();
         createDeveloperButton();
 
@@ -133,6 +138,14 @@ public class TomorrowFragment extends Fragment {
             else {
                 goal.makeInComplete();
             }
+        });
+    }
+
+    public void addFocusModeListener(){
+        view.hamburgerMenu.setOnClickListener(v -> {
+            var dialogFragment = FocusModeDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
+            this.context = dialogFragment.getFocusContext();
         });
     }
 

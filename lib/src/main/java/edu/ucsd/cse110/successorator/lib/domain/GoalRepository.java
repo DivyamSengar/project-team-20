@@ -62,5 +62,5 @@ public interface GoalRepository {
     /**
      * Removes all the goals in the list
      */
-    void deleteCompleted();
+    void deleteCompleted(int year, int month, int day);
 }

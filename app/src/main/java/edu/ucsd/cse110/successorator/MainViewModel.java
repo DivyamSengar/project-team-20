@@ -285,7 +285,13 @@ public class MainViewModel extends ViewModel {
     public Subject<List<Goal>> getGoalsByDayIncomplete(int year, int month, int day) {return goalRepositoryIncomplete.getGoalsByDay(year, month, day);}
 
     public Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getGoalsByDay(year, month, day);}
-
+    public Subject<List<Goal>> getGoalsByDay(int year, int month, int day){
+        var complete = getGoalsByDayComplete(year, month, day);
+        var incomplete = getGoalsByDayIncomplete(year, month, day);
+        var incompleteList = incomplete.getValue();
+        incompleteList.addAll(complete.getValue());
+        return incomplete;
+    }
     public Subject<List<Goal>> getRecurringGoals(){
         MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
         MutableSubject<List<Goal>> complete = new SimpleSubject<>();
@@ -410,6 +416,8 @@ public class MainViewModel extends ViewModel {
     public Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getRecurringGoalsByDay(year, month, day);}
 
     public Subject<List<Goal>> getContext(Subject<List<Goal>> listOfGoals, int context){
+        // if there is no context set in focus mode or the cancel button has been hit, then don't sort by anything
+        if (context == 0) return listOfGoals;
         MutableSubject<List<Goal>> contextGoals = new SimpleSubject<>();
         listOfGoals.observe(goals -> {
             List<Goal> goalList = List.of();
@@ -737,9 +745,10 @@ public class MainViewModel extends ViewModel {
      * first or should the incompleted goals get rolld over first? The order of the goals changes based on this
      */
     public void deleteCompleted(){
+        LocalDateTime today = LocalDateTime.now();
         var recGoals = goalRepositoryComplete.getRecurringGoals();
         if (recGoals.getValue() == null || recGoals.getValue().isEmpty()){
-            goalRepositoryComplete.deleteCompleted();
+            goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
             return;
         }
         ArrayList<Goal> toAdd = new ArrayList<>();
@@ -747,9 +756,9 @@ public class MainViewModel extends ViewModel {
             goal.makeInComplete();
             toAdd.add(goal.updateRecurring());
         }
-        goalRepositoryComplete.deleteCompleted();
+        goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
         for (var goal : toAdd){
-            goalRepositoryComplete.append(goal);
+            goalRepositoryIncomplete.append(goal);
         }
     }
 

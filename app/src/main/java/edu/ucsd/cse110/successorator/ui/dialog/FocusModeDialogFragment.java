@@ -15,6 +15,8 @@ import edu.ucsd.cse110.successorator.databinding.FragmentFocusModeBinding;
 
 public class FocusModeDialogFragment extends DialogFragment {
     private FragmentFocusModeBinding view;
+
+    private int focusContext;
     FocusModeDialogFragment(){}
 
     public static FocusModeDialogFragment newInstance() {
@@ -47,6 +49,7 @@ public class FocusModeDialogFragment extends DialogFragment {
     private void getFocusInput(){
         view.homeContextBtn.setOnCheckedChangeListener((view, isChecked) -> {
             if (isChecked){
+                setFocusContext(1);
                 // filter the contexts based on home
                 System.out.println("Home checked");
                 dismiss();
@@ -55,6 +58,7 @@ public class FocusModeDialogFragment extends DialogFragment {
 
         view.workContextBtn.setOnCheckedChangeListener((view, isChecked) -> {
             if (isChecked){
+                setFocusContext(2);
                 // filter the contexts based on work
                 System.out.println("work checked");
                 dismiss();
@@ -63,6 +67,7 @@ public class FocusModeDialogFragment extends DialogFragment {
 
         view.schoolContextBtn.setOnCheckedChangeListener((view, isChecked) -> {
             if (isChecked){
+                setFocusContext(3);
                 // filter the contexts based on school
                 System.out.println("school checked");
                 dismiss();
@@ -71,6 +76,7 @@ public class FocusModeDialogFragment extends DialogFragment {
 
         view.errandContextBtn.setOnCheckedChangeListener((view, isChecked) -> {
             if (isChecked){
+                setFocusContext(4);
                 // filter the contexts based on errands
                 System.out.println("errand checked");
                 dismiss();
@@ -80,6 +86,15 @@ public class FocusModeDialogFragment extends DialogFragment {
 
     private void onNegativeButtonClick(DialogInterface dialog, int which){
         // Exit out of focus mode
+        setFocusContext(0);
         dialog.dismiss();
+    }
+
+    public int getFocusContext() {
+        return focusContext;
+    }
+
+    public void setFocusContext(int focusContext) {
+        this.focusContext = focusContext;
     }
 }
