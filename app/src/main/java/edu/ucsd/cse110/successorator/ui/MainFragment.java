@@ -31,7 +31,7 @@ import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
  * MainFragment is the main fragment for the application
  */
 public class MainFragment extends Fragment {
-    private MainViewModel activityModel;
+    public MainViewModel activityModel;
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
 
