@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentFocusModeBinding;
+import edu.ucsd.cse110.successorator.ui.FocusModeListener;
 import edu.ucsd.cse110.successorator.ui.MainFragment;
 
 public class FocusModeDialogFragment extends DialogFragment {
@@ -28,20 +29,19 @@ public class FocusModeDialogFragment extends DialogFragment {
 
     private MainViewModel activityModel;
 
+    private static FocusModeListener listener;
 
 //    private int whichView;
-
-
-
 
     private int focusContext;
     FocusModeDialogFragment(){
     }
 
-    public static FocusModeDialogFragment newInstance() {
+    public static FocusModeDialogFragment newInstance(FocusModeListener l) {
         Bundle args = new Bundle();
         FocusModeDialogFragment fragment = new FocusModeDialogFragment();
         fragment.setArguments(args);
+        listener = l;
         return fragment;
     }
 
@@ -83,6 +83,7 @@ public class FocusModeDialogFragment extends DialogFragment {
                 System.out.println("in dialog" + focusContext);
                 activityModel.removeContext();
                 activityModel.setContextWithBoolean(1, true);
+                listener.onFocusModeSelected(1);
                 dismiss();
 
 //                return 1;
@@ -97,6 +98,7 @@ public class FocusModeDialogFragment extends DialogFragment {
                 System.out.println("in dialog" + focusContext);
                 activityModel.removeContext();
                 activityModel.setContextWithBoolean(2, true);
+                listener.onFocusModeSelected(2);
                 dismiss();
             } else {}
         });
@@ -109,6 +111,7 @@ public class FocusModeDialogFragment extends DialogFragment {
                 System.out.println("in dialog" + focusContext);
                 activityModel.removeContext();
                 activityModel.setContextWithBoolean(3, true);
+                listener.onFocusModeSelected(3);
                 dismiss();
             } else {}
         });
@@ -121,6 +124,7 @@ public class FocusModeDialogFragment extends DialogFragment {
                 System.out.println("in dialog" + focusContext);
                 activityModel.removeContext();
                 activityModel.setContextWithBoolean(4, true);
+                listener.onFocusModeSelected(4);
                 dismiss();
             } else {}
         });
@@ -135,6 +139,7 @@ public class FocusModeDialogFragment extends DialogFragment {
         System.out.println("in dialog" + focusContext);
         activityModel.removeContext();
         activityModel.setContextWithBoolean(0, true);
+        listener.onFocusModeSelected(0);
         dialog.dismiss();
     }
 

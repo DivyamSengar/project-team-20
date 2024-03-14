@@ -12,6 +12,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -25,7 +28,7 @@ import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.CreatePendingDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
 
-public class PendingFragment extends Fragment {
+public class PendingFragment extends Fragment implements FocusModeListener{
     private FragmentPendingBinding view;
     private PendingFragmentAdapter adapter;
     private MainViewModel activityModel;
@@ -41,6 +44,34 @@ public class PendingFragment extends Fragment {
         PendingFragment fragment = new PendingFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onFocusModeSelected(int context) {
+        this.context = context;
+        updateGoals();
+    }
+
+    public void updateGoals() {
+        LocalDateTime current = activityModel.getTodayTime();
+        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
+        Calendar today = Calendar.getInstance();
+        today.setTimeInMillis(instant.toEpochMilli());
+//        while (!activityModel.getCurrUpdateValue()){}
+        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
+        activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
+                                (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
+                        activityModel.getCurrentContextValue())
+                .observe(goal -> {
+                    if (goal == null) {
+                        System.out.println("way too early?");
+                        return;
+                    }
+                    System.out.println("My size is " + goal.size());
+                    adapter.clear();
+                    adapter.addAll(new ArrayList<>(goal));
+                    adapter.notifyDataSetChanged();
+                });
     }
 
     @Override
@@ -107,7 +138,7 @@ public class PendingFragment extends Fragment {
 
     public void addFocusModeListener(){
         view.hamburgerMenu.setOnClickListener(v -> {
-            var dialogFragment = FocusModeDialogFragment.newInstance();
+            var dialogFragment = FocusModeDialogFragment.newInstance(this);
             dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
             this.context = dialogFragment.getFocusContext();
         });

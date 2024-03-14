@@ -34,7 +34,7 @@ import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
 /**
  * MainFragment is the main fragment for the application
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements FocusModeListener {
     private MainViewModel activityModel;
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
@@ -151,22 +151,6 @@ public class MainFragment extends Fragment {
 
         view.topText.setText(currentDate);
         activityModel.rollover();
-
-        LocalDateTime current = activityModel.getTodayTime();
-        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
-        Calendar today = Calendar.getInstance();
-        today.setTimeInMillis(instant.toEpochMilli());
-        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
-        activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
-                                (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
-                        activityModel.getCurrentContextValue())
-                .observe(goal -> {
-                    if (goal == null) return;
-                    System.out.println("My size is " + goal.size());
-                    adapter.clear();
-                    adapter.addAll(new ArrayList<>(goal));
-                    adapter.notifyDataSetChanged();
-                });
     }
 
     public void showTopBar(){
@@ -187,36 +171,18 @@ public class MainFragment extends Fragment {
 
     public void addFocusModeListener(){
         view.hamburgerMenu.setOnClickListener(v -> {
-            var dialogFragment = FocusModeDialogFragment.newInstance();
+            var dialogFragment = FocusModeDialogFragment.newInstance(this);
             System.out.println(dialogFragment.getFocusContext() + "printed here");
             dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
-            LocalDateTime current = activityModel.getTodayTime();
-            Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
-            Calendar today = Calendar.getInstance();
-            today.setTimeInMillis(instant.toEpochMilli());
-//        while (!activityModel.getCurrUpdateValue()){}
-            System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
-            activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
-                                    (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
-                            activityModel.getCurrentContextValue())
-                    .observe(goal -> {
-                        if (goal == null) {
-                            System.out.println("way too early?");
-                            return;
-                        }
-                        System.out.println("My size is " + goal.size());
-                        adapter.clear();
-                        adapter.addAll(new ArrayList<>(goal));
-                        adapter.notifyDataSetChanged();
-                    });
-//        int context = activityModel.getCurrentContextValue();
-//        activityModel.removeContext();
-//        activityModel.setContextWithBoolean(context, false);
-
         });
 
-        }
+    }
 
+    @Override
+    public void onFocusModeSelected(int context) {
+        this.context = context;
+        updateGoals();
+    }
 
     public void updateGoals() {
         LocalDateTime current = activityModel.getTodayTime();
@@ -380,3 +346,4 @@ public class MainFragment extends Fragment {
         });
     }
 }
+
