@@ -1,20 +1,22 @@
 package edu.ucsd.cse110.successorator.ui;
 
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -28,7 +30,7 @@ import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.CreatePendingDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
 
-public class PendingFragment extends Fragment implements FocusModeListener{
+public class PendingFragment extends Fragment {
     private FragmentPendingBinding view;
     private PendingFragmentAdapter adapter;
     private MainViewModel activityModel;
@@ -44,34 +46,6 @@ public class PendingFragment extends Fragment implements FocusModeListener{
         PendingFragment fragment = new PendingFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onFocusModeSelected(int context) {
-        this.context = context;
-        updateGoals();
-    }
-
-    public void updateGoals() {
-        LocalDateTime current = activityModel.getTodayTime();
-        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
-        Calendar today = Calendar.getInstance();
-        today.setTimeInMillis(instant.toEpochMilli());
-//        while (!activityModel.getCurrUpdateValue()){}
-        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
-        activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
-                                (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
-                        activityModel.getCurrentContextValue())
-                .observe(goal -> {
-                    if (goal == null) {
-                        System.out.println("way too early?");
-                        return;
-                    }
-                    System.out.println("My size is " + goal.size());
-                    adapter.clear();
-                    adapter.addAll(new ArrayList<>(goal));
-                    adapter.notifyDataSetChanged();
-                });
     }
 
     @Override
@@ -113,6 +87,128 @@ public class PendingFragment extends Fragment implements FocusModeListener{
         // Inflate the layout for this fragment
         return view.getRoot();
     }
+
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add("Move to today");
+        menu.add("Move to tomorrow");
+        menu.add("Finish");
+        menu.add("Delete");
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Goal goal = adapter.getItem(info.position);
+
+        return true;
+    }
+
+    private void showPopupMenu(View view, Goal goal) {
+        PopupMenu popupMenu = new PopupMenu(requireContext(), view);
+        popupMenu.inflate(R.menu.pending_goal_context_menu);
+        popupMenu.setOnMenuItemClickListener(item -> {
+            if (item.getTitle().equals("Move to today")) {
+                moveToToday(goal);
+            } else if (item.getTitle().equals("Move to tomorrow")) {
+                moveToTomorrow(goal);
+            } else if (item.getTitle().equals("Finish")) {
+                finishGoal(goal);
+            } else if (item.getTitle().equals("Delete")) {
+                deleteGoal(goal);
+            }
+
+            return true;
+        });
+        popupMenu.show();
+    }
+
+
+    // TODO: Modify this in long press
+    public void addGoalListeners() {
+        view.listGoals.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Goal goal = adapter.getItem(position);
+                showPopupMenu(view, goal);
+                return true;
+            }
+        });
+    }
+    public void removeGoalComplete(Goal goal) {
+        activityModel.removeGoalIncomplete(goal.id());
+        adapter.remove(goal);
+        activityModel.appendIncomplete(goal);
+        adapter.notifyDataSetChanged();
+    }
+
+    public void removeGoalIncomplete(Goal goal) {
+        activityModel.removeGoalIncomplete(goal.id());
+        adapter.remove(goal);
+        activityModel.appendComplete(goal);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void moveToToday(Goal goal) {
+        // Update the goal's date
+        goal.setDate(LocalDateTime.now().getMinute(),
+                LocalDateTime.now().getHour(),
+                LocalDateTime.now().getDayOfMonth(),
+                LocalDateTime.now().getMonthValue(),
+                LocalDateTime.now().getYear());
+
+        // Remove the goal from the pending goals
+
+        goal.changePending();
+        removeGoalComplete(goal);
+
+        // Get the MainFragment and add the goal
+        MainFragment mainFragment = (MainFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
+        if (mainFragment != null) {
+            mainFragment.addGoalIncomplete(goal);
+        }
+    }
+
+    private void moveToTomorrow(Goal goal) {
+        goal.setDate(LocalDateTime.now().getMinute(),
+                LocalDateTime.now().getHour(),
+                LocalDateTime.now().plusDays(1).getDayOfMonth(),
+                LocalDateTime.now().getMonthValue(),
+                LocalDateTime.now().getYear());
+
+        goal.changePending();
+        removeGoalComplete(goal);
+
+        TomorrowFragment tomorrowFragment = (TomorrowFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
+        if (tomorrowFragment != null){
+            tomorrowFragment.addGoalIncomplete(goal);
+        }
+    }
+
+    private void finishGoal(Goal goal) {
+        goal.setDate(LocalDateTime.now().getMinute(),
+                LocalDateTime.now().getHour(),
+                LocalDateTime.now().getDayOfMonth(),
+                LocalDateTime.now().getMonthValue(),
+                LocalDateTime.now().getYear());
+
+        goal.changePending();
+        goal.makeComplete();
+        removeGoalIncomplete(goal);
+
+        // Get the MainFragment and add the goal
+        MainFragment mainFragment = (MainFragment) getParentFragmentManager().findFragmentByTag("android:switcher:" + R.id.fragment_container + ":" + 1);
+        if (mainFragment != null) {
+            mainFragment.addGoalComplete(goal);
+        }
+    }
+
+    private void deleteGoal(Goal goal) {
+        activityModel.removeGoalIncomplete(goal.id());
+        adapter.notifyDataSetChanged();
+    }
+
     @Override
     public void onResume(){
         super.onResume();
@@ -131,14 +227,10 @@ public class PendingFragment extends Fragment implements FocusModeListener{
         });
     }
 
-    // TODO: Modify this in long press
-    public void addGoalListeners() {
-
-    }
 
     public void addFocusModeListener(){
         view.hamburgerMenu.setOnClickListener(v -> {
-            var dialogFragment = FocusModeDialogFragment.newInstance(this);
+            var dialogFragment = FocusModeDialogFragment.newInstance((FocusModeListener) this);
             dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
             this.context = dialogFragment.getFocusContext();
         });

@@ -78,6 +78,12 @@ public class TomorrowFragment extends Fragment implements FocusModeListener {
                 });
     }
 
+    public void addGoalIncomplete(Goal goal) {
+        activityModel.appendIncomplete(goal);
+        adapter.addAll(goal);
+        adapter.notifyDataSetChanged();
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @NonNull ViewGroup container,
