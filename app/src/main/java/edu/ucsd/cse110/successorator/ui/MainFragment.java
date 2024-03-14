@@ -95,10 +95,12 @@ public class MainFragment extends Fragment implements FocusModeListener {
         Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
         Calendar today = Calendar.getInstance();
         today.setTimeInMillis(instant.toEpochMilli());
-        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
+        System.out.println("curr context in main" + activityModel.getCurrentContextValue());
+        activityModel.removeContext();
+        activityModel.setContext(0);
         activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
                         (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
-                        activityModel.getCurrentContextValue())
+                        0)
                 .observe(goal -> {
                     if (goal == null) return;
                     System.out.println("My size is " + goal.size());
@@ -106,6 +108,7 @@ public class MainFragment extends Fragment implements FocusModeListener {
                     adapter.addAll(new ArrayList<>(goal));
                     adapter.notifyDataSetChanged();
                 });
+
     }
 
     /**
@@ -126,7 +129,8 @@ public class MainFragment extends Fragment implements FocusModeListener {
         view.listGoals.setAdapter(adapter);
 
         showTopBar();
-
+        activityModel.removeContext();
+        activityModel.setContext(0);
         activityModel.rollover();
 
         checkGoalsIsEmpty();
@@ -135,7 +139,7 @@ public class MainFragment extends Fragment implements FocusModeListener {
         addGoalListeners();
         createSpinner();
         createDeveloperButton();
-
+        onFocusModeSelected(0);
 
         // Inflate the layout for this fragment
         return view.getRoot();
@@ -257,12 +261,14 @@ public class MainFragment extends Fragment implements FocusModeListener {
                 goal.makeComplete();
                 activityModel.removeGoalIncomplete(goal.id());
                 activityModel.appendComplete(goal);
+                updateGoals();
             }
             // If goal is complete make incomplete
             else{
                 goal.makeInComplete();
                 activityModel.removeGoalComplete(goal.id());
                 activityModel.prependIncomplete(goal);
+                updateGoals();
             }
         });
     }
