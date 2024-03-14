@@ -6,8 +6,11 @@ import androidx.room.Room;
 
 import java.time.LocalDateTime;
 
+import edu.ucsd.cse110.successorator.context.db.RoomContextRepository;
+import edu.ucsd.cse110.successorator.context.db.SuccessoratorContextDatabase;
 import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 import edu.ucsd.cse110.successorator.data.db.SuccessoratorDatabase;
+import edu.ucsd.cse110.successorator.lib.domain.ContextRepository;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
 import edu.ucsd.cse110.successorator.timedata.db.RoomTimeKeeper;
@@ -24,6 +27,8 @@ public class SuccessoratorApplication extends Application {
     private GoalRepository goalRepositoryRecurring;
 
     private TimeKeeper timeKeeper;
+
+    private ContextRepository contextRepository;
 
     private LocalDateTime todayTime;
 
@@ -62,13 +67,22 @@ public class SuccessoratorApplication extends Application {
                 .build();
         this.goalRepositoryRecurring = new RoomGoalRepository(database4.goalDao());
 
+        var database5 = Room.databaseBuilder(getApplicationContext(),
+                SuccessoratorContextDatabase.class, "successorator-database5")
+                .allowMainThreadQueries()
+                .build();
+        this.contextRepository = new RoomContextRepository(database5.contextDao());
+
         // Initalize a default value into the time keeper database
         var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
 
         var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
-        if (isFirstRun && database3.timeDao().count() == 0){
+        if (isFirstRun && database3.timeDao().count() == 0 && database5.contextDao().count() == 0){
             timeKeeper.setDateTime(LocalDateTime.of(1900, 1, 20, 10, 30));
+            contextRepository.setContext(0);
 
+
+            // might be able to use sharedPreferences to edit the issue with resetting date.
             sharedPreferences.edit()
                     .putBoolean("isFirstRun", false)
                     .apply();
@@ -103,6 +117,10 @@ public class SuccessoratorApplication extends Application {
      */
     public TimeKeeper getTimeKeeper() {
         return timeKeeper;
+    }
+
+    public ContextRepository getContextRepository() {
+        return contextRepository;
     }
 
     public LocalDateTime getTodayTime(){ return todayTime;}

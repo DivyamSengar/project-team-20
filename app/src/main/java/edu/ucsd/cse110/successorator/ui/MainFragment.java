@@ -96,7 +96,7 @@ public class MainFragment extends Fragment {
         Calendar today = Calendar.getInstance();
         today.setTimeInMillis(instant.toEpochMilli());
         activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
-                        (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)), context)
+                        (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)), activityModel.getCurrentContextValue())
                 .observe(goal -> {
                     if (goal == null) return;
                     System.out.println("My size is " + goal.size());

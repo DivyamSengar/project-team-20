@@ -21,7 +21,7 @@ import edu.ucsd.cse110.successorator.databinding.FragmentFocusModeBinding;
 public class FocusModeDialogFragment extends DialogFragment {
     private FragmentFocusModeBinding view;
 
-//    private MainViewModel activityModel;
+    private MainViewModel activityModel;
 
 //    private int whichView;
 
@@ -43,10 +43,10 @@ public class FocusModeDialogFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        var modelOwner = requireActivity();
-//        var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
-//        var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
-//        this.activityModel = modelProvider.get(MainViewModel.class);
+        var modelOwner = requireActivity();
+        var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
+        var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
+        this.activityModel = modelProvider.get(MainViewModel.class);
     }
 
     @NonNull
@@ -74,6 +74,8 @@ public class FocusModeDialogFragment extends DialogFragment {
                 // filter the contexts based on home
                 System.out.println("Home checked");
                 System.out.println("in dialog" + focusContext);
+                activityModel.removeContext();
+                activityModel.setContext(1);
                 dismiss();
 
 //                return 1;
@@ -87,6 +89,8 @@ public class FocusModeDialogFragment extends DialogFragment {
                 // filter the contexts based on work
                 System.out.println("work checked");
                 System.out.println("in dialog" + focusContext);
+                activityModel.removeContext();
+                activityModel.setContext(2);
                 dismiss();
             } else {}
         });
@@ -98,6 +102,8 @@ public class FocusModeDialogFragment extends DialogFragment {
                 // filter the contexts based on school
                 System.out.println("school checked");
                 System.out.println("in dialog" + focusContext);
+                activityModel.removeContext();
+                activityModel.setContext(3);
                 dismiss();
             } else {}
         });
@@ -109,6 +115,8 @@ public class FocusModeDialogFragment extends DialogFragment {
                 // filter the contexts based on errands
                 System.out.println("errand checked");
                 System.out.println("in dialog" + focusContext);
+                activityModel.removeContext();
+                activityModel.setContext(4);
                 dismiss();
             } else {}
         });
@@ -117,12 +125,13 @@ public class FocusModeDialogFragment extends DialogFragment {
         return context.get();
     }
 
-    private int onNegativeButtonClick(DialogInterface dialog, int which){
+    private void onNegativeButtonClick(DialogInterface dialog, int which){
         // Exit out of focus mode
         this.focusContext = 0;
         System.out.println("in dialog" + focusContext);
+        activityModel.removeContext();
+        activityModel.setContext(0);
         dialog.dismiss();
-        return 0;
     }
 
     public int getFocusContext() {

@@ -64,7 +64,8 @@ public class TomorrowFragment extends Fragment {
         tomorrow.add(Calendar.DAY_OF_MONTH, 1);
         System.out.println("Tomorrow date" + tomorrow.get(Calendar.YEAR) + " " + (tomorrow.get(Calendar.MONTH)) + " " + tomorrow.get(Calendar.DAY_OF_MONTH));
         activityModel.getContext(activityModel.getGoalsByDay(tomorrow.get(Calendar.YEAR),
-                        (tomorrow.get(Calendar.MONTH) +1), tomorrow.get(Calendar.DAY_OF_MONTH)), context)
+                        (tomorrow.get(Calendar.MONTH) +1), tomorrow.get(Calendar.DAY_OF_MONTH)),
+                        activityModel.getCurrentContextValue())
                 .observe(goal -> {
                     if (goal == null) return;
                     System.out.println("Tomorrow adapter" + goal.size());

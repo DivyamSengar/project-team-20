@@ -55,7 +55,8 @@ public class PendingFragment extends Fragment {
         // Initialize the adapter
         this.adapter = new PendingFragmentAdapter(requireContext(), List.of());
 
-        activityModel.getContext(activityModel.getPendingGoals(), context).observe(goal -> {
+        activityModel.getContext(activityModel.getPendingGoals(),
+                activityModel.getCurrentContextValue()).observe(goal -> {
             if (goal == null) return;
             adapter.clear();
             adapter.addAll(new ArrayList<>(goal));

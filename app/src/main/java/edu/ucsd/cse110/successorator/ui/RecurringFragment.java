@@ -52,7 +52,8 @@ public class RecurringFragment extends Fragment {
         // Initialize the adapter
         this.adapter = new RecurringFragmentAdapter(requireContext(), List.of());
 
-        activityModel.getContext(activityModel.getGoalsFromRecurringList(), context).observe(goal -> {
+        activityModel.getContext(activityModel.getGoalsFromRecurringList(),
+                activityModel.getCurrentContextValue()).observe(goal -> {
             if (goal == null) return;
             adapter.clear();
             adapter.addAll(new ArrayList<>(goal));

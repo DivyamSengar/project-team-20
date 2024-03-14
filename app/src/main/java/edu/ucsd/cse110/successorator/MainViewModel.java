@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 
 import edu.ucsd.cse110.successorator.data.db.GoalEntity;
+import edu.ucsd.cse110.successorator.lib.domain.ContextRepository;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
@@ -36,9 +37,10 @@ public class MainViewModel extends ViewModel {
                         assert app != null;
                         return new MainViewModel(app.getGoalRepositoryComplete(),
                                 app.getGoalRepositoryIncomplete(), app.getGoalRepositoryRecurring(),
-                                app.getTimeKeeper(), app.getTodayTime());
+                                app.getTimeKeeper(), app.getTodayTime(), app.getContextRepository());
                     });
     private final GoalRepository goalRepositoryComplete;
+
 
     private  LocalDateTime todayTime;
     private final GoalRepository goalRepositoryIncomplete;
@@ -46,6 +48,8 @@ public class MainViewModel extends ViewModel {
     private final GoalRepository goalRepositoryRecurring;
 
     public final TimeKeeper timeKeeper;
+
+    private final ContextRepository contextRepository;
     private MutableSubject<List<Goal>> goals;
     private MutableSubject<Boolean> isGoalsEmpty;
 
@@ -68,13 +72,15 @@ public class MainViewModel extends ViewModel {
      * @param timeKeeper -
      */
     public MainViewModel(GoalRepository goalRepositoryComplete,
-                         GoalRepository goalRepositoryIncomplete, GoalRepository goalRepositoryRecurring, TimeKeeper timeKeeper, LocalDateTime todayTime) {
+                         GoalRepository goalRepositoryIncomplete, GoalRepository goalRepositoryRecurring,
+                         TimeKeeper timeKeeper, LocalDateTime todayTime, ContextRepository contextRepository) {
 
         this.goalRepositoryComplete = goalRepositoryComplete;
         this.goalRepositoryIncomplete = goalRepositoryIncomplete;
         this.goalRepositoryRecurring = goalRepositoryRecurring;
         this.timeKeeper = timeKeeper;
         this.todayTime = todayTime;
+        this.contextRepository = contextRepository;
 
         // Observables
         this.goals = new SimpleSubject<>();
@@ -934,5 +940,17 @@ public class MainViewModel extends ViewModel {
 
     public void updateTodayTime(){
         this.todayTime = todayTime.plusDays(1);
+    }
+
+    public void setContext(int context){
+        contextRepository.setContext(context);
+    }
+
+    public void removeContext(){
+        contextRepository.removeContext();
+    }
+
+    public int getCurrentContextValue(){
+        return contextRepository.getContext();
     }
 }
