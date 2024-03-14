@@ -24,4 +24,16 @@
         <item>Pending</item>
         <item>Recurring</item>
     </string-array>
+
+    <string-array name="pending_goal_context_menu">
+        <item>Move to today</item>
+        <item>Move to tomorrow</item>
+        <item>Finish</item>
+        <item>Delete</item>
+    </string-array>
+
+    <string-array name="recurring_goal_context_menu">
+        <item>Delete</item>
+    </string-array>
+
 </resources>

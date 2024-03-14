@@ -211,6 +211,18 @@ public class MainFragment extends Fragment {
         });
     }
 
+    public void addGoalIncomplete(Goal goal) {
+        activityModel.appendIncomplete(goal);
+        adapter.addAll(goal);
+        adapter.notifyDataSetChanged();
+    }
+
+    public void addGoalComplete(Goal goal) {
+        activityModel.appendComplete(goal);
+        adapter.addAll(goal);
+        adapter.notifyDataSetChanged();
+    }
+
     public void createSpinner(){
         /*
         https://developer.android.com/develop/ui/views/components/spinner#java
