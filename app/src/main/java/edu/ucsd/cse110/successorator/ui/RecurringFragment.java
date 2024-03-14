@@ -1,13 +1,17 @@
 package edu.ucsd.cse110.successorator.ui;
 
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -74,6 +78,48 @@ public class RecurringFragment extends Fragment {
         return view.getRoot();
     }
 
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add("Delete");
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Goal goal = adapter.getItem(info.position);
+
+        return true;
+    }
+
+    private void showPopupMenu(View view, Goal goal) {
+        PopupMenu popupMenu = new PopupMenu(requireContext(), view);
+        popupMenu.inflate(R.menu.recurring_goal_context_menu);
+        popupMenu.setOnMenuItemClickListener(item -> {
+            if (item.getTitle().equals("Delete")) {
+                deleteGoal(goal);
+            }
+            return true;
+        });
+        popupMenu.show();
+    }
+
+    public void addGoalListeners() {
+        view.listGoals.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Goal goal = adapter.getItem(position);
+                showPopupMenu(view, goal);
+                return true;
+            }
+        });
+    }
+
+    private void deleteGoal(Goal goal) {
+        activityModel.removeGoalIncomplete(goal.id());
+        adapter.notifyDataSetChanged();
+    }
+
     public void showTopBar(){
         view.topText.setText(R.string.recurring);
     }
@@ -84,12 +130,6 @@ public class RecurringFragment extends Fragment {
             var dialogFragment = CreateRecurringDialogFragment.newInstance();
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
-    }
-
-    // TODO: Modify this in long press
-    public void addGoalListeners () {
-        // Listener for taps/clicks on each list item
-
     }
 
     public void createSpinner(){
