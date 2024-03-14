@@ -48,6 +48,7 @@ public class RoomGoalRepository implements GoalRepository {
                     .map(GoalEntity::toGoal)
                     .collect(Collectors.toList());
         });
+
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
 
@@ -77,9 +78,9 @@ public class RoomGoalRepository implements GoalRepository {
                     .collect(Collectors.toList());
         });
         if (goalsLiveData.getValue() != null){
-            System.out.println("Testing" + goalsLiveData.getValue().size());
+            System.out.println("Testing recurring items" + goalsLiveData.getValue().size());
         } else {
-            System.out.println("No recurring items found");
+            System.out.println("No recurring items found HHAHA");
         }
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }

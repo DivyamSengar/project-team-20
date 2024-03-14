@@ -129,8 +129,9 @@ public class CreateRecurringDialogFragment extends DialogFragment {
                     Instant instant = parsed.toInstant();
 
                     LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+                    LocalDateTime now = LocalDateTime.now();
 
-                    int[] date = {localDateTime.getMinute(), localDateTime.getHour(),
+                    int[] date = {now.getMinute(), now.getHour(),
                             localDateTime.getDayOfMonth(), localDateTime.getMonthValue(), localDateTime.getYear()};
                     var newGoal = new Goal(null, input, false, -1, false, recurring,
                             date[0], date[1], date[2], date[3], date[4], contextOption);
