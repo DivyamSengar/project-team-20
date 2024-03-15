@@ -17,9 +17,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -151,10 +154,16 @@ public class CreateGoalDialogFragment extends DialogFragment {
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
 
+        LocalDateTime todayTime = activityModel.getTodayTime();
+        Calendar c = Calendar.getInstance();
+        Instant instant = todayTime.atZone(ZoneId.systemDefault()).toInstant();
+        c.setTimeInMillis(instant.toEpochMilli());
+
+
         SimpleDateFormat daysOfWeek = new SimpleDateFormat("E", Locale.getDefault());
         SimpleDateFormat dayofMonth = new SimpleDateFormat("F", Locale.getDefault());
         SimpleDateFormat dayofYear = new SimpleDateFormat("MM/dd", Locale.getDefault());
-        Calendar c = Calendar.getInstance();
+
         String[] postfix = {"st", "nd", "rd", "th","th","th"};
         String weeklyText = "Weekly on " + daysOfWeek.format(c.getTime());
         // not entirely sure if this is correct or not
@@ -178,7 +187,7 @@ public class CreateGoalDialogFragment extends DialogFragment {
                         view.schoolBtn.isChecked() || view.errandBtn.isChecked()){
                     // Get the input of the textEdit
                     var input = view.goalEditText.getText().toString();
-                    LocalDateTime currentTime = LocalDateTime.now();
+                    LocalDateTime currentTime = activityModel.getTodayTime();
                     // Create a new Goal with the text and add it
                     String recurring = null;
                     int contextOption = 0;

@@ -164,14 +164,13 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
     }
 
     public void updateGoals() {
-        LocalDateTime current = activityModel.getTodayTime();
-        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
-        Calendar today = Calendar.getInstance();
-        today.setTimeInMillis(instant.toEpochMilli());
-//        while (!activityModel.getCurrUpdateValue()){}
-        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
-        activityModel.getContext(activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR),
-                                (today.get(Calendar.MONTH)+1), today.get(Calendar.DAY_OF_MONTH)),
+//        LocalDateTime current = activityModel.getTodayTime();
+//        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
+//        Calendar today = Calendar.getInstance();
+//        today.setTimeInMillis(instant.toEpochMilli());
+////        while (!activityModel.getCurrUpdateValue()){}
+//        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
+        activityModel.getContext(activityModel.getGoalsFromRecurringList(),
                         activityModel.getCurrentContextValue())
                 .observe(goal -> {
                     if (goal == null) {

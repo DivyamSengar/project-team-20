@@ -7,14 +7,12 @@ import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLI
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-import edu.ucsd.cse110.successorator.data.db.GoalEntity;
 import edu.ucsd.cse110.successorator.lib.domain.ContextRepository;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
@@ -37,7 +35,7 @@ public class MainViewModel extends ViewModel {
                         assert app != null;
                         return new MainViewModel(app.getGoalRepositoryComplete(),
                                 app.getGoalRepositoryIncomplete(), app.getGoalRepositoryRecurring(),
-                                app.getTimeKeeper(), app.getTodayTime(), app.getContextRepository());
+                                app.getTimeKeeper(), app.getActualTimeKeeper(), app.getContextRepository());
                     });
     private final GoalRepository goalRepositoryComplete;
 
@@ -48,6 +46,8 @@ public class MainViewModel extends ViewModel {
     private final GoalRepository goalRepositoryRecurring;
 
     public final TimeKeeper timeKeeper;
+
+    public final TimeKeeper ActualTimeKeeper;
 
     private final ContextRepository contextRepository;
     private MutableSubject<List<Goal>> goals;
@@ -73,13 +73,13 @@ public class MainViewModel extends ViewModel {
      */
     public MainViewModel(GoalRepository goalRepositoryComplete,
                          GoalRepository goalRepositoryIncomplete, GoalRepository goalRepositoryRecurring,
-                         TimeKeeper timeKeeper, LocalDateTime todayTime, ContextRepository contextRepository) {
+                         TimeKeeper timeKeeper, TimeKeeper ActualTimeKeeper, ContextRepository contextRepository) {
 
         this.goalRepositoryComplete = goalRepositoryComplete;
         this.goalRepositoryIncomplete = goalRepositoryIncomplete;
         this.goalRepositoryRecurring = goalRepositoryRecurring;
         this.timeKeeper = timeKeeper;
-        this.todayTime = todayTime;
+        this.ActualTimeKeeper = ActualTimeKeeper;
         this.contextRepository = contextRepository;
 
         // Observables
@@ -204,12 +204,12 @@ public class MainViewModel extends ViewModel {
      */
     public void rollover() {
         // Current time and time that the app was last opened
-        LocalDateTime currentTime = LocalDateTime.now();
-        int lastOpenedHour = this.getFields()[3];
-        int lastOpenedMinute = this.getFields()[4];
-        int lastDay = this.getFields()[2];
-        int lastMonth =this.getFields()[1];
-        int lastYear = this.getFields()[0];
+        LocalDateTime currentTime = getTodayTime();
+        int lastOpenedHour = this.getFieldsForLastDate()[3];
+        int lastOpenedMinute = this.getFieldsForLastDate()[4];
+        int lastDay = this.getFieldsForLastDate()[2];
+        int lastMonth =this.getFieldsForLastDate()[1];
+        int lastYear = this.getFieldsForLastDate()[0];
 
         LocalDateTime previous = LocalDateTime.of(lastYear, lastMonth,
                 lastDay, lastOpenedHour, lastOpenedMinute);
@@ -258,7 +258,7 @@ public class MainViewModel extends ViewModel {
         if (list.getValue() == null || list.getValue().isEmpty()){
             return;
         }
-        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime today = getTodayTime();
         for (var goal : list.getValue()){
             if (today.isBefore(goal.getBoundaryRecurringDate())){
 
@@ -834,9 +834,10 @@ public class MainViewModel extends ViewModel {
      * first or should the incompleted goals get rolld over first? The order of the goals changes based on this
      */
     public void deleteCompleted(){
-        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime today = getTodayTime();
         var recGoals = goalRepositoryComplete.getRecurringGoals();
         if (recGoals.getValue() == null || recGoals.getValue().isEmpty()){
+            System.out.println("ayo bruh this happened");
             goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
             return;
         }
@@ -873,7 +874,7 @@ public class MainViewModel extends ViewModel {
      *
      * @return Array of fields such as hours, minutes, etc. for the time
      */
-    public int[] getFields() {
+    public int[] getFieldsForLastDate() {
         return timeKeeper.getFields();
     }
 
@@ -936,11 +937,14 @@ public class MainViewModel extends ViewModel {
         goalRepositoryIncomplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
     }
     public LocalDateTime getTodayTime() {
-        return todayTime;
+        int[] timeFields = ActualTimeKeeper.getFields();
+        return LocalDateTime.of(timeFields[0], timeFields[1], timeFields[2],
+                timeFields[3], timeFields[4]);
     }
 
-    public void updateTodayTime(){
-        this.todayTime = todayTime.plusDays(1);
+    public void updateTodayTime(LocalDateTime localDateTime){
+        this.ActualTimeKeeper.removeDateTime();
+        this.ActualTimeKeeper.setDateTime(localDateTime);
     }
 
     public void setContext(int context){

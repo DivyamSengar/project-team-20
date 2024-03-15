@@ -131,10 +131,17 @@ public class CreateRecurringDialogFragment extends DialogFragment {
                         Instant instant = parsed.toInstant();
 
                         LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
-                        LocalDateTime now = LocalDateTime.now();
+                        LocalDateTime now = activityModel.getTodayTime();
 
                         int[] date = {now.getMinute(), now.getHour(),
                                 localDateTime.getDayOfMonth(), localDateTime.getMonthValue(), localDateTime.getYear()};
+
+                        // if user enters a date that is before today, then just dismiss and do nothing
+
+                         if (LocalDateTime.of(date[4], date[3], date[2], date[1], date[0]).isBefore(now)) {
+                             dismiss();
+                             return;
+                         }
                         var newGoal = new Goal(null, input, false, -1, false, recurring,
                                 date[0], date[1], date[2], date[3], date[4], contextOption);
                         // Create a new Goal with the text and add it
@@ -142,7 +149,9 @@ public class CreateRecurringDialogFragment extends DialogFragment {
                         if (recurring != null) {
                             activityModel.appendToRecurringList(newGoal);
                         }
-                        LocalDateTime today = LocalDateTime.now();
+                        LocalDateTime today = activityModel.getTodayTime();
+                        localDateTime = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonthValue(),
+                                localDateTime.getDayOfMonth(), today.getHour(), today.getMinute());
                         if ("daily".equals(recurring) && localDateTime.isEqual(today)) {
                             LocalDateTime tomorrow = today.plusDays(1);
                             newGoal.setDate(tomorrow.getMinute(), tomorrow.getHour(),

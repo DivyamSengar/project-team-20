@@ -20,9 +20,11 @@ import java.time.LocalDateTime;
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentPendingDialogCreateGoalBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
+import edu.ucsd.cse110.successorator.ui.FocusModeListener;
 
 public class CreatePendingDialogFragment extends DialogFragment {
     private MainViewModel activityModel;
+
     private FragmentPendingDialogCreateGoalBinding view;
 
     CreatePendingDialogFragment(){}
@@ -82,7 +84,7 @@ public class CreatePendingDialogFragment extends DialogFragment {
                 if (view.workBtn.isChecked() || view.homeBtn.isChecked() ||
                         view.schoolBtn.isChecked() || view.errandBtn.isChecked()) {
                     var input = view.goalEditText.getText().toString();
-                    LocalDateTime currentTime = LocalDateTime.now();
+                    LocalDateTime currentTime = activityModel.getTodayTime();
                     // Create a new Goal with the text and add it
                     String recurring = null;
                     int contextOption = 0;

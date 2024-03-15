@@ -18,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -150,8 +152,13 @@ public class MainFragment extends Fragment implements FocusModeListener {
         System.out.println("resumed??");
         super.onResume();
         // Show the current date at the top
-        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
-        String currentDate = "Today, " + date.format(new Date());
+        LocalDateTime todayTime = activityModel.getTodayTime();
+        System.out.println("so now what is the time?" + todayTime);
+        activityModel.updateTodayTime(todayTime);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
+        String formattedDate = formatter.format(todayTime);
+//        LocalDateTime update = LocalDateTime.from((TemporalAccessor) date);
+        String currentDate = "Today, " + formattedDate;
 
         view.topText.setText(currentDate);
         activityModel.rollover();
@@ -159,8 +166,11 @@ public class MainFragment extends Fragment implements FocusModeListener {
 
     public void showTopBar(){
         // Show the current date at the top
-        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
-        String currentDate = "Today, " + date.format(new Date());
+        LocalDateTime todayTime = activityModel.getTodayTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
+        String formattedDate = formatter.format(todayTime);
+
+        String currentDate = "Today, " + formattedDate;
 
         view.topText.setText(currentDate);
     }
@@ -341,25 +351,41 @@ public class MainFragment extends Fragment implements FocusModeListener {
 
     public void createDeveloperButton(){
         // Show the current date at the top
-        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
+//        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
         // Button for developer testing, changes the date by a day
         view.imageButton2.setOnClickListener(new View.OnClickListener(){
-            Calendar c = Calendar.getInstance();
-            Calendar c2 = Calendar.getInstance();
+            // Create Calendar objects from Instant
+//            Calendar c = Calendar.getInstance();
+//            Calendar c2 = Calendar.getInstance();
+//            LocalDateTime todayTime = activityModel.getTodayTime();
 
             @Override
             public void onClick(View v){
-                c.add(Calendar.DATE, 1);
-                c2.add(Calendar.DATE, 1);
-                if (c.equals(c2)){
-                    c2.add(Calendar.DATE, 1);
-                }
-                String currentDate =  "Today, " + date.format(c.getTime());
-                String nextDate = date.format(c2.getTime());
+//                LocalDateTime todayTime = activityModel.getTodayTime();
+//                Instant instant = todayTime.atZone(ZoneId.systemDefault()).toInstant();
+//                c.setTimeInMillis(instant.toEpochMilli());
+//                c2.setTimeInMillis(instant.toEpochMilli());
+//                String formattedDate = formatter.format(c);
+
+//                c.add(Calendar.DATE, 1);
+//                c2.add(Calendar.DATE, 1);
+//                if (c.equals(c2)){
+//                    c2.add(Calendar.DATE, 1);
+//                }
+                activityModel.updateTodayTime(activityModel.getTodayTime().plusDays(1));
+                LocalDateTime current = activityModel.getTodayTime();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
+                String formattedDate = formatter.format(current);
+
+
+
+                // CALL ROLLOVER IN ALL ONRESUME METHODS AND IN ALL OTHER APPLICABLE METHODS (ON CREATE?)
+                String currentDate =  "Today, " + formattedDate;
+//                String nextDate = date.format(c2.getTime());
 
                 view.topText.setText(currentDate);
 
-                activityModel.deleteCompleted();
+                activityModel.rollover();
             }
         });
     }

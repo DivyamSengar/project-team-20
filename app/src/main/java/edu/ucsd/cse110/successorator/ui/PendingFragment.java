@@ -16,7 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -30,7 +32,7 @@ import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.CreatePendingDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
 
-public class PendingFragment extends Fragment {
+public class PendingFragment extends Fragment implements FocusModeListener{
     private FragmentPendingBinding view;
     private PendingFragmentAdapter adapter;
     private MainViewModel activityModel;
@@ -136,6 +138,31 @@ public class PendingFragment extends Fragment {
             }
         });
     }
+    @Override
+    public void onFocusModeSelected(int context) {
+        this.context = context;
+        updateGoals();
+    }
+    public void updateGoals() {
+        LocalDateTime current = activityModel.getTodayTime();
+        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
+        Calendar today = Calendar.getInstance();
+        today.setTimeInMillis(instant.toEpochMilli());
+//        while (!activityModel.getCurrUpdateValue()){}
+        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
+        activityModel.getContext(activityModel.getPendingGoals(),
+                        activityModel.getCurrentContextValue())
+                .observe(goal -> {
+                    if (goal == null) {
+                        System.out.println("way too early?");
+                        return;
+                    }
+                    System.out.println("My size is " + goal.size());
+                    adapter.clear();
+                    adapter.addAll(new ArrayList<>(goal));
+                    adapter.notifyDataSetChanged();
+                });
+    }
     public void removeGoalComplete(Goal goal) {
         activityModel.removeGoalIncomplete(goal.id());
         adapter.remove(goal);
@@ -152,11 +179,12 @@ public class PendingFragment extends Fragment {
 
     private void moveToToday(Goal goal) {
         // Update the goal's date
-        goal.setDate(LocalDateTime.now().getMinute(),
-                LocalDateTime.now().getHour(),
-                LocalDateTime.now().getDayOfMonth(),
-                LocalDateTime.now().getMonthValue(),
-                LocalDateTime.now().getYear());
+        LocalDateTime today = activityModel.getTodayTime();
+        goal.setDate(today.getMinute(),
+               today.getHour(),
+               today.getDayOfMonth(),
+                today.getMonthValue(),
+               today.getYear());
 
         // Remove the goal from the pending goals
 
@@ -171,11 +199,12 @@ public class PendingFragment extends Fragment {
     }
 
     private void moveToTomorrow(Goal goal) {
-        goal.setDate(LocalDateTime.now().getMinute(),
-                LocalDateTime.now().getHour(),
-                LocalDateTime.now().plusDays(1).getDayOfMonth(),
-                LocalDateTime.now().getMonthValue(),
-                LocalDateTime.now().getYear());
+        LocalDateTime tomorrow = activityModel.getTodayTime().plusDays(1);
+        goal.setDate(tomorrow.getMinute(),
+                tomorrow.getHour(),
+               tomorrow.getDayOfMonth(),
+                tomorrow.getMonthValue(),
+                tomorrow.getYear());
 
         goal.changePending();
         removeGoalComplete(goal);
@@ -187,11 +216,12 @@ public class PendingFragment extends Fragment {
     }
 
     private void finishGoal(Goal goal) {
-        goal.setDate(LocalDateTime.now().getMinute(),
-                LocalDateTime.now().getHour(),
-                LocalDateTime.now().getDayOfMonth(),
-                LocalDateTime.now().getMonthValue(),
-                LocalDateTime.now().getYear());
+        LocalDateTime today = activityModel.getTodayTime();
+        goal.setDate(today.getMinute(),
+                today.getHour(),
+                today.getDayOfMonth(),
+                today.getMonthValue(),
+                today.getYear());
 
         goal.changePending();
         goal.makeComplete();

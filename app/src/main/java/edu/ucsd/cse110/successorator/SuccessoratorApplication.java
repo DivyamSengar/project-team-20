@@ -19,7 +19,7 @@ import edu.ucsd.cse110.successorator.timedata.db.SuccessoratorTimeDatabase;
 /**
  * The Successorator Application
  */
-public class SuccessoratorApplication extends Application {
+public class SuccessoratorApplication extends Application{
     private GoalRepository goalRepositoryComplete;
 
     private GoalRepository goalRepositoryIncomplete;
@@ -30,7 +30,7 @@ public class SuccessoratorApplication extends Application {
 
     private ContextRepository contextRepository;
 
-    private LocalDateTime todayTime;
+    private TimeKeeper ActualTimeKeeper;
 
     /**
      * Initializes the databases for the application upon application creation
@@ -73,6 +73,12 @@ public class SuccessoratorApplication extends Application {
                 .build();
         this.contextRepository = new RoomContextRepository(database5.contextDao());
 
+        var database6 = Room.databaseBuilder(getApplicationContext(),
+                        SuccessoratorTimeDatabase.class, "successorator-database6")
+                .allowMainThreadQueries()
+                .build();
+        this.ActualTimeKeeper = new RoomTimeKeeper(database6.timeDao());
+
         // Initalize a default value into the time keeper database
         var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
 
@@ -87,7 +93,12 @@ public class SuccessoratorApplication extends Application {
                     .putBoolean("isFirstRun", false)
                     .apply();
         }
-        this.todayTime = LocalDateTime.now();
+        if (isFirstRun || !isFirstRun){
+            if (database6.timeDao().count() > 0){this.ActualTimeKeeper.removeDateTime();}
+            this.ActualTimeKeeper.setDateTime( LocalDateTime.now());
+        }
+
+        // need to make sure that the app resets the date every time you open and then close it
     }
 
     /**
@@ -119,9 +130,20 @@ public class SuccessoratorApplication extends Application {
         return timeKeeper;
     }
 
+    public TimeKeeper getActualTimeKeeper(){
+        return ActualTimeKeeper;
+    }
+
     public ContextRepository getContextRepository() {
         return contextRepository;
     }
 
-    public LocalDateTime getTodayTime(){ return todayTime;}
+//    public LocalDateTime getTodayTime(){ return todayTime;}
+
+    public void setTodayTime(LocalDateTime localDateTime){
+        if (this.ActualTimeKeeper.count() > 0) this.ActualTimeKeeper.removeDateTime();
+        this.ActualTimeKeeper.setDateTime(localDateTime);
+        System.out.println("it ran bruh " + ActualTimeKeeper.getFields());
+    }
+
 }

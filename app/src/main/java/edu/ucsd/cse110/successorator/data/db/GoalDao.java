@@ -100,7 +100,7 @@ public interface GoalDao {
     @Query("SELECT * from Goals WHERE recurring IS NOT NULL")
     LiveData<List<GoalEntity>> getRecurring();
 
-    @Query("SELECT * from Goals WHERE recurring != null AND year = :year AND month = :month AND day = :day")
+    @Query("SELECT * from Goals WHERE recurring IS NOT null AND year = :year AND month = :month AND day = :day")
     LiveData<List<GoalEntity>> getRecurringByDay(int year, int month, int day);
 
     @Query("SELECT * from Goals WHERE context = 1")

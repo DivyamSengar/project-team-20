@@ -25,4 +25,6 @@ public interface TimeKeeper {
      */
     int[] getFields();
 
+    int count();
+
 }

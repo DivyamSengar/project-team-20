@@ -19,7 +19,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Locale;
@@ -80,11 +82,16 @@ public class CreateTomorrowDialogFragment extends DialogFragment {
         edit.requestFocus();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
+        LocalDateTime todayTime = activityModel.getTodayTime().plusDays(1);
+        Calendar c = Calendar.getInstance();
+        Instant instant = todayTime.atZone(ZoneId.systemDefault()).toInstant();
+        c.setTimeInMillis(instant.toEpochMilli());
+
         SimpleDateFormat daysOfWeek = new SimpleDateFormat("E", Locale.getDefault());
         SimpleDateFormat dayofMonth = new SimpleDateFormat("F", Locale.getDefault());
         SimpleDateFormat dayofYear = new SimpleDateFormat("MM/dd", Locale.getDefault());
-        Calendar c = Calendar.getInstance();
-        c.add(Calendar.DATE, 1);
+
+//        c.add(Calendar.DATE, 1);
         String[] postfix = {"st", "nd", "rd", "th","th","th"};
         String weeklyText = "Weekly on " + daysOfWeek.format(c.getTime());
         // not entirely sure if this is correct or not
@@ -110,7 +117,7 @@ public class CreateTomorrowDialogFragment extends DialogFragment {
                 if (view.workBtn.isChecked() || view.homeBtn.isChecked() ||
                         view.schoolBtn.isChecked() || view.errandBtn.isChecked()){
                     var input = view.goalEditText.getText().toString();
-                    LocalDateTime tomorrowTime = LocalDateTime.now().plusDays(1);
+                    LocalDateTime tomorrowTime = activityModel.getTodayTime().plusDays(1);
                     // Create a new Goal with the text and add it
                     String recurring = null;
                     int contextOption = 0;
