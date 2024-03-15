@@ -86,7 +86,7 @@ public class CreatePendingDialogFragment extends DialogFragment {
                     var input = view.goalEditText.getText().toString();
                     LocalDateTime currentTime = activityModel.getTodayTime();
                     // Create a new Goal with the text and add it
-                    String recurring = null;
+                    int recurring = 0;
                     int contextOption = 0;
 
                     if (view.homeBtn.isChecked()) {
@@ -102,9 +102,9 @@ public class CreatePendingDialogFragment extends DialogFragment {
                     //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
                     int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
                             currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
-
+                    int goalPair = activityModel.getMaxGoalPair()+1;
                     var newGoal = new Goal(null, input, false, -1, true, recurring,
-                            date[0], date[1], date[2], date[3], date[4], contextOption);
+                            date[0], date[1], date[2], date[3], date[4], contextOption, goalPair);
                     // Create a new Goal with the text and add it
                     activityModel.appendIncomplete(newGoal);
                     dismiss();

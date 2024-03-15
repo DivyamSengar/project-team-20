@@ -72,6 +72,7 @@ public class RoomGoalRepository implements GoalRepository {
 //        } else {
 //            System.out.println("Testing" + entitiesLiveData.getValue().size());
 //        }
+        System.out.println("entities live data" + entitiesLiveData.toString());
         var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
             return entities.stream()
                     .map(GoalEntity::toGoal)
@@ -217,7 +218,26 @@ public class RoomGoalRepository implements GoalRepository {
     }
 
     @Override
-    public void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, String recurring){
+    public void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, int recurring){
         goalDao.InsertWithSortOrderAndRecurring(GoalEntity.fromGoal(goal), sortOrder, recurring);
     }
+
+    @Override
+    public int getMaxGoalPair(){
+        return goalDao.getMaxgoalPair();
+    }
+
+    @Override
+    public Subject<List<Goal>> getGoalPairVals(int goalPair){
+        var entitiesLiveData = goalDao.getGoalPairVals(goalPair);
+        var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
+            return entities.stream()
+                    .map(GoalEntity::toGoal)
+                    .collect(Collectors.toList());
+        });
+
+        return new LiveDataSubjectAdapter<>(goalsLiveData);
+    }
+
+
 }

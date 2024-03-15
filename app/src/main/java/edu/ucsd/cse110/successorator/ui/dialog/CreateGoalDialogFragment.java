@@ -189,18 +189,18 @@ public class CreateGoalDialogFragment extends DialogFragment {
                     var input = view.goalEditText.getText().toString();
                     LocalDateTime currentTime = activityModel.getTodayTime();
                     // Create a new Goal with the text and add it
-                    String recurring = null;
+                    int recurring = 0;
                     int contextOption = 0;
                     // check which recurrence option was selected
                     if (view.oneTimeBtn.isChecked()){
                     } else if (view.dailyBtn.isChecked()){
-                        recurring = "daily";
+                        recurring = 1;
                     } else if (view.weeklyBtn.isChecked()){
-                        recurring = "weekly";
+                        recurring = 2;
                     } else if (view.monthlyBtn.isChecked()){
-                        recurring = "monthly";
+                        recurring = 3;
                     } else if (view.yearlyBtn.isChecked()) {
-                        recurring = "yearly";
+                        recurring = 4;
                     }
                     if (view.homeBtn.isChecked()){
                         contextOption = 1;
@@ -211,17 +211,18 @@ public class CreateGoalDialogFragment extends DialogFragment {
                     } else if (view.errandBtn.isChecked()){
                         contextOption = 4;
                     }
+                    int goalPair = activityModel.getMaxGoalPair()+1;
                     //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
                     int[] date = {currentTime.getMinute(), currentTime.getHour(),
                             currentTime.getDayOfMonth(), currentTime.getMonthValue(), currentTime.getYear()};
                     var newGoal = new Goal(null, input, false, -1, false, recurring,
-                            date[0], date[1], date[2], date[3], date[4], contextOption);
+                            date[0], date[1], date[2], date[3], date[4], contextOption, goalPair);
                     // Create a new Goal with the text and add it
                     activityModel.appendIncomplete(newGoal);
-                    if (recurring != null){
+                    if (recurring != 0){
                         activityModel.appendToRecurringList(newGoal);
                     }
-                    if ("daily".equals(recurring)){
+                    if (1 == recurring){
                         LocalDateTime tomorrow = currentTime.plusDays(1);
                         newGoal.setDate(tomorrow.getMinute(), tomorrow.getHour(),
                                 tomorrow.getDayOfMonth(), tomorrow.getMonthValue(), tomorrow.getYear());

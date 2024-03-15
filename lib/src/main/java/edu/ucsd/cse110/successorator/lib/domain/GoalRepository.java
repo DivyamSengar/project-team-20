@@ -69,5 +69,10 @@ public interface GoalRepository {
 
     void InsertWithSortOrder(Goal goal, int sortOrder);
 
-    void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, String recurring);
+    void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, int recurring);
+
+    int getMaxGoalPair();
+
+    Subject<List<Goal>> getGoalPairVals(int goalPair);
+
 }

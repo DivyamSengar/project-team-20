@@ -75,6 +75,13 @@ public interface GoalDao {
     @Query("SELECT MAX(sort_order) FROM Goals")
     int getMaxSortOrder();
 
+
+    @Query("SELECT MAX(goalPair) FROM Goals")
+    int getMaxgoalPair();
+
+
+
+
     /**
      * Delete goals with given id
      * @param id of goal to delete
@@ -97,10 +104,10 @@ public interface GoalDao {
     @Query("SELECT * from Goals WHERE year <= :year AND month <= :month AND day <= :day")
     LiveData<List<GoalEntity>> getLessThanOrEqualToDay(int year, int month, int day);
 
-    @Query("SELECT * from Goals WHERE recurring IS NOT NULL")
+    @Query("SELECT * from Goals WHERE recurring != 0")
     LiveData<List<GoalEntity>> getRecurring();
 
-    @Query("SELECT * from Goals WHERE recurring IS NOT null AND year = :year AND month = :month AND day = :day")
+    @Query("SELECT * from Goals WHERE recurring != 0 AND year = :year AND month = :month AND day = :day")
     LiveData<List<GoalEntity>> getRecurringByDay(int year, int month, int day);
 
     @Query("SELECT * from Goals WHERE context = 1")
@@ -115,6 +122,9 @@ public interface GoalDao {
     @Query("SELECT * from Goals WHERE context = 4")
     LiveData<List<GoalEntity>> getContextErrands();
 
+    @Query("SELECT * from Goals WHERE goalPair = :goalPair")
+    LiveData<List<GoalEntity>> getGoalPairVals(int goalPair);
+
 
     @Query("SELECT * FROM Goals WHERE id = :id")
     LiveData<List<GoalEntity>> findListOfGoalsById(int id);
@@ -128,7 +138,7 @@ public interface GoalDao {
     default int append(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
                 getMaxSortOrder()+1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
 
@@ -141,7 +151,7 @@ public interface GoalDao {
     default int prepend(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
                 getMinSortOrder()-1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
 
@@ -149,15 +159,15 @@ public interface GoalDao {
     default int InsertWithSortOrder(GoalEntity goal, int sortOrder){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
                 sortOrder, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
 
     @Transaction
-    default int InsertWithSortOrderAndRecurring(GoalEntity goal, int sortOrder, String recurring){
+    default int InsertWithSortOrderAndRecurring(GoalEntity goal, int sortOrder, int recurring){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
                 sortOrder, goal.pending, recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
 

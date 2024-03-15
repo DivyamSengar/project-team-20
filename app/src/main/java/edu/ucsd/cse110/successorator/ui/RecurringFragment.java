@@ -143,7 +143,7 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
     }
 
     private void deleteGoal(Goal goal) {
-        activityModel.removeGoalFromRecurringList(goal.sortOrder());
+        activityModel.removeGoalFromRecurringList(goal.id());
         adapter.notifyDataSetChanged();
     }
 
