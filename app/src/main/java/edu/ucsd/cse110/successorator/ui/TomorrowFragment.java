@@ -125,6 +125,7 @@ When the US7 button is tapped, the time is updated to the current time plus 24 h
 //        t.add(Calendar.DATE, 1);
         String tomorrow = "Tomorrow, " + formattedDate;
         activityModel.rollover();
+        updateGoals();
 
         view.topText.setText(tomorrow);
     }
@@ -297,6 +298,7 @@ When the US7 button is tapped, the time is updated to the current time plus 24 h
 
                 view.topText.setText(nextDate);
                 activityModel.rollover();
+                updateGoals();
 
             }
         });

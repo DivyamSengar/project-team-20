@@ -78,6 +78,7 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
     public void onResume(){
         super.onResume();
         activityModel.rollover();
+        updateGoals();
     }
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked

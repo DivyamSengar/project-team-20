@@ -136,6 +136,7 @@ public class MainFragment extends Fragment implements FocusModeListener {
         String currentDate = "Today, " + formattedDate;
         view.topText.setText(currentDate);
         activityModel.rollover();
+        updateGoals();
     }
     public void showTopBar(){
         // Show the current date at the top
@@ -335,6 +336,7 @@ public class MainFragment extends Fragment implements FocusModeListener {
 //                String nextDate = date.format(c2.getTime());
                 view.topText.setText(currentDate);
                 activityModel.rollover();
+                updateGoals();
             }
         });
     }

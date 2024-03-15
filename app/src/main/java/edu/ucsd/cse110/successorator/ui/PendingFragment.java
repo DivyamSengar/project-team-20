@@ -206,6 +206,7 @@ public class PendingFragment extends Fragment implements FocusModeListener{
     public void onResume(){
         super.onResume();
         activityModel.rollover();
+        updateGoals();
     }
     public void showTopBar(){
         view.topText.setText(R.string.pending);
