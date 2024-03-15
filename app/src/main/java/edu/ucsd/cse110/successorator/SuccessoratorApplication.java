@@ -6,8 +6,11 @@ import androidx.room.Room;
 
 import java.time.LocalDateTime;
 
+import edu.ucsd.cse110.successorator.context.db.RoomContextRepository;
+import edu.ucsd.cse110.successorator.context.db.SuccessoratorContextDatabase;
 import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 import edu.ucsd.cse110.successorator.data.db.SuccessoratorDatabase;
+import edu.ucsd.cse110.successorator.lib.domain.ContextRepository;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
 import edu.ucsd.cse110.successorator.timedata.db.RoomTimeKeeper;
@@ -16,12 +19,18 @@ import edu.ucsd.cse110.successorator.timedata.db.SuccessoratorTimeDatabase;
 /**
  * The Successorator Application
  */
-public class SuccessoratorApplication extends Application {
+public class SuccessoratorApplication extends Application{
     private GoalRepository goalRepositoryComplete;
 
     private GoalRepository goalRepositoryIncomplete;
 
+    private GoalRepository goalRepositoryRecurring;
+
     private TimeKeeper timeKeeper;
+
+    private ContextRepository contextRepository;
+
+    private TimeKeeper ActualTimeKeeper;
 
     /**
      * Initializes the databases for the application upon application creation
@@ -52,17 +61,44 @@ public class SuccessoratorApplication extends Application {
                 .build();
         this.timeKeeper = new RoomTimeKeeper(database3.timeDao());
 
+        var database4 = Room.databaseBuilder(getApplicationContext(),
+                        SuccessoratorDatabase.class, "successorator-database4")
+                .allowMainThreadQueries()
+                .build();
+        this.goalRepositoryRecurring = new RoomGoalRepository(database4.goalDao());
+
+        var database5 = Room.databaseBuilder(getApplicationContext(),
+                SuccessoratorContextDatabase.class, "successorator-database5")
+                .allowMainThreadQueries()
+                .build();
+        this.contextRepository = new RoomContextRepository(database5.contextDao());
+
+        var database6 = Room.databaseBuilder(getApplicationContext(),
+                        SuccessoratorTimeDatabase.class, "successorator-database6")
+                .allowMainThreadQueries()
+                .build();
+        this.ActualTimeKeeper = new RoomTimeKeeper(database6.timeDao());
+
         // Initalize a default value into the time keeper database
         var sharedPreferences = getSharedPreferences("Successorator", MODE_PRIVATE);
 
         var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
-        if (isFirstRun && database3.timeDao().count() == 0){
+        if (isFirstRun && database3.timeDao().count() == 0 && database5.contextDao().count() == 0){
             timeKeeper.setDateTime(LocalDateTime.of(1900, 1, 20, 10, 30));
+            contextRepository.setContext(0);
 
+
+            // might be able to use sharedPreferences to edit the issue with resetting date.
             sharedPreferences.edit()
                     .putBoolean("isFirstRun", false)
                     .apply();
         }
+        if (isFirstRun || !isFirstRun){
+            if (database6.timeDao().count() > 0){this.ActualTimeKeeper.removeDateTime();}
+            this.ActualTimeKeeper.setDateTime( LocalDateTime.now());
+        }
+
+        // need to make sure that the app resets the date every time you open and then close it
     }
 
     /**
@@ -83,6 +119,8 @@ public class SuccessoratorApplication extends Application {
         return goalRepositoryIncomplete;
     }
 
+    public GoalRepository getGoalRepositoryRecurring(){ return goalRepositoryRecurring;}
+
     /**
      * Getter for the app's TimeKeeper
      *
@@ -91,4 +129,21 @@ public class SuccessoratorApplication extends Application {
     public TimeKeeper getTimeKeeper() {
         return timeKeeper;
     }
+
+    public TimeKeeper getActualTimeKeeper(){
+        return ActualTimeKeeper;
+    }
+
+    public ContextRepository getContextRepository() {
+        return contextRepository;
+    }
+
+//    public LocalDateTime getTodayTime(){ return todayTime;}
+
+    public void setTodayTime(LocalDateTime localDateTime){
+        if (this.ActualTimeKeeper.count() > 0) this.ActualTimeKeeper.removeDateTime();
+        this.ActualTimeKeeper.setDateTime(localDateTime);
+        System.out.println("it ran bruh " + ActualTimeKeeper.getFields());
+    }
+
 }

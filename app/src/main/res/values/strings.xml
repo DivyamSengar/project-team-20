@@ -35,6 +35,5 @@
     <string-array name="recurring_goal_context_menu">
         <item>Delete</item>
     </string-array>
-
-
+    
 </resources>

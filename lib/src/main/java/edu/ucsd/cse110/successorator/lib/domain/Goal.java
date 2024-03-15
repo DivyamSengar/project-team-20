@@ -1,7 +1,11 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Locale;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
@@ -17,12 +21,15 @@ public class Goal implements Serializable {
     private @NonNull boolean isComplete;
     private int sortOrder;
     private boolean pending;
-    private String recurring;
+    private int recurring;
     private int minutes;
     private int hour;
     private int day;
     private int month;
     private int year;
+    private int context;
+
+    private int goalPair;
 
     /**
      * Goal constructor to initialize the fields of goal
@@ -32,8 +39,8 @@ public class Goal implements Serializable {
      * @param sortOrder = index of goal in the List according the sorted order
      */
     public Goal(@Nullable Integer id, @NonNull String text, @NonNull boolean isComplete,
-                int sortOrder, boolean pending, String recurring, int minutes,
-                int hour, int day, int month, int year){
+                int sortOrder, boolean pending, int recurring, int minutes,
+                int hour, int day, int month, int year, int context, int goalPair){
         this.id = id;
         this.text = text;
         this.isComplete = isComplete;
@@ -45,6 +52,8 @@ public class Goal implements Serializable {
         this.day=day;
         this.month=month;
         this.year=year;
+        this.context = context;
+        this.goalPair = goalPair;
     }
 
     /**
@@ -71,6 +80,8 @@ public class Goal implements Serializable {
         return this.text;
     }
 
+    public int getGoalPair() {return this.goalPair;}
+
     /**
      * Getter method to get the index of the goal in sortOrder
      * @return integer value of the sortOrder of the goal
@@ -84,7 +95,7 @@ public class Goal implements Serializable {
      */
     public boolean isPending(){ return this.pending;}
 
-    public @NonNull String getRecurring(){return this.recurring;}
+    public int getRecurring(){return this.recurring;}
 
     public int getMinutes() {
         return minutes;
@@ -106,6 +117,8 @@ public class Goal implements Serializable {
         return year;
     }
 
+    public int getContext() {return context;}
+
     public void makeComplete(){
 
         this.isComplete = true;
@@ -118,7 +131,7 @@ public class Goal implements Serializable {
         this.isComplete = false;
     }
     public void changePending() {this.pending = !this.pending;}
-    public void setRecurring(String recurring){this.recurring = recurring;}
+    public void setRecurring(int recurring){this.recurring = recurring;}
     public void setDate(int minutes, int hour, int day, int month, int year){
         this.minutes=minutes;
         this.day = day;
@@ -129,12 +142,12 @@ public class Goal implements Serializable {
 
     public Goal withId(int id) {
         return new Goal(id, this.text, this.isComplete, this.sortOrder, this.pending, this.recurring,
-                this.minutes, this.hour, this.day, this.month, this.year);
+                this.minutes, this.hour, this.day, this.month, this.year, this.context, this.goalPair);
     }
 
     public Goal withSortOrder(int sortOrder) {
         return new Goal(this.id, this.text, this.isComplete, sortOrder, this.pending, this.recurring,
-                this.minutes, this.hour, this.day, this.month, this.year);
+                this.minutes, this.hour, this.day, this.month, this.year, this.context, this.goalPair);
     }
 
     /* returns the boundary/recurring date if it is a recurring goal,
@@ -143,16 +156,16 @@ public class Goal implements Serializable {
     public LocalDateTime getBoundaryRecurringDate(){
         LocalDateTime goal_Time = LocalDateTime.of(this.getYear(),
                 this.getMonth(), this.getDay(),  0, 0);
-        if(this.getRecurring().equals("daily")){
+        if(this.getRecurring() == 1){
             return goal_Time.plusDays(1);
-        } else if(this.getRecurring().equals("weekly")) {
+        } else if(this.getRecurring() == 2) {
             return goal_Time.plusWeeks(1);
             /* this monthly is likely incorrect given that the monthly option is supposed to be for
              recurring days of the week, not just going to the same date in the next month
             */
-        } else if(this.getRecurring().equals("monthly")) {
+        } else if(this.getRecurring() == 3) {
             return goal_Time.plusMonths(1);
-        } else if(this.getRecurring().equals("yearly")) {
+        } else if(this.getRecurring() == 4) {
             return goal_Time.plusYears(1);
         }
         else return goal_Time;
@@ -163,21 +176,35 @@ public class Goal implements Serializable {
     public Goal updateRecurring(){
         LocalDateTime goal_Time = LocalDateTime.of(this.getYear(),
                 this.getMonth(), this.getDay(), this.getHour(), this.getMinutes());
-        if(this.getRecurring().equals("daily")){
+        if(this.getRecurring() == 1){
             goal_Time = goal_Time.plusDays(1);
-        } else if(this.getRecurring().equals("weekly")) {
+        } else if(this.getRecurring() == 2) {
             goal_Time = goal_Time.plusWeeks(1);
             /* this monthly is likely incorrect given that the monthly option is supposed to be for
              recurring days of the week, not just going to the same date in the next month
             */
-        } else if(this.getRecurring().equals("monthly")) {
-            goal_Time = goal_Time.plusMonths(1);
-        } else if(this.getRecurring().equals("yearly")) {
+        } else if(this.getRecurring() == 3) {
+            goal_Time = getNextDayOfWeekInMonth(goal_Time);
+//            goal_Time = goal_Time.plusMonths(1);
+        } else if(this.getRecurring() == 4) {
             goal_Time = goal_Time.plusYears(1);
         }
         this.setDate(goal_Time.getMinute(), goal_Time.getHour(), goal_Time.getDayOfMonth(),
                 goal_Time.getMonthValue(), goal_Time.getYear());
         return this;
+    }
+
+    static LocalDateTime getNextDayOfWeekInMonth(LocalDateTime current) {
+        int currentOrdinal = (current.getDayOfMonth() - 1) / 7 + 1; // Calculate current ordinal position
+        LocalDateTime temp = current.plusWeeks(1);
+        int tempOrdinal = (temp.getDayOfMonth()-1)/7 + 1;
+        if (currentOrdinal == 5 && tempOrdinal == 1) return temp;
+        while (tempOrdinal != currentOrdinal){
+            temp = temp.plusWeeks(1);
+            tempOrdinal = (temp.getDayOfMonth()-1)/7 + 1;
+        }
+        return temp;
+
     }
 
     /**

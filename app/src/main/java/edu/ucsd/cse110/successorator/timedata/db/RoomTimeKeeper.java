@@ -27,6 +27,10 @@ public class RoomTimeKeeper implements TimeKeeper {
         return liveDataTemp.Fields();
     }
 
+    public int count(){
+        return timeDao.count();
+    }
+
     /**
      * Updates the time database with a new localDateTime object
      * @param dateTime updated value to be inserted into the database as a TimeEntity object

@@ -38,10 +38,10 @@ public class DataSource {
     public DataSource() {}
 
     public final static List<Goal> DEFAULT_GOALS = List.of(
-            new Goal(1, "do smn", false, 3, true, "monthly", 0, 4, 30, 3, 2024),
-            new Goal(2, "clean room", false, 1, true, "null", 0, 4, 30, 3, 2024),
-            new Goal(3, "play basketball", true, 2, false, "daily", 0, 4, 30, 3, 2024),
-            new Goal(4, "do homework", true, 0, true, "daily", 0, 4, 30, 4, 2024)
+            new Goal(1, "do smn", false, 3, true, 0, 0, 4, 30, 3, 2024, 0, 0),
+            new Goal(2, "clean room", false, 1, true, 1, 0, 4, 30, 3, 2024, 0, 0),
+            new Goal(3, "play basketball", true, 2, false, 2, 0, 4, 30, 3, 2024, 0, 0),
+            new Goal(4, "do homework", true, 0, true, 3, 0, 4, 30, 4, 2024, 0, 0)
     );
 
     public static DataSource fromDefault() {

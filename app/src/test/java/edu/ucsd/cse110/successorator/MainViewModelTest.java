@@ -14,8 +14,10 @@ import java.util.List;
 
 import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 import edu.ucsd.cse110.successorator.lib.data.DataSource;
+import edu.ucsd.cse110.successorator.lib.domain.ContextRepository;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
+import edu.ucsd.cse110.successorator.lib.domain.SimpleContextRepository;
 import edu.ucsd.cse110.successorator.lib.domain.SimpleGoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.SimpleTimeKeeper;
 import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
@@ -31,9 +33,13 @@ public class MainViewModelTest {
     GoalRepository goalsComplete;
 
     GoalRepository goalsIncomplete;
+
+    GoalRepository goalsRecurring;
     TimeKeeper timeKeeper;
 
     TimeKeeper mockKeeper;
+
+    ContextRepository context;
 
     MainViewModel mvm;
 
@@ -45,7 +51,9 @@ public class MainViewModelTest {
         this.goals = new SimpleGoalRepository(dataSource);
         this.goalsComplete = new SimpleGoalRepository(dataSource);
         this.goalsIncomplete = new SimpleGoalRepository(dataSource);
-        mvm = new MainViewModel(goalsComplete, goalsIncomplete, timeKeeper);
+        this.goalsRecurring = new SimpleGoalRepository(dataSource);
+        this.context = new SimpleContextRepository();
+        mvm = new MainViewModel(goalsComplete, goalsIncomplete, goalsRecurring, timeKeeper, mockKeeper, context);
     }
 
     @Test
@@ -143,7 +151,7 @@ public class MainViewModelTest {
 
     @Test
     public void testAppendComplete() {
-        goals.appendComplete(new Goal(null, "workout", true, 0, true, "null", 0, 4, 30, 3, 2024));
+        goals.appendComplete(new Goal(null, "workout", true, 0, true, 0, 0, 4, 30, 3, 2024, 0, 0));
         for (int i = 0; i < goals.findAll().getValue().size(); i++){
             if (!goals.findAll().getValue().get(i).isComplete()){
                 goals.findAll().getValue().remove(i);
@@ -154,7 +162,7 @@ public class MainViewModelTest {
 
     @Test
     public void testAppendIncomplete() {
-        goals.appendIncomplete(new Goal(null, "workout", false, 0, true, "null", 0, 4, 30, 3, 2024));
+        goals.appendIncomplete(new Goal(null, "workout", false, 0, true, 0, 0, 4, 30, 3, 2024, 0, 0));
         for (int i = 0; i < goals.findAll().getValue().size(); i++){
             if (goals.findAll().getValue().get(i).isComplete()){
                 goals.findAll().getValue().remove(i);
@@ -165,7 +173,7 @@ public class MainViewModelTest {
 
     @Test
     public void testPrependIncomplete() {
-        goalsIncomplete.prepend(new Goal(null, "workout", false, 5, true, "null", 0, 4, 30, 3, 2024));
+        goalsIncomplete.prepend(new Goal(null, "workout", false, 5, true, 0, 0, 4, 30, 3, 2024, 0, 0));
         for (int i = 0; i < goalsIncomplete.findAll().getValue().size(); i++){
             if (goalsIncomplete.findAll().getValue().get(i).isComplete()){
                 goalsIncomplete.findAll().getValue().remove(i);

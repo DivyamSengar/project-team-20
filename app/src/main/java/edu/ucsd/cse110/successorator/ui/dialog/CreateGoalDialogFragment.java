@@ -17,9 +17,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -143,7 +146,6 @@ public class CreateGoalDialogFragment extends DialogFragment {
          */
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder
-                .setTitle("Enter Most Important Thing")
                 .setView(view.getRoot())
                 .setNegativeButton("Cancel", this::onNegativeButtonClick);
         Dialog dialog = dialogBuilder.create();
@@ -152,10 +154,16 @@ public class CreateGoalDialogFragment extends DialogFragment {
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
 
+        LocalDateTime todayTime = activityModel.getTodayTime();
+        Calendar c = Calendar.getInstance();
+        Instant instant = todayTime.atZone(ZoneId.systemDefault()).toInstant();
+        c.setTimeInMillis(instant.toEpochMilli());
+
+
         SimpleDateFormat daysOfWeek = new SimpleDateFormat("E", Locale.getDefault());
         SimpleDateFormat dayofMonth = new SimpleDateFormat("F", Locale.getDefault());
         SimpleDateFormat dayofYear = new SimpleDateFormat("MM/dd", Locale.getDefault());
-        Calendar c = Calendar.getInstance();
+
         String[] postfix = {"st", "nd", "rd", "th","th","th"};
         String weeklyText = "Weekly on " + daysOfWeek.format(c.getTime());
         // not entirely sure if this is correct or not
@@ -175,34 +183,101 @@ public class CreateGoalDialogFragment extends DialogFragment {
         view.saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get the input of the textEdit
-                var input = view.goalEditText.getText().toString();
-                LocalDateTime currentTime = LocalDateTime.now();
-                // Create a new Goal with the text and add it
-                String recurring = null;
-
-                // check which recurrence option was selected
-                if (view.oneTimeBtn.isChecked()){
-
-                } else if (view.dailyBtn.isChecked()){
-                    recurring = "daily";
-                } else if (view.weeklyBtn.isChecked()){
-                    recurring = "weekly";
-                } else if (view.monthlyBtn.isChecked()){
-                    recurring = "monthly";
-                } else if (view.yearlyBtn.isChecked()) {
-                    recurring = "yearly";
+                if (view.workBtn.isChecked() || view.homeBtn.isChecked() ||
+                        view.schoolBtn.isChecked() || view.errandBtn.isChecked()){
+                    // Get the input of the textEdit
+                    var input = view.goalEditText.getText().toString();
+                    LocalDateTime currentTime = activityModel.getTodayTime();
+                    // Create a new Goal with the text and add it
+                    int recurring = 0;
+                    int contextOption = 0;
+                    // check which recurrence option was selected
+                    if (view.oneTimeBtn.isChecked()){
+                    } else if (view.dailyBtn.isChecked()){
+                        recurring = 1;
+                    } else if (view.weeklyBtn.isChecked()){
+                        recurring = 2;
+                    } else if (view.monthlyBtn.isChecked()){
+                        recurring = 3;
+                    } else if (view.yearlyBtn.isChecked()) {
+                        recurring = 4;
+                    }
+                    if (view.homeBtn.isChecked()){
+                        contextOption = 1;
+                    } else if (view.workBtn.isChecked()){
+                        contextOption = 2;
+                    } else if (view.schoolBtn.isChecked()){
+                        contextOption = 3;
+                    } else if (view.errandBtn.isChecked()){
+                        contextOption = 4;
+                    }
+                    int goalPair = activityModel.getMaxGoalPair()+1;
+                    //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
+                    int[] date = {currentTime.getMinute(), currentTime.getHour(),
+                            currentTime.getDayOfMonth(), currentTime.getMonthValue(), currentTime.getYear()};
+                    var newGoal = new Goal(null, input, false, -1, false, recurring,
+                            date[0], date[1], date[2], date[3], date[4], contextOption, goalPair);
+                    // Create a new Goal with the text and add it
+                    activityModel.appendIncomplete(newGoal);
+                    if (recurring != 0){
+                        activityModel.appendToRecurringList(newGoal);
+                    }
+                    if (1 == recurring){
+                        LocalDateTime tomorrow = currentTime.plusDays(1);
+                        newGoal.setDate(tomorrow.getMinute(), tomorrow.getHour(),
+                                tomorrow.getDayOfMonth(), tomorrow.getMonthValue(), tomorrow.getYear());
+                        activityModel.appendIncomplete(newGoal);
+                    }
+                    dismiss();
                 }
-
-                //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
-                int[] date = {currentTime.getMinute(), currentTime.getHour(),
-                        currentTime.getDayOfMonth(), currentTime.getMonthValue(), currentTime.getYear()};
-
-                var newGoal = new Goal(null, input, false, -1, false, recurring,
-                        date[0], date[1], date[2], date[3], date[4]);
-                // Create a new Goal with the text and add it
-                activityModel.appendIncomplete(newGoal);
-                dismiss();
+//                // Get the input of the textEdit
+//                var input = view.goalEditText.getText().toString();
+//                LocalDateTime currentTime = LocalDateTime.now();
+//                // Create a new Goal with the text and add it
+//                String recurring = null;
+//                int contextOption = 0;
+//
+//                // check which recurrence option was selected
+//                if (view.oneTimeBtn.isChecked()){
+//
+//                } else if (view.dailyBtn.isChecked()){
+//                    recurring = "daily";
+//                } else if (view.weeklyBtn.isChecked()){
+//                    recurring = "weekly";
+//                } else if (view.monthlyBtn.isChecked()){
+//                    recurring = "monthly";
+//                } else if (view.yearlyBtn.isChecked()) {
+//                    recurring = "yearly";
+//                }
+//
+//                if (view.homeBtn.isChecked()){
+//                    contextOption = 1;
+//                } else if (view.workBtn.isChecked()){
+//                    contextOption = 2;
+//                } else if (view.schoolBtn.isChecked()){
+//                    contextOption = 3;
+//                } else if (view.errandBtn.isChecked()){
+//                    contextOption = 4;
+//                }
+//
+//                //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
+//                int[] date = {currentTime.getMinute(), currentTime.getHour(),
+//                        currentTime.getDayOfMonth(), currentTime.getMonthValue(), currentTime.getYear()};
+//                var newGoal = new Goal(null, input, false, -1, false, recurring,
+//                        date[0], date[1], date[2], date[3], date[4], contextOption);
+//                // Create a new Goal with the text and add it
+//                activityModel.appendIncomplete(newGoal);
+//                if (recurring != null){
+//                    activityModel.appendToRecurringList(newGoal);
+//                }
+//                if ("daily".equals(recurring)){
+//                    LocalDateTime tomorrow = currentTime.plusDays(1);
+//                    newGoal.setDate(tomorrow.getMinute(), tomorrow.getHour(),
+//                            tomorrow.getDayOfMonth(), tomorrow.getMonthValue(), tomorrow.getYear());
+//                    activityModel.appendIncomplete(newGoal);
+//                }
+//
+//                dismiss();
             }
         });
 

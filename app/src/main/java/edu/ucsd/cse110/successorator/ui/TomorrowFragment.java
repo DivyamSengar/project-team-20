@@ -12,6 +12,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,12 +29,15 @@ import edu.ucsd.cse110.successorator.databinding.FragmentTomorrowBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateTomorrowDialogFragment;
+import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
 
-public class TomorrowFragment extends Fragment {
+public class TomorrowFragment extends Fragment implements FocusModeListener {
     private FragmentTomorrowBinding view;
     private TomorrowFragmentAdapter adapter;
 
     private MainViewModel activityModel;
+
+    private int context = 0;
 
     /**
      * Required empty public constructor
@@ -57,10 +64,11 @@ public class TomorrowFragment extends Fragment {
         // Initialize the adapter
         this.adapter = new TomorrowFragmentAdapter(requireContext(), List.of());
 
-        var tomorrow = Calendar.getInstance();
-        tomorrow.add(Calendar.DAY_OF_MONTH, 1);
-        System.out.println("Tomorrow date" + tomorrow.get(Calendar.YEAR) + " " + (tomorrow.get(Calendar.MONTH) + 1) + " " + tomorrow.get(Calendar.DAY_OF_MONTH));
-        activityModel.getGoalsLessThanOrEqualToDay(tomorrow.get(Calendar.YEAR), (tomorrow.get(Calendar.MONTH) + 1), tomorrow.get(Calendar.DAY_OF_MONTH))
+        var tomorrow = activityModel.getTodayTime().plusDays(1);
+        System.out.println("Tomorrow date" + tomorrow.getYear() + " " + (tomorrow.getMonthValue()) + " " + tomorrow.getDayOfMonth());
+        activityModel.getContext(activityModel.getGoalsByDay(tomorrow.getYear(),
+                        (tomorrow.getMonthValue()), tomorrow.getDayOfMonth()),
+                        activityModel.getCurrentContextValue())
                 .observe(goal -> {
                     if (goal == null) return;
                     System.out.println("Tomorrow adapter" + goal.size());
@@ -86,7 +94,9 @@ public class TomorrowFragment extends Fragment {
 
         createSpinner();
         showTopBar();
+        activityModel.rollover();
         addPlusButtonListener();
+        addFocusModeListener();
         addGoalListeners();
         createDeveloperButton();
 
@@ -94,29 +104,47 @@ public class TomorrowFragment extends Fragment {
         return view.getRoot();
     }
 
+    /*
+When the application is resumed, the time is updated to the current time.
+When the US7 button is tapped, the time is updated to the current time plus 24 hours.
+     */
     @Override
     public void onResume(){
         super.onResume();
         // Show the current date at the top
-        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
+        LocalDateTime tomorrowTime = activityModel.getTodayTime();
+        activityModel.updateTodayTime(tomorrowTime);
+        tomorrowTime = tomorrowTime.plusDays(1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
+        String formattedDate = formatter.format(tomorrowTime);
 
-        Calendar t = Calendar.getInstance();
-        t.add(Calendar.DATE, 1);
-        String tomorrow = "Tomorrow, " + date.format(t.getTime());
+
+//        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
+//
+//        Calendar t = Calendar.getInstance();
+//        t.add(Calendar.DATE, 1);
+        String tomorrow = "Tomorrow, " + formattedDate;
+        activityModel.rollover();
+        updateGoals();
 
         view.topText.setText(tomorrow);
     }
 
     public void showTopBar(){
         // Show the current date at the top
-        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
+//        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
 
-        Calendar t = Calendar.getInstance();
-        t.add(Calendar.DATE, 1);
-        String tomorrow = "Tomorrow, " + date.format(t.getTime());
+//        Calendar t = Calendar.getInstance();
+//        t.add(Calendar.DATE, 1);
+        LocalDateTime tomorrowTime = activityModel.getTodayTime().plusDays(1);
+//        activityModel.updateTodayTime(tomorrowTime);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
+        String formattedDate = formatter.format(tomorrowTime);
+        String tomorrow = "Tomorrow, " + formattedDate;
 
         view.topText.setText(tomorrow);
     }
+
 
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
@@ -134,11 +162,23 @@ public class TomorrowFragment extends Fragment {
             // If the tapped goal is incomplete, make it complete
             if (!goal.isComplete()) {
                 goal.makeComplete();
+                activityModel.removeGoalIncomplete(goal.id());
+                activityModel.appendComplete(goal);
             }
             // If goal is complete make incomplete
             else {
                 goal.makeInComplete();
+                activityModel.removeGoalComplete(goal.id());
+                activityModel.prependIncomplete(goal);
             }
+        });
+    }
+
+    public void addFocusModeListener(){
+        view.hamburgerMenu.setOnClickListener(v -> {
+            var dialogFragment = FocusModeDialogFragment.newInstance(this);
+            dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
+            this.context = dialogFragment.getFocusContext();
         });
     }
 
@@ -196,25 +236,69 @@ public class TomorrowFragment extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onFocusModeSelected(int context) {
+        this.context = context;
+        updateGoals();
+    }
+
+    public void updateGoals() {
+        LocalDateTime tomorrow = activityModel.getTodayTime().plusDays(1);
+        Instant instant = tomorrow.atZone(ZoneId.systemDefault()).toInstant();
+        Calendar tomorrowDate = Calendar.getInstance();
+        tomorrowDate.setTimeInMillis(instant.toEpochMilli());
+//        while (!activityModel.getCurrUpdateValue()){}
+        System.out.println("curr context in main" + activityModel.getCurrentContextValue()) ;
+        activityModel.getContext(activityModel.getGoalsByDay(tomorrowDate.get(Calendar.YEAR),
+                                (tomorrowDate.get(Calendar.MONTH)+1), tomorrowDate.get(Calendar.DAY_OF_MONTH)),
+                        activityModel.getCurrentContextValue())
+                .observe(goal -> {
+                    if (goal == null) {
+                        System.out.println("way too early?");
+                        return;
+                    }
+                    System.out.println("My size is " + goal.size());
+                    adapter.clear();
+                    adapter.addAll(new ArrayList<>(goal));
+                    adapter.notifyDataSetChanged();
+                });
+    }
+
     public void createDeveloperButton(){
         // Show the current date at the top
         SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
         // Button for developer testing, changes the date by a day
         view.imageButton2.setOnClickListener(new View.OnClickListener(){
-            Calendar c = Calendar.getInstance();
-            Calendar c2 = Calendar.getInstance();
+//            Calendar c = Calendar.getInstance();
+//            Calendar c2 = Calendar.getInstance();
+//            LocalDateTime todayTime = activityModel.getTodayTime();
+
 
             @Override
             public void onClick(View v){
-                c.add(Calendar.DATE, 1);
-                c2.add(Calendar.DATE, 1);
-                if (c.equals(c2)){
-                    c2.add(Calendar.DATE, 1);
-                }
-                String currentDate =  "Today, " + date.format(c.getTime());
-                String nextDate = "Tomorrow, " +date.format(c2.getTime());
+//                LocalDateTime todayTime = activityModel.getTodayTime();
+//                Instant instant = todayTime.atZone(ZoneId.systemDefault()).toInstant();
+//                c.setTimeInMillis(instant.toEpochMilli());
+//                c2.setTimeInMillis(instant.toEpochMilli());
+//
+//                c.add(Calendar.DATE, 1);
+//                c2.add(Calendar.DATE, 1);
+//                if (c.equals(c2)){
+//                    c2.add(Calendar.DATE, 1);
+//                }
+//                String currentDate =  "Today, " + date.format(c.getTime());
+                activityModel.updateTodayTime(activityModel.getTodayTime().plusDays(1));
+                LocalDateTime current = activityModel.getTodayTime();
+                LocalDateTime nextDay = current.plusDays(1);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
+//                String formattedDate = formatter.format(current);
+                String nextFormatted = formatter.format(nextDay);
+                String nextDate = "Tomorrow, " + nextFormatted;
 
                 view.topText.setText(nextDate);
+                activityModel.rollover();
+                updateGoals();
 
             }
         });

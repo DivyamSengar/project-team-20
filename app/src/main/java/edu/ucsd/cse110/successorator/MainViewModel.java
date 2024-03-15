@@ -7,13 +7,13 @@ import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLI
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
+import edu.ucsd.cse110.successorator.lib.domain.ContextRepository;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
@@ -34,12 +34,22 @@ public class MainViewModel extends ViewModel {
                         var app = (SuccessoratorApplication) creationExtras.get(APPLICATION_KEY);
                         assert app != null;
                         return new MainViewModel(app.getGoalRepositoryComplete(),
-                                app.getGoalRepositoryIncomplete(), app.getTimeKeeper());
+                                app.getGoalRepositoryIncomplete(), app.getGoalRepositoryRecurring(),
+                                app.getTimeKeeper(), app.getActualTimeKeeper(), app.getContextRepository());
                     });
     private final GoalRepository goalRepositoryComplete;
+
+
+    private  LocalDateTime todayTime;
     private final GoalRepository goalRepositoryIncomplete;
 
+    private final GoalRepository goalRepositoryRecurring;
+
     public final TimeKeeper timeKeeper;
+
+    public final TimeKeeper ActualTimeKeeper;
+
+    private final ContextRepository contextRepository;
     private MutableSubject<List<Goal>> goals;
     private MutableSubject<Boolean> isGoalsEmpty;
 
@@ -51,6 +61,9 @@ public class MainViewModel extends ViewModel {
 
     private MutableSubject<Boolean> isIncompletedGoalsEmpty;
 
+    private MutableSubject<List<Goal>> recurringGoals;
+
+    private MutableSubject<List<Goal>> FocusList;
     /**
      * Constructor for MainViewModel
      *
@@ -59,11 +72,15 @@ public class MainViewModel extends ViewModel {
      * @param timeKeeper -
      */
     public MainViewModel(GoalRepository goalRepositoryComplete,
-                         GoalRepository goalRepositoryIncomplete, TimeKeeper timeKeeper) {
+                         GoalRepository goalRepositoryIncomplete, GoalRepository goalRepositoryRecurring,
+                         TimeKeeper timeKeeper, TimeKeeper ActualTimeKeeper, ContextRepository contextRepository) {
 
         this.goalRepositoryComplete = goalRepositoryComplete;
         this.goalRepositoryIncomplete = goalRepositoryIncomplete;
+        this.goalRepositoryRecurring = goalRepositoryRecurring;
         this.timeKeeper = timeKeeper;
+        this.ActualTimeKeeper = ActualTimeKeeper;
+        this.contextRepository = contextRepository;
 
         // Observables
         this.goals = new SimpleSubject<>();
@@ -72,11 +89,28 @@ public class MainViewModel extends ViewModel {
         this.goalsIncompleted = new SimpleSubject<>();
         this.isCompletedGoalsEmpty = new SimpleSubject<>();
         this.isIncompletedGoalsEmpty = new SimpleSubject<>();
+        this.recurringGoals = new SimpleSubject<>();
 
         // Setting empty booleans to true upon initialization
         isGoalsEmpty.setValue(true);
         isCompletedGoalsEmpty.setValue(true);
         isIncompletedGoalsEmpty.setValue(true);
+
+        this.goalRepositoryRecurring.findAll().observe(newGoals -> {
+            List<Goal> orderedGoals = List.of();
+            if (newGoals == null) return;
+            else if (newGoals.size() == 0);
+            else {
+                orderedGoals = newGoals.stream()
+                        .sorted(Comparator.comparingInt(Goal::getYear).thenComparing(Goal::getMonth)
+                        .thenComparing(Goal::getDay).thenComparing(Goal::getHour).thenComparing(Goal::getMinutes))
+                        .collect(Collectors.toList());
+            }
+            for (var goal : orderedGoals){
+                System.out.println(goal.getText() + goal.getMinutes() + goal.getHour());
+            }
+            recurringGoals.setValue(orderedGoals);
+        });
 
         // When the repository of completed goals changes, get the completed goals
         this.goalRepositoryComplete.findAll().observe(newGoals -> {
@@ -86,7 +120,6 @@ public class MainViewModel extends ViewModel {
             else if (newGoals.size() == 0);
             else {
                 orderedGoals = newGoals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
 
@@ -101,7 +134,7 @@ public class MainViewModel extends ViewModel {
             else if (newGoals.size() == 0);
             else {
                 orderedGoals = newGoals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
             goalsIncompleted.setValue(orderedGoals);
@@ -171,12 +204,12 @@ public class MainViewModel extends ViewModel {
      */
     public void rollover() {
         // Current time and time that the app was last opened
-        LocalDateTime currentTime = LocalDateTime.now();
-        int lastOpenedHour = this.getFields()[3];
-        int lastOpenedMinute = this.getFields()[4];
-        int lastDay = this.getFields()[2];
-        int lastMonth =this.getFields()[1];
-        int lastYear = this.getFields()[0];
+        LocalDateTime currentTime = getTodayTime();
+        int lastOpenedHour = this.getFieldsForLastDate()[3];
+        int lastOpenedMinute = this.getFieldsForLastDate()[4];
+        int lastDay = this.getFieldsForLastDate()[2];
+        int lastMonth =this.getFieldsForLastDate()[1];
+        int lastYear = this.getFieldsForLastDate()[0];
 
         LocalDateTime previous = LocalDateTime.of(lastYear, lastMonth,
                 lastDay, lastOpenedHour, lastOpenedMinute);
@@ -225,13 +258,15 @@ public class MainViewModel extends ViewModel {
         if (list.getValue() == null || list.getValue().isEmpty()){
             return;
         }
-        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime today = getTodayTime();
         for (var goal : list.getValue()){
             if (today.isBefore(goal.getBoundaryRecurringDate())){
 
             }
             else {
                 goal.updateRecurring();
+                goalRepositoryIncomplete.remove(goal.id());
+                goalRepositoryIncomplete.append(goal);
             }
         }
     }
@@ -256,7 +291,7 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
             incomplete.setValue(goalList);
@@ -285,7 +320,66 @@ public class MainViewModel extends ViewModel {
     public Subject<List<Goal>> getGoalsByDayIncomplete(int year, int month, int day) {return goalRepositoryIncomplete.getGoalsByDay(year, month, day);}
 
     public Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getGoalsByDay(year, month, day);}
+    public Subject<List<Goal>> getGoalsByDay(int year, int month, int day){
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> goalsForDay = new SimpleSubject<>();
 
+        goalRepositoryIncomplete.getGoalsByDay(year, month, day).observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getGoalsByDay(year, month, day).observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Incomplete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            goalsForDay.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(goalsForDay.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            goalsForDay.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(goalsForDay.getValue().size());
+        });
+
+        return goalsForDay;
+
+    }
     public Subject<List<Goal>> getRecurringGoals(){
         MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
         MutableSubject<List<Goal>> complete = new SimpleSubject<>();
@@ -296,11 +390,11 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
             incomplete.setValue(goalList);
-            System.out.println("incomp recurring size" + incomplete.getValue().size());
+//            System.out.println("incomp recurring size" + incomplete.getValue().size());
         });
 
         goalRepositoryComplete.getRecurringGoals().observe(goals -> {
@@ -308,10 +402,10 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Complete size" + goalList.size());
+//            System.out.println("Complete size" + goalList.size());
             complete.setValue(goalList);
         });
 
@@ -338,7 +432,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println("Recurring size" + recurring.getValue().size());
+//            System.out.println("Recurring size" + recurring.getValue().size());
         });
 
         return recurring;
@@ -352,27 +446,27 @@ public class MainViewModel extends ViewModel {
         MutableSubject<List<Goal>> complete = new SimpleSubject<>();
         MutableSubject<List<Goal>> goalsForDay = new SimpleSubject<>();
 
-        goalRepositoryIncomplete.getGoalsByDay(year, month, day).observe(goals -> {
+        goalRepositoryIncomplete.getGoalsLessThanOrEqualToDay(year, month, day).observe(goals -> {
             List<Goal> goalList = List.of();
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Incomplete size" + goalList.size());
+//            System.out.println("Incomplete size" + goalList.size());
             incomplete.setValue(goalList);
         });
 
-        goalRepositoryComplete.getGoalsByDay(year, month, day).observe(goals -> {
+        goalRepositoryComplete.getGoalsLessThanOrEqualToDay(year, month, day).observe(goals -> {
             List<Goal> goalList = List.of();
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
             }
-            System.out.println("Complete size" + goalList.size());
+//            System.out.println("Complete size" + goalList.size());
             complete.setValue(goalList);
         });
 
@@ -387,7 +481,7 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(goalsForDay.getValue().size());
+//            System.out.println(goalsForDay.getValue().size());
         });
 
         complete.observe(goals -> {
@@ -401,13 +495,34 @@ public class MainViewModel extends ViewModel {
                     .collect(Collectors.toList())
             );
 
-            System.out.println(goalsForDay.getValue().size());
+//            System.out.println(goalsForDay.getValue().size());
         });
 
         return goalsForDay;
     }
 
     public Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day) {return goalRepositoryComplete.getRecurringGoalsByDay(year, month, day);}
+
+    public Subject<List<Goal>> getContext(Subject<List<Goal>> listOfGoals, int context){
+        // if there is no context set in focus mode or the cancel button has been hit, then don't sort by anything
+        if (context == 0) return listOfGoals;
+        MutableSubject<List<Goal>> contextGoals = new SimpleSubject<List<Goal>>();
+        contextGoals.setValue(List.of());
+        listOfGoals.observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .filter(goal -> goal.getContext() == context)
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+
+            contextGoals.setValue(goalList);
+
+        });
+        return contextGoals;
+    }
 
 
     /**
@@ -479,9 +594,11 @@ public class MainViewModel extends ViewModel {
      * first or should the incompleted goals get rolld over first? The order of the goals changes based on this
      */
     public void deleteCompleted(){
+        LocalDateTime today = getTodayTime();
         var recGoals = goalRepositoryComplete.getRecurringGoals();
         if (recGoals.getValue() == null || recGoals.getValue().isEmpty()){
-            goalRepositoryComplete.deleteCompleted();
+            System.out.println("ayo bruh this happened");
+            goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
             return;
         }
         ArrayList<Goal> toAdd = new ArrayList<>();
@@ -489,11 +606,12 @@ public class MainViewModel extends ViewModel {
             goal.makeInComplete();
             toAdd.add(goal.updateRecurring());
         }
-        goalRepositoryComplete.deleteCompleted();
+        goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
         for (var goal : toAdd){
-            goalRepositoryComplete.append(goal);
+            goalRepositoryIncomplete.append(goal);
         }
     }
+
 
     /**
      * Appends a time to the time database
@@ -516,8 +634,100 @@ public class MainViewModel extends ViewModel {
      *
      * @return Array of fields such as hours, minutes, etc. for the time
      */
-    public int[] getFields() {
+    public int[] getFieldsForLastDate() {
         return timeKeeper.getFields();
     }
 
+
+    public void removeGoalFromRecurringList (int id){
+//        List<Goal> listOfGoalsWithId = (List<Goal>) goalRepositoryRecurring.findListOfGoalsById(id).getValue();
+//        for (var goal : listOfGoalsWithId){
+//            int newSortOrder = goal.sortOrder();
+//            if (goal.isComplete()){
+//                removeGoalComplete(id);
+//                InsertWithSortOrderAndRecurringToRecurringListComplete(goal, newSortOrder, null);
+//            }
+//            if (!goal.isComplete()){
+//                removeGoalIncomplete(id);
+//                InsertWithSortOrderAndRecurringToRecurringListIncomplete(goal, newSortOrder, null);
+//            }
+//        }
+        goalRepositoryRecurring.remove(id);
+    }
+
+    public void appendToRecurringList(Goal goal){
+        goalRepositoryRecurring.append(goal);
+    }
+
+    public Subject<List<Goal>> getGoalsFromRecurringList(){
+//        System.out.println("it printed bruh");
+//        var goalSubject = goalRepositoryRecurring.findAll();
+//        var goalList = goalSubject.getValue();
+//        if (goalList == null) {
+//            System.out.println("early return");
+//            var toReturn = new SimpleSubject<List<Goal>>();
+//            toReturn.setValue(List.of());
+//            return toReturn;
+//        }
+//        goalList.stream()
+//                .sorted(Comparator.comparingInt(Goal::getYear).thenComparing(Goal::getMonth)
+//                        .thenComparing(Goal::getDay).thenComparing(Goal::getHour).thenComparing(Goal::getMinutes))
+//                .collect(Collectors.toList());
+//        for (var goal: goalSubject.getValue()){
+//            System.out.println(goal.getText());
+//        }
+//        System.out.println("It's empty");
+//        return goalSubject;
+        return recurringGoals;
+    }
+
+
+    public void InsertWithSortOrderToRecurringListComplete(Goal goal, int sortOrder){
+        goalRepositoryComplete.InsertWithSortOrder(goal, sortOrder);
+    }
+
+    public void InsertWithSortOrderToRecurringListIncomplete(Goal goal, int sortOrder){
+        goalRepositoryIncomplete.InsertWithSortOrder(goal, sortOrder);
+    }
+
+    public void InsertWithSortOrderAndRecurringToRecurringListComplete(Goal goal, int sortOrder, String recurring){
+        goalRepositoryComplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
+    }
+    public void InsertWithSortOrderAndRecurringToRecurringListIncomplete(Goal goal, int sortOrder, String recurring){
+        goalRepositoryIncomplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
+    }
+    public LocalDateTime getTodayTime() {
+        int[] timeFields = ActualTimeKeeper.getFields();
+        return LocalDateTime.of(timeFields[0], timeFields[1], timeFields[2],
+                timeFields[3], timeFields[4]);
+    }
+
+    public void updateTodayTime(LocalDateTime localDateTime){
+        this.ActualTimeKeeper.removeDateTime();
+        this.ActualTimeKeeper.setDateTime(localDateTime);
+    }
+
+    public void setContext(int context){
+        contextRepository.setContext(context);
+    }
+
+    public void setContextWithBoolean(int context, boolean update){
+        contextRepository.setContextWithBoolean(context, update);
+    }
+
+    public boolean getCurrUpdateValue(){
+        return contextRepository.getCurrentUpdateValue();
+    }
+
+    public void removeContext(){
+        contextRepository.removeContext();
+    }
+
+    public int getCurrentContextValue(){
+        return contextRepository.getContext();
+    }
+
+    public int getMaxGoalPair() {
+        return contextRepository.getContext();
+    }
 }

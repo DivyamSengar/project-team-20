@@ -66,22 +66,14 @@ public class RoomGoalRepository implements GoalRepository {
     @Override
     public Subject<List<Goal>> getRecurringGoals() {
         var entitiesLiveData = goalDao.getRecurring();
-//        if (entitiesLiveData.getValue() == null || entitiesLiveData.getValue().isEmpty()){
-//            System.out.println("Hello world");
-//            return new SimpleSubject<List<Goal>>();
-//        } else {
-//            System.out.println("Testing" + entitiesLiveData.getValue().size());
-//        }
+        if (entitiesLiveData.getValue() == null || entitiesLiveData.getValue().isEmpty()){
+            return new SimpleSubject<List<Goal>>();
+        }
         var goalsLiveData = Transformations.map(entitiesLiveData, entities -> {
             return entities.stream()
                     .map(GoalEntity::toGoal)
                     .collect(Collectors.toList());
         });
-        if (goalsLiveData.getValue() != null){
-            System.out.println("Testing" + goalsLiveData.getValue().size());
-        } else {
-            System.out.println("No recurring items found");
-        }
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
 
@@ -163,11 +155,6 @@ public class RoomGoalRepository implements GoalRepository {
                     .map(GoalEntity::toGoal)
                     .collect(Collectors.toList());
         });
-        if (goalsLiveData.getValue() != null){
-            System.out.println("Goals as live data" + goalsLiveData.getValue().size());
-        } else {
-            System.out.println("No items found");
-        }
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
 
@@ -221,6 +208,36 @@ public class RoomGoalRepository implements GoalRepository {
      */
     public void deleteCompleted(){
         goalDao.deleteComplete();
+    }
+
+    @Override
+    public void getContextHome() {
+        goalDao.getPending();
+    }
+
+    @Override
+    public void deleteCompleted(int year, int monthValue, int dayOfMonth) {
+        goalDao.deleteComplete();
+    }
+
+    @Override
+    public void getContextSchool() {
+
+    }
+
+    @Override
+    public void InsertWithSortOrder(Goal goal, int sortOrder) {
+        goalDao.append(GoalEntity.fromGoal(goal));
+    }
+
+    @Override
+    public void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, String recurring) {
+        goalDao.append(GoalEntity.fromGoal(goal));
+    }
+
+    @Override
+    public Subject<Object> findListOfGoalsById(int id) {
+        return null;
     }
 
     public boolean isGoalsEmpty(){ return goalDao.isGoalsEmpty(); }
