@@ -130,11 +130,6 @@ public class RecurringFragment extends Fragment {
             var dialogFragment = CreateRecurringDialogFragment.newInstance();
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
-    }
-
-    // TODO: Modify this in long press
-    public void addGoalListeners () {
-        // Listener for taps/clicks on each list item
 
     }
 
