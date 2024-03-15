@@ -31,7 +31,7 @@ import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
  * MainFragment is the main fragment for the application
  */
 public class MainFragment extends Fragment {
-    private MainViewModel activityModel;
+    public MainViewModel activityModel;
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
 
@@ -92,6 +92,21 @@ public class MainFragment extends Fragment {
                 });
     }
 
+    public void addGoalIncomplete(Goal goal) {
+        activityModel.appendIncomplete(goal);
+        adapter.addAll(goal);
+        adapter.notifyDataSetChanged();
+    }
+
+    public void addGoalComplete(Goal goal) {
+        goal.makeComplete();
+//        activityModel.removeGoalIncomplete(goal.id());
+        activityModel.appendComplete(goal);
+        adapter.addAll(goal);
+        adapter.notifyDataSetChanged();
+        
+    }
+
     /**
      * Method that runs when the View is created
      *
@@ -118,6 +133,7 @@ public class MainFragment extends Fragment {
         addGoalListeners();
         createSpinner();
         createDeveloperButton();
+
 
         // Inflate the layout for this fragment
         return view.getRoot();
