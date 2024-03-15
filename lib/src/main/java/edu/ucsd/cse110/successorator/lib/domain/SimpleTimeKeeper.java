@@ -37,5 +37,10 @@ public class SimpleTimeKeeper implements TimeKeeper {
         };
     }
 
+    @Override
+    public int count() {
+        return localdatetime.getMinute();
+    }
+
 }
 

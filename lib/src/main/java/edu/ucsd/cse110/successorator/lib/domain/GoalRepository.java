@@ -75,4 +75,17 @@ public interface GoalRepository {
      * Removes all the goals in the list
      */
     void deleteCompleted();
+
+
+    void getContextHome();
+
+    void deleteCompleted(int year, int monthValue, int dayOfMonth);
+
+    void getContextSchool();
+
+    void InsertWithSortOrder(Goal goal, int sortOrder);
+
+    void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, String recurring);
+
+    Subject<Object> findListOfGoalsById(int id);
 }

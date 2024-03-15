@@ -525,246 +525,6 @@ public class MainViewModel extends ViewModel {
     }
 
 
-    public Subject<List<Goal>> getContextHome() {
-        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> contextHome = new SimpleSubject<>();
-
-        goalRepositoryIncomplete.getContextHome().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-//            System.out.println("Incomplete size" + goalList.size());
-            incomplete.setValue(goalList);
-        });
-
-        goalRepositoryComplete.getContextHome().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-//            System.out.println("Complete size" + goalList.size());
-            complete.setValue(goalList);
-        });
-
-        incomplete.observe(goals -> {
-            if (goals == null) return;
-
-            if (complete.getValue() == null){
-                complete.setValue(List.of());
-            }
-
-            contextHome.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
-                    .collect(Collectors.toList())
-            );
-
-//            System.out.println(contextHome.getValue().size());
-        });
-
-        complete.observe(goals -> {
-            if (goals == null) return;
-
-            if (incomplete.getValue() == null){
-                incomplete.setValue(List.of());
-            }
-
-            contextHome.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
-                    .collect(Collectors.toList())
-            );
-
-//            System.out.println(contextHome.getValue().size());
-        });
-
-        return contextHome;
-    }
-
-    public Subject<List<Goal>> getContextWork() {
-        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> contextWork = new SimpleSubject<>();
-
-        goalRepositoryIncomplete.getContextWork().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-//            System.out.println("Incomplete size" + goalList.size());
-            incomplete.setValue(goalList);
-        });
-
-        goalRepositoryComplete.getContextWork().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-//            System.out.println("Complete size" + goalList.size());
-            complete.setValue(goalList);
-        });
-
-        incomplete.observe(goals -> {
-            if (goals == null) return;
-
-            if (complete.getValue() == null){
-                complete.setValue(List.of());
-            }
-
-            contextWork.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
-                    .collect(Collectors.toList())
-            );
-
-//            System.out.println(contextWork.getValue().size());
-        });
-
-        complete.observe(goals -> {
-            if (goals == null) return;
-
-            if (incomplete.getValue() == null){
-                incomplete.setValue(List.of());
-            }
-
-            contextWork.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
-                    .collect(Collectors.toList())
-            );
-
-//            System.out.println(contextWork.getValue().size());
-        });
-
-        return contextWork;
-    }
-
-    public Subject<List<Goal>> getContextSchool() {
-        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> contextSchool = new SimpleSubject<>();
-
-        goalRepositoryIncomplete.getContextSchool().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-//            System.out.println("Incomplete size" + goalList.size());
-            incomplete.setValue(goalList);
-        });
-
-        goalRepositoryComplete.getContextSchool().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-//            System.out.println("Complete size" + goalList.size());
-            complete.setValue(goalList);
-        });
-
-        incomplete.observe(goals -> {
-            if (goals == null) return;
-
-            if (complete.getValue() == null){
-                complete.setValue(List.of());
-            }
-
-            contextSchool.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
-                    .collect(Collectors.toList())
-            );
-
-//            System.out.println(contextSchool.getValue().size());
-        });
-
-        complete.observe(goals -> {
-            if (goals == null) return;
-
-            if (incomplete.getValue() == null){
-                incomplete.setValue(List.of());
-            }
-
-            contextSchool.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
-                    .collect(Collectors.toList())
-            );
-
-//            System.out.println(contextSchool.getValue().size());
-        });
-
-        return contextSchool;
-    }
-
-    public Subject<List<Goal>> getContextErrands() {
-        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> contextErrands = new SimpleSubject<>();
-
-        goalRepositoryIncomplete.getContextErrands().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-//            System.out.println("Incomplete size" + goalList.size());
-            incomplete.setValue(goalList);
-        });
-
-        goalRepositoryComplete.getContextErrands().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-//            System.out.println("Complete size" + goalList.size());
-            complete.setValue(goalList);
-        });
-
-        incomplete.observe(goals -> {
-            if (goals == null) return;
-
-            if (complete.getValue() == null){
-                complete.setValue(List.of());
-            }
-
-            contextErrands.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
-                    .collect(Collectors.toList())
-            );
-
-//            System.out.println(contextErrands.getValue().size());
-        });
-
-        complete.observe(goals -> {
-            if (goals == null) return;
-
-            if (incomplete.getValue() == null){
-                incomplete.setValue(List.of());
-            }
-
-            contextErrands.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
-                    .collect(Collectors.toList())
-            );
-
-//            System.out.println(contextErrands.getValue().size());
-        });
-
-        return contextErrands;
-    }
-
     /**
      * Checks if list of goals is empty
      *
@@ -786,8 +546,6 @@ public class MainViewModel extends ViewModel {
      */
     public void removeGoalComplete (int id){
         goalRepositoryComplete.remove(id);
-        this.goalsCompleted.setValue(goalRepositoryComplete.findAll().getValue());
-
     }
 
     /**
@@ -797,8 +555,6 @@ public class MainViewModel extends ViewModel {
      */
     public void removeGoalIncomplete (int id){
         goalRepositoryIncomplete.remove(id);
-        this.goalsIncompleted.setValue(goalRepositoryIncomplete.findAll().getValue());
-
     }
 
     /**
@@ -828,8 +584,6 @@ public class MainViewModel extends ViewModel {
      */
     public void prependIncomplete(Goal goal){
         goalRepositoryIncomplete.prepend(goal);
-        this.goalsIncompleted.setValue(goalRepositoryIncomplete.findAll().getValue());
-
     }
 
     /**
@@ -843,10 +597,8 @@ public class MainViewModel extends ViewModel {
         LocalDateTime today = getTodayTime();
         var recGoals = goalRepositoryComplete.getRecurringGoals();
         if (recGoals.getValue() == null || recGoals.getValue().isEmpty()){
-
             System.out.println("ayo bruh this happened");
             goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
-//            System.out.println(recGoals.getValue().toString());
             return;
         }
         ArrayList<Goal> toAdd = new ArrayList<>();
@@ -855,12 +607,9 @@ public class MainViewModel extends ViewModel {
             toAdd.add(goal.updateRecurring());
         }
         goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
-        this.goalsCompleted.setValue(goalRepositoryComplete.findAll().getValue());
         for (var goal : toAdd){
             goalRepositoryIncomplete.append(goal);
-            this.goalsIncompleted.setValue(goalRepositoryIncomplete.findAll().getValue());
         }
-
     }
 
 
@@ -891,34 +640,19 @@ public class MainViewModel extends ViewModel {
 
 
     public void removeGoalFromRecurringList (int id){
-        goalRepositoryRecurring.findListOfGoalsById(id).observe(goals -> {
-            if (goals == null) {
-                System.out.println("Null Value");
-                return;
-            }
-            // from the recurring list goal, get its pairID
-            // use the pairID to get its related recurring goals (int hte other views)
-            // when I have them, delete them
-            goals.forEach(goal -> {
-                int pairID = goal.getGoalPair();
-                var subjListOfGoalPairs = getGoalPairValyes(pairID);
-                if (subjListOfGoalPairs.getValue() == null){
-                    System.out.println("it happened ono");
-                    return;
-                }
-                subjListOfGoalPairs.getValue().forEach(goal1 -> {
-                    int newSortOrder = goal1.sortOrder();
-                    if (goal1.isComplete()) {
-                        removeGoalComplete(goal1.id());
-                        InsertWithSortOrderAndRecurringToRecurringListComplete(goal1, newSortOrder, 0);
-                    } else {
-                        removeGoalIncomplete(goal1.id());
-                        InsertWithSortOrderAndRecurringToRecurringListIncomplete(goal1, newSortOrder, 0);
-                    }
-                });
-            });
-            goalRepositoryRecurring.remove(id);
-        });
+//        List<Goal> listOfGoalsWithId = (List<Goal>) goalRepositoryRecurring.findListOfGoalsById(id).getValue();
+//        for (var goal : listOfGoalsWithId){
+//            int newSortOrder = goal.sortOrder();
+//            if (goal.isComplete()){
+//                removeGoalComplete(id);
+//                InsertWithSortOrderAndRecurringToRecurringListComplete(goal, newSortOrder, null);
+//            }
+//            if (!goal.isComplete()){
+//                removeGoalIncomplete(id);
+//                InsertWithSortOrderAndRecurringToRecurringListIncomplete(goal, newSortOrder, null);
+//            }
+//        }
+        goalRepositoryRecurring.remove(id);
     }
 
     public void appendToRecurringList(Goal goal){
@@ -956,10 +690,10 @@ public class MainViewModel extends ViewModel {
         goalRepositoryIncomplete.InsertWithSortOrder(goal, sortOrder);
     }
 
-    public void InsertWithSortOrderAndRecurringToRecurringListComplete(Goal goal, int sortOrder, int recurring){
+    public void InsertWithSortOrderAndRecurringToRecurringListComplete(Goal goal, int sortOrder, String recurring){
         goalRepositoryComplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
     }
-    public void InsertWithSortOrderAndRecurringToRecurringListIncomplete(Goal goal, int sortOrder, int recurring){
+    public void InsertWithSortOrderAndRecurringToRecurringListIncomplete(Goal goal, int sortOrder, String recurring){
         goalRepositoryIncomplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
     }
     public LocalDateTime getTodayTime() {
@@ -993,29 +727,7 @@ public class MainViewModel extends ViewModel {
         return contextRepository.getContext();
     }
 
-    public int getMaxGoalPair(){
-        int max1 =  goalRepositoryComplete.getMaxGoalPair();
-        int max2 = goalRepositoryIncomplete.getMaxGoalPair();
-        return Math.max(max1, max2);
-    }
-    Subject<List<Goal>> getGoalPairValyes(int goalPair){
-        var subj1 = goalRepositoryIncomplete.getGoalPairVals(goalPair);
-        var subj2 = goalRepositoryComplete.getGoalPairVals(goalPair);
-
-        if (subj1.getValue() != null && subj2.getValue() != null) {
-            subj1.getValue().addAll(subj2.getValue());
-            return subj1;
-
-        }
-        else if (subj1.getValue() == null && subj2.getValue() != null){
-            return subj2;
-        }
-        else if (subj1.getValue() != null && subj2.getValue() == null){
-            return subj1;
-        }
-        else {
-            System.out.println("ran ???? manoon");
-            return subj1;
-        }
+    public int getMaxGoalPair() {
+        return contextRepository.getContext();
     }
 }

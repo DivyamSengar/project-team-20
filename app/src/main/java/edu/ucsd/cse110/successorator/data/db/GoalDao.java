@@ -137,7 +137,7 @@ public interface GoalDao {
     default int append(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
                 getMaxSortOrder()+1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
 
@@ -145,7 +145,7 @@ public interface GoalDao {
     default int appendComplete(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, true,
                 getMaxSortOrder()+1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
 
@@ -153,7 +153,7 @@ public interface GoalDao {
     default int appendIncomplete(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, false,
                 getMaxSortOrder()+1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
 
@@ -166,7 +166,7 @@ public interface GoalDao {
     default int prepend(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
                 getMinSortOrder()-1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year);
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
 }

@@ -210,6 +210,36 @@ public class RoomGoalRepository implements GoalRepository {
         goalDao.deleteComplete();
     }
 
+    @Override
+    public void getContextHome() {
+        goalDao.getPending();
+    }
+
+    @Override
+    public void deleteCompleted(int year, int monthValue, int dayOfMonth) {
+        goalDao.deleteComplete();
+    }
+
+    @Override
+    public void getContextSchool() {
+
+    }
+
+    @Override
+    public void InsertWithSortOrder(Goal goal, int sortOrder) {
+        goalDao.append(GoalEntity.fromGoal(goal));
+    }
+
+    @Override
+    public void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, String recurring) {
+        goalDao.append(GoalEntity.fromGoal(goal));
+    }
+
+    @Override
+    public Subject<Object> findListOfGoalsById(int id) {
+        return null;
+    }
+
     public boolean isGoalsEmpty(){ return goalDao.isGoalsEmpty(); }
 
     public void removeGoalComplete(int id){ goalDao.removeGoalComplete(id); }

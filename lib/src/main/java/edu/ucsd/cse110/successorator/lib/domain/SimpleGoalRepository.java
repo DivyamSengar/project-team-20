@@ -41,7 +41,7 @@ public class SimpleGoalRepository implements GoalRepository {
     public Subject<List<Goal>> getRecurringGoals() {
         Subject<List<Goal>> goals = dataSource.getAllGoalEntrySubject();
         for (int i = 0; i < goals.getValue().size(); i++){
-            if (goals.getValue().get(i).getRecurring().compareTo("null") == 0){
+            if (goals.getValue().get(i).getRecurring() == 0){
                 goals.getValue().remove(i);
             }
         }
@@ -52,7 +52,7 @@ public class SimpleGoalRepository implements GoalRepository {
     public Subject<List<Goal>> getRecurringGoalsIncomplete() {
         Subject<List<Goal>> goals = dataSource.getAllGoalEntrySubject();
         for (int i = 0; i < goals.getValue().size(); i++){
-            if (goals.getValue().get(i).getRecurring().compareTo("null") == 0 || goals.getValue().get(i).isComplete()){
+            if (goals.getValue().get(i).getRecurring() == 0 || goals.getValue().get(i).isComplete()){
                 goals.getValue().remove(i);
             }
         }
@@ -63,7 +63,7 @@ public class SimpleGoalRepository implements GoalRepository {
     public Subject<List<Goal>> getRecurringGoalsComplete() {
         Subject<List<Goal>> goals = dataSource.getAllGoalEntrySubject();
         for (int i = 0; i < goals.getValue().size(); i++){
-            if (goals.getValue().get(i).getRecurring().compareTo("null") == 0 || !goals.getValue().get(i).isComplete()){
+            if (goals.getValue().get(i).getRecurring() == 0 || !goals.getValue().get(i).isComplete()){
                goals.getValue().remove(i);
                i--;
             }
@@ -111,7 +111,7 @@ public class SimpleGoalRepository implements GoalRepository {
     public Subject<List<Goal>> getRecurringGoalsByDay(int year, int month, int day) {
         Subject<List<Goal>> goals = dataSource.getAllGoalEntrySubject();
         for (int i = 0; i < goals.getValue().size(); i++){
-            if (goals.getValue().get(i).getYear() != year || goals.getValue().get(i).getMonth() != month || goals.getValue().get(i).getDay() != day || goals.getValue().get(i).getRecurring().compareTo("null") == 0){
+            if (goals.getValue().get(i).getYear() != year || goals.getValue().get(i).getMonth() != month || goals.getValue().get(i).getDay() != day || goals.getValue().get(i).getRecurring() == 0){
                 goals.getValue().remove(i);
                 i--;
             }
@@ -123,7 +123,7 @@ public class SimpleGoalRepository implements GoalRepository {
     public Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day) {
         Subject<List<Goal>> goals = dataSource.getAllGoalEntrySubject();
         for (int i = 0; i < goals.getValue().size(); i++){
-            if (goals.getValue().get(i).getYear() != year || goals.getValue().get(i).getMonth() != month || goals.getValue().get(i).getDay() != day || goals.getValue().get(i).getRecurring().compareTo("null") == 0 || !goals.getValue().get(i).isComplete()){
+            if (goals.getValue().get(i).getYear() != year || goals.getValue().get(i).getMonth() != month || goals.getValue().get(i).getDay() != day || goals.getValue().get(i).getRecurring() == 0 || !goals.getValue().get(i).isComplete()){
                 goals.getValue().remove(i);
                 i--;
             }
@@ -196,6 +196,36 @@ public class SimpleGoalRepository implements GoalRepository {
                 dataSource.getGoals().remove(i);
             }
         }
+    }
+
+    @Override
+    public void getContextHome() {
+        dataSource.getGoals();
+    }
+
+    @Override
+    public void deleteCompleted(int year, int monthValue, int dayOfMonth) {
+
+    }
+
+    @Override
+    public void getContextSchool() {
+
+    }
+
+    @Override
+    public void InsertWithSortOrder(Goal goal, int sortOrder) {
+
+    }
+
+    @Override
+    public void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, String recurring) {
+
+    }
+
+    @Override
+    public Subject<Object> findListOfGoalsById(int id) {
+        return null;
     }
 
 }
