@@ -786,6 +786,8 @@ public class MainViewModel extends ViewModel {
      */
     public void removeGoalComplete (int id){
         goalRepositoryComplete.remove(id);
+        this.goalsCompleted.setValue(goalRepositoryComplete.findAll().getValue());
+
     }
 
     /**
@@ -795,6 +797,8 @@ public class MainViewModel extends ViewModel {
      */
     public void removeGoalIncomplete (int id){
         goalRepositoryIncomplete.remove(id);
+        this.goalsIncompleted.setValue(goalRepositoryIncomplete.findAll().getValue());
+
     }
 
     /**
@@ -824,6 +828,8 @@ public class MainViewModel extends ViewModel {
      */
     public void prependIncomplete(Goal goal){
         goalRepositoryIncomplete.prepend(goal);
+        this.goalsIncompleted.setValue(goalRepositoryIncomplete.findAll().getValue());
+
     }
 
     /**
@@ -837,8 +843,10 @@ public class MainViewModel extends ViewModel {
         LocalDateTime today = getTodayTime();
         var recGoals = goalRepositoryComplete.getRecurringGoals();
         if (recGoals.getValue() == null || recGoals.getValue().isEmpty()){
+
             System.out.println("ayo bruh this happened");
             goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
+//            System.out.println(recGoals.getValue().toString());
             return;
         }
         ArrayList<Goal> toAdd = new ArrayList<>();
@@ -847,9 +855,12 @@ public class MainViewModel extends ViewModel {
             toAdd.add(goal.updateRecurring());
         }
         goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
+        this.goalsCompleted.setValue(goalRepositoryComplete.findAll().getValue());
         for (var goal : toAdd){
             goalRepositoryIncomplete.append(goal);
+            this.goalsIncompleted.setValue(goalRepositoryIncomplete.findAll().getValue());
         }
+
     }
 
 
@@ -880,19 +891,34 @@ public class MainViewModel extends ViewModel {
 
 
     public void removeGoalFromRecurringList (int id){
-        List<Goal> listOfGoalsWithId = goalRepositoryRecurring.findListOfGoalsById(id).getValue();
-        for (var goal : listOfGoalsWithId){
-            int newSortOrder = goal.sortOrder();
-            if (goal.isComplete()){
-                removeGoalComplete(id);
-                InsertWithSortOrderAndRecurringToRecurringListComplete(goal, newSortOrder, null);
+        goalRepositoryRecurring.findListOfGoalsById(id).observe(goals -> {
+            if (goals == null) {
+                System.out.println("Null Value");
+                return;
             }
-            if (!goal.isComplete()){
-                removeGoalIncomplete(id);
-                InsertWithSortOrderAndRecurringToRecurringListIncomplete(goal, newSortOrder, null);
-            }
-        }
-        goalRepositoryRecurring.remove(id);
+            // from the recurring list goal, get its pairID
+            // use the pairID to get its related recurring goals (int hte other views)
+            // when I have them, delete them
+            goals.forEach(goal -> {
+                int pairID = goal.getGoalPair();
+                var subjListOfGoalPairs = getGoalPairValyes(pairID);
+                if (subjListOfGoalPairs.getValue() == null){
+                    System.out.println("it happened ono");
+                    return;
+                }
+                subjListOfGoalPairs.getValue().forEach(goal1 -> {
+                    int newSortOrder = goal1.sortOrder();
+                    if (goal1.isComplete()) {
+                        removeGoalComplete(goal1.id());
+                        InsertWithSortOrderAndRecurringToRecurringListComplete(goal1, newSortOrder, 0);
+                    } else {
+                        removeGoalIncomplete(goal1.id());
+                        InsertWithSortOrderAndRecurringToRecurringListIncomplete(goal1, newSortOrder, 0);
+                    }
+                });
+            });
+            goalRepositoryRecurring.remove(id);
+        });
     }
 
     public void appendToRecurringList(Goal goal){
@@ -930,10 +956,10 @@ public class MainViewModel extends ViewModel {
         goalRepositoryIncomplete.InsertWithSortOrder(goal, sortOrder);
     }
 
-    public void InsertWithSortOrderAndRecurringToRecurringListComplete(Goal goal, int sortOrder, String recurring){
+    public void InsertWithSortOrderAndRecurringToRecurringListComplete(Goal goal, int sortOrder, int recurring){
         goalRepositoryComplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
     }
-    public void InsertWithSortOrderAndRecurringToRecurringListIncomplete(Goal goal, int sortOrder, String recurring){
+    public void InsertWithSortOrderAndRecurringToRecurringListIncomplete(Goal goal, int sortOrder, int recurring){
         goalRepositoryIncomplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
     }
     public LocalDateTime getTodayTime() {
@@ -965,5 +991,31 @@ public class MainViewModel extends ViewModel {
 
     public int getCurrentContextValue(){
         return contextRepository.getContext();
+    }
+
+    public int getMaxGoalPair(){
+        int max1 =  goalRepositoryComplete.getMaxGoalPair();
+        int max2 = goalRepositoryIncomplete.getMaxGoalPair();
+        return Math.max(max1, max2);
+    }
+    Subject<List<Goal>> getGoalPairValyes(int goalPair){
+        var subj1 = goalRepositoryIncomplete.getGoalPairVals(goalPair);
+        var subj2 = goalRepositoryComplete.getGoalPairVals(goalPair);
+
+        if (subj1.getValue() != null && subj2.getValue() != null) {
+            subj1.getValue().addAll(subj2.getValue());
+            return subj1;
+
+        }
+        else if (subj1.getValue() == null && subj2.getValue() != null){
+            return subj2;
+        }
+        else if (subj1.getValue() != null && subj2.getValue() == null){
+            return subj1;
+        }
+        else {
+            System.out.println("ran ???? manoon");
+            return subj1;
+        }
     }
 }

@@ -119,20 +119,20 @@ public class CreateTomorrowDialogFragment extends DialogFragment {
                     var input = view.goalEditText.getText().toString();
                     LocalDateTime tomorrowTime = activityModel.getTodayTime().plusDays(1);
                     // Create a new Goal with the text and add it
-                    String recurring = null;
+                    int recurring = 0;
                     int contextOption = 0;
 
                     // check which recurrence option was selected
                     if (view.oneTimeBtn.isChecked()){
 
                     } else if (view.dailyBtn.isChecked()){
-                        recurring = "daily";
+                        recurring = 1;
                     } else if (view.weeklyBtn.isChecked()){
-                        recurring = "weekly";
+                        recurring = 2;
                     } else if (view.monthlyBtn.isChecked()){
-                        recurring = "monthly";
+                        recurring = 3;
                     } else if (view.yearlyBtn.isChecked()) {
-                        recurring = "yearly";
+                        recurring = 4;
                     }
 
                     if (view.homeBtn.isChecked()){
@@ -148,12 +148,12 @@ public class CreateTomorrowDialogFragment extends DialogFragment {
                     //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
                     int[] date = {tomorrowTime.getMinute(), tomorrowTime.getHour(),
                             tomorrowTime.getDayOfMonth(), tomorrowTime.getMonthValue(), tomorrowTime.getYear()};
-
+                    int goalPair = activityModel.getMaxGoalPair()+1;
                     var newGoal = new Goal(null, input, false, -1, false, recurring,
-                            date[0], date[1], date[2], date[3], date[4], contextOption);
+                            date[0], date[1], date[2], date[3], date[4], contextOption, goalPair);
                     // Create a new Goal with the text and add it
                     activityModel.appendIncomplete(newGoal);
-                    if (recurring != null){
+                    if (recurring != 0){
                         activityModel.appendToRecurringList(newGoal);
                     }
                     dismiss();
