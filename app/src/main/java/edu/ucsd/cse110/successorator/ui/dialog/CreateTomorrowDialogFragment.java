@@ -17,52 +17,29 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import java.util.Calendar;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Locale;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
-import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 
-/**
- * DialogFragment that captures the input of the user when inputting a goal
- *
- */
-public class CreateGoalDialogFragment extends DialogFragment {
+public class CreateTomorrowDialogFragment extends DialogFragment {
     private MainViewModel activityModel;
     private FragmentDialogCreateGoalBinding view;
-    private static String viewType;
 
-    /**
-     * Required empty public constructor
-     */
-    CreateGoalDialogFragment(){
+    CreateTomorrowDialogFragment(){
     }
 
-    /**
-     * Creates a new instance of MainFragment
-     *
-     * @return Fragment - returns a new fragment instance for MainFragment
-     */
-    public static CreateGoalDialogFragment newInstance(String vType){
-        viewType = vType;
-        var fragment = new CreateGoalDialogFragment();
+    public static CreateTomorrowDialogFragment newInstance() {
         Bundle args = new Bundle();
+        CreateTomorrowDialogFragment fragment = new CreateTomorrowDialogFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    /**
-     * Initializes the model when the DialogFragment is created
-     *
-     * @param savedInstanceState - state of the application
-     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -74,60 +51,11 @@ public class CreateGoalDialogFragment extends DialogFragment {
         this.activityModel = modelProvider.get(MainViewModel.class);
     }
 
-    /**
-     * Creates a dialog for capturing input from the user when entering a goal
-     *
-     * @param savedInstanceState - state of the application
-     * @return The dialog fragment for capturing text input
-     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
-//        /*
-//        https://stackoverflow.com/questions/12937731/android-enter-key-listener
-//        Source Title:
-//        Date Captured: 2/17/2024 4:51 pm
-//        Used as a reference to have the done/check button on the keyboard to "mark as done"
-//        and capture the input to add as a goal. When typing .setOnEditorActionListener()
-//        the code automatically generated, the rest was reused from previously written code
-//        Handle: smhitle
-//         */
-//        view.goalEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
-//                    // Get the input of the textEdit
-//                    var input = view.goalEditText.getText().toString();
-//                    // get whether it's pending/get the view
-//                    // get whether it's recurring and if so which type
-//                    // get current system time
-//
-//                    LocalDateTime currentTime = LocalDateTime.now();
-//                    // Create a new Goal with the text and add it
-//                    // need to get the current date, decide whether it's pending, and decide whether it's recurring
-//                    boolean pending = false;
-//                    String recurring = null;
-//                    if(viewType.equals("tomorrow")){
-//                        currentTime = currentTime.plusDays(1);
-//                    } else if(viewType.equals("pending")){
-//                        pending = true;
-//                    } else if(viewType.equals("recurring")){
-//                        //need to instantiate the recurring field based on the OnClick which will determine whether the goal is daily, weekly, monthly, yearly
-//                    }
-//
-//                    //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
-//                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
-//                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
-//
-//                    var newGoal = new Goal(null, input, false, -1, pending, recurring,
-//                            date[0], date[1], date[2], date[3], date[4]);
-//                    activityModel.appendIncomplete(newGoal);
-//                    dismiss();
-//                }
-//                return false;
-//            }
-//        });
+
         captureGoalInput();
         return makeDialog();
     }
@@ -151,11 +79,11 @@ public class CreateGoalDialogFragment extends DialogFragment {
         edit.requestFocus();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
-
         SimpleDateFormat daysOfWeek = new SimpleDateFormat("E", Locale.getDefault());
         SimpleDateFormat dayofMonth = new SimpleDateFormat("F", Locale.getDefault());
         SimpleDateFormat dayofYear = new SimpleDateFormat("MM/dd", Locale.getDefault());
         Calendar c = Calendar.getInstance();
+        c.add(Calendar.DATE, 1);
         String[] postfix = {"st", "nd", "rd", "th","th","th"};
         String weeklyText = "Weekly on " + daysOfWeek.format(c.getTime());
         // not entirely sure if this is correct or not
@@ -172,12 +100,13 @@ public class CreateGoalDialogFragment extends DialogFragment {
     }
 
     private void captureGoalInput(){
+
         view.saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Get the input of the textEdit
                 var input = view.goalEditText.getText().toString();
-                LocalDateTime currentTime = LocalDateTime.now();
+                LocalDateTime tomorrowTime = LocalDateTime.now().plusDays(1);
                 // Create a new Goal with the text and add it
                 String recurring = null;
 
@@ -195,8 +124,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
                 }
 
                 //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
-                int[] date = {currentTime.getMinute(), currentTime.getHour(),
-                        currentTime.getDayOfMonth(), currentTime.getMonthValue(), currentTime.getYear()};
+                int[] date = {tomorrowTime.getMinute(), tomorrowTime.getHour(),
+                        tomorrowTime.getDayOfMonth(), tomorrowTime.getMonthValue(), tomorrowTime.getYear()};
 
                 var newGoal = new Goal(null, input, false, -1, false, recurring,
                         date[0], date[1], date[2], date[3], date[4]);
@@ -223,7 +152,7 @@ public class CreateGoalDialogFragment extends DialogFragment {
 //                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
 //                    // Get the input of the textEdit
 //                    var input = view.goalEditText.getText().toString();
-//                    LocalDateTime currentTime = LocalDateTime.now();
+//                    LocalDateTime tomorrowTime = LocalDateTime.now().plusDays(1);
 //                    // Create a new Goal with the text and add it
 //                    String recurring = null;
 //
@@ -241,8 +170,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
 //                    }
 //
 //                    //need to set onClick to change date array based on whether or not the calendar was chosen for a future date
-//                    int[] date = {currentTime.getYear(), currentTime.getMonthValue(),
-//                            currentTime.getDayOfMonth(), currentTime.getHour(), currentTime.getMinute()};
+//                    int[] date = {tomorrowTime.getYear(), tomorrowTime.getMonthValue(),
+//                            tomorrowTime.getDayOfMonth(), tomorrowTime.getHour(), tomorrowTime.getMinute()};
 //
 //                    var newGoal = new Goal(null, input, false, -1, false, recurring,
 //                            date[0], date[1], date[2], date[3], date[4]);
