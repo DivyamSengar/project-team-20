@@ -1,21 +1,17 @@
 package edu.ucsd.cse110.successorator.data.db;
 import androidx.lifecycle.Transformations;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.util.*;
-
 /**
  * RoomGoalRepository class that implements the behavior and attributes of GoalRepository
  */
 public class RoomGoalRepository implements GoalRepository {
     private final GoalDao goalDao;
-
     /**
      * RoomGoalRepository constructor to initialize its fields
      * @param goalDao goalDao object to initialize the field with
@@ -23,7 +19,6 @@ public class RoomGoalRepository implements GoalRepository {
     public RoomGoalRepository(GoalDao goalDao){
         this.goalDao = goalDao;
     }
-
     /**
      * This method returns a subject of a goal given a specific goal id
      * @param id = id of goal to find
@@ -35,7 +30,6 @@ public class RoomGoalRepository implements GoalRepository {
         var goalLiveData = Transformations.map(entityLiveData, GoalEntity::toGoal);
         return new LiveDataSubjectAdapter<>(goalLiveData);
     }
-
     /**
      * This methods returns a subject of a list of all the goals
      * @return subject of the list of all the goals
@@ -48,10 +42,8 @@ public class RoomGoalRepository implements GoalRepository {
                     .map(GoalEntity::toGoal)
                     .collect(Collectors.toList());
         });
-
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     @Override
     public Subject<List<Goal>> getPendingGoals() {
         var entitiesLiveData = goalDao.getPending();
@@ -62,7 +54,6 @@ public class RoomGoalRepository implements GoalRepository {
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     @Override
     public Subject<List<Goal>> getRecurringGoals() {
         var entitiesLiveData = goalDao.getRecurring();
@@ -85,7 +76,6 @@ public class RoomGoalRepository implements GoalRepository {
         }
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     @Override
     public Subject<List<Goal>> getGoalsByDay(int year, int month, int day) {
         var entitiesLiveData = goalDao.getByDay(year, month, day);
@@ -96,7 +86,6 @@ public class RoomGoalRepository implements GoalRepository {
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     /*
     need to use this to display goals for today
      */
@@ -115,7 +104,6 @@ public class RoomGoalRepository implements GoalRepository {
         }
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     @Override
     public Subject<List<Goal>> getRecurringGoalsByDay(int year, int month, int day) {
         var entitiesLiveData = goalDao.getRecurringByDay(year, month, day);
@@ -126,7 +114,6 @@ public class RoomGoalRepository implements GoalRepository {
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     @Override
     public Subject<List<Goal>> getContextHome() {
         var entitiesLiveData = goalDao.getContextHome();
@@ -137,7 +124,6 @@ public class RoomGoalRepository implements GoalRepository {
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     @Override
     public Subject<List<Goal>> getContextWork() {
         var entitiesLiveData = goalDao.getContextWork();
@@ -148,7 +134,6 @@ public class RoomGoalRepository implements GoalRepository {
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     @Override
     public Subject<List<Goal>> getContextSchool() {
         var entitiesLiveData = goalDao.getContextSchool();
@@ -159,7 +144,6 @@ public class RoomGoalRepository implements GoalRepository {
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     @Override
     public Subject<List<Goal>> getContextErrands() {
         var entitiesLiveData = goalDao.getContextErrands();
@@ -170,7 +154,6 @@ public class RoomGoalRepository implements GoalRepository {
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
     /**
      * This method appends a goal to the list of goals
      * @param goal to be appended
@@ -178,7 +161,6 @@ public class RoomGoalRepository implements GoalRepository {
     public void append(Goal goal){
         goalDao.append(GoalEntity.fromGoal(goal));
     }
-
     /**
      * This method prepends a goal to the list of goals
      * @param goal to be prepended
@@ -186,7 +168,6 @@ public class RoomGoalRepository implements GoalRepository {
     public void prepend(Goal goal){
         goalDao.prepend(GoalEntity.fromGoal(goal));
     }
-
     /**
      * This method removes a goal given a specific goal id
      * @param id of goal to remove
@@ -194,7 +175,6 @@ public class RoomGoalRepository implements GoalRepository {
     public void remove(int id){
         goalDao.delete(id);
     }
-
     /**
      * This method clears the entire goal list
      */
@@ -210,23 +190,19 @@ public class RoomGoalRepository implements GoalRepository {
                     .collect(Collectors.toList());
         });
         return new LiveDataSubjectAdapter<>(goalsLiveData);
-
     }
     @Override
-  public void InsertWithSortOrder(Goal goal, int sortOrder){
+    public void InsertWithSortOrder(Goal goal, int sortOrder){
         goalDao.InsertWithSortOrder(GoalEntity.fromGoal(goal), sortOrder);
     }
-
     @Override
     public void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, int recurring){
         goalDao.InsertWithSortOrderAndRecurring(GoalEntity.fromGoal(goal), sortOrder, recurring);
     }
-
     @Override
     public int getMaxGoalPair(){
         return goalDao.getMaxgoalPair();
     }
-
     @Override
     public Subject<List<Goal>> getGoalPairVals(int goalPair){
         var entitiesLiveData = goalDao.getGoalPairVals(goalPair);
@@ -235,9 +211,6 @@ public class RoomGoalRepository implements GoalRepository {
                     .map(GoalEntity::toGoal)
                     .collect(Collectors.toList());
         });
-
         return new LiveDataSubjectAdapter<>(goalsLiveData);
     }
-
-
 }

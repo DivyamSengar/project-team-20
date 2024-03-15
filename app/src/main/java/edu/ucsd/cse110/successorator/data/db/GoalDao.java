@@ -5,15 +5,12 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
-
 import java.util.List;
-
 /**
  * Interface for GoalDao, describing the sql queries and goal insert logic
  */
 @Dao
 public interface GoalDao {
-
     /**
      * Only one insert since we only insert one at time
      * @param goal to insert
@@ -21,8 +18,6 @@ public interface GoalDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insert(GoalEntity goal);
-
-
     /**
      * Query all the goals with a given id
      * @param id of goal to find
@@ -30,14 +25,12 @@ public interface GoalDao {
      */
     @Query("SELECT * FROM Goals WHERE id = :id")
     GoalEntity find(int id);
-
     /**
      * Query all the goals by sort_order
      * @return List of GoalEntity objects in sort_order
      */
     @Query("SELECT * FROM Goals ORDER BY sort_order")
     List<GoalEntity> find();
-
     /**
      * Query all the goals with a given id
      * @param id of goals to find
@@ -45,14 +38,12 @@ public interface GoalDao {
      */
     @Query("SELECT * FROM Goals WHERE id = :id")
     LiveData<GoalEntity> findAsLiveData(int id);
-
     /**
      * Query all goals by sort_order
      * @return LiveData list of GoalEntity objects in sort_order
      */
     @Query("SELECT * FROM Goals ORDER BY sort_order")
     LiveData<List<GoalEntity>> findAllAsLiveData();
-
     /**
      * Query all goals where the complete status is equal to that of the parameter
      * @param isComplete is the status we want to query the goals by
@@ -60,75 +51,53 @@ public interface GoalDao {
      */
     @Query("SELECT * FROM Goals WHERE isComplete = :isComplete")
     List<GoalEntity> find(boolean isComplete);
-
     /**
      * Get the minimum sort_order from goals
      * @return integer minimum sort_order
      */
     @Query("SELECT MIN(sort_order) FROM Goals")
     int getMinSortOrder();
-
     /**
      * Get the maximum sort_order from goals
      * @return integer maximum sort_order
      */
     @Query("SELECT MAX(sort_order) FROM Goals")
     int getMaxSortOrder();
-
-
     @Query("SELECT MAX(goalPair) FROM Goals")
     int getMaxgoalPair();
-
-
-
-
     /**
      * Delete goals with given id
      * @param id of goal to delete
      */
     @Query("DELETE from Goals WHERE id = :id")
     void delete(int id);
-
     /**
      * Delete goals with isComplete being true
      */
     @Query("DELETE from Goals WHERE isComplete = true AND year <= :year AND month <= :month AND day <= :day" )
     void deleteComplete(int year, int month, int day);
-
     @Query("SELECT * from Goals WHERE Pending = true")
     LiveData<List<GoalEntity>> getPending();
-
     @Query("SELECT * from Goals WHERE year = :year AND month = :month AND day = :day")
     LiveData<List<GoalEntity>> getByDay(int year, int month, int day);
-
     @Query("SELECT * from Goals WHERE year <= :year AND month <= :month AND day <= :day")
     LiveData<List<GoalEntity>> getLessThanOrEqualToDay(int year, int month, int day);
-
     @Query("SELECT * from Goals WHERE recurring != 0")
     LiveData<List<GoalEntity>> getRecurring();
-
     @Query("SELECT * from Goals WHERE recurring != 0 AND year = :year AND month = :month AND day = :day")
     LiveData<List<GoalEntity>> getRecurringByDay(int year, int month, int day);
-
     @Query("SELECT * from Goals WHERE context = 1")
     LiveData<List<GoalEntity>> getContextHome();
-
     @Query("SELECT * from Goals WHERE context = 2")
     LiveData<List<GoalEntity>> getContextWork();
-
     @Query("SELECT * from Goals WHERE context = 3")
     LiveData<List<GoalEntity>> getContextSchool();
-
     @Query("SELECT * from Goals WHERE context = 4")
     LiveData<List<GoalEntity>> getContextErrands();
-
     @Query("SELECT * from Goals WHERE goalPair = :goalPair")
     LiveData<List<GoalEntity>> getGoalPairVals(int goalPair);
-
-
     @Query("SELECT * FROM Goals WHERE id = :id")
     LiveData<List<GoalEntity>> findListOfGoalsById(int id);
-
     /**
      * Append a goal to the list
      * @param goal goal to append
@@ -141,7 +110,6 @@ public interface GoalDao {
                 goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
-
     /**
      * Prepend a goal to the list
      * @param goal goal to be prepended
@@ -154,7 +122,6 @@ public interface GoalDao {
                 goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
-
     @Transaction
     default int InsertWithSortOrder(GoalEntity goal, int sortOrder){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
@@ -162,7 +129,6 @@ public interface GoalDao {
                 goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
-
     @Transaction
     default int InsertWithSortOrderAndRecurring(GoalEntity goal, int sortOrder, int recurring){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
@@ -170,5 +136,4 @@ public interface GoalDao {
                 goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
-
 }
