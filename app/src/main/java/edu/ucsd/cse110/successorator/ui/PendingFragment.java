@@ -181,11 +181,6 @@ public class PendingFragment extends Fragment {
             mainFragment.addGoalIncomplete(goal);
         }
 
-    // TODO: Modify this in long press
-    public void addGoalListeners() {
-
-    }
-
     private void moveToTomorrow(Goal goal) {
         goal.setDate(LocalDateTime.now().getMinute(),
                 LocalDateTime.now().getHour(),
