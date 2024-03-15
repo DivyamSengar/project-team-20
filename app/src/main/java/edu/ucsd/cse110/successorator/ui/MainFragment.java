@@ -104,15 +104,7 @@ public class MainFragment extends Fragment {
         activityModel.appendComplete(goal);
         adapter.addAll(goal);
         adapter.notifyDataSetChanged();
-        var today = Calendar.getInstance();
-        activityModel.getGoalsLessThanOrEqualToDay(today.get(Calendar.YEAR), (today.get(Calendar.MONTH) + 1), today.get(Calendar.DAY_OF_MONTH))
-                .observe(goal -> {
-                    if (goal == null) return;
-                    System.out.println("My size is " + goal.size());
-                    adapter.clear();
-                    adapter.addAll(new ArrayList<>(goal));
-                    adapter.notifyDataSetChanged();
-                });
+        
     }
 
     /**
