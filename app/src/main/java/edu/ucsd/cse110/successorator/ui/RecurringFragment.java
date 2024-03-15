@@ -132,6 +132,12 @@ public class RecurringFragment extends Fragment {
         });
     }
 
+    // TODO: Modify this in long press
+    public void addGoalListeners () {
+        // Listener for taps/clicks on each list item
+
+    }
+
     public void createSpinner(){
         /*
         https://developer.android.com/develop/ui/views/components/spinner#java

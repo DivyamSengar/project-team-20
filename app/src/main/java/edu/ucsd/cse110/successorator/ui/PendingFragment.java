@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -65,7 +66,6 @@ public class PendingFragment extends Fragment {
             adapter.addAll(new ArrayList<>(goal));
             adapter.notifyDataSetChanged();
         });
-
 
     }
 
@@ -147,6 +147,7 @@ public class PendingFragment extends Fragment {
         });
     }
 
+
     public void removeGoalComplete(Goal goal) {
         activityModel.removeGoalIncomplete(goal.id());
         adapter.remove(goal);
@@ -179,6 +180,10 @@ public class PendingFragment extends Fragment {
         if (mainFragment != null) {
             mainFragment.addGoalIncomplete(goal);
         }
+
+    // TODO: Modify this in long press
+    public void addGoalListeners() {
+
     }
 
     private void moveToTomorrow(Goal goal) {
