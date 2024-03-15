@@ -1,4 +1,4 @@
-//package edu.ucsd.cse110.successorator.lib.data;
+package edu.ucsd.cse110.successorator.lib.data;
 //import edu.ucsd.cse110.successorator.lib.domain.Goal;
 //import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 //
