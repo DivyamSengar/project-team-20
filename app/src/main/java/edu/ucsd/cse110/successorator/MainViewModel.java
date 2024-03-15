@@ -903,6 +903,7 @@ public class MainViewModel extends ViewModel {
                 int pairID = goal.getGoalPair();
                 var subjListOfGoalPairs = getGoalPairValyes(pairID);
                 if (subjListOfGoalPairs.getValue() == null){
+                    System.out.println("it happened ono");
                     return;
                 }
                 subjListOfGoalPairs.getValue().forEach(goal1 -> {
@@ -993,11 +994,14 @@ public class MainViewModel extends ViewModel {
     }
 
     public int getMaxGoalPair(){
-        return goalRepositoryRecurring.getMaxGoalPair();
+        int max1 =  goalRepositoryComplete.getMaxGoalPair();
+        int max2 = goalRepositoryIncomplete.getMaxGoalPair();
+        return Math.max(max1, max2);
     }
     Subject<List<Goal>> getGoalPairValyes(int goalPair){
         var subj1 = goalRepositoryIncomplete.getGoalPairVals(goalPair);
         var subj2 = goalRepositoryComplete.getGoalPairVals(goalPair);
+
         if (subj1.getValue() != null && subj2.getValue() != null) {
             subj1.getValue().addAll(subj2.getValue());
             return subj1;
@@ -1010,6 +1014,7 @@ public class MainViewModel extends ViewModel {
             return subj1;
         }
         else {
+            System.out.println("ran ???? manoon");
             return subj1;
         }
     }
