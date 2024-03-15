@@ -180,6 +180,7 @@ public class PendingFragment extends Fragment {
         if (mainFragment != null) {
             mainFragment.addGoalIncomplete(goal);
         }
+    }
 
     private void moveToTomorrow(Goal goal) {
         goal.setDate(LocalDateTime.now().getMinute(),
