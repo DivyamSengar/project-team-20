@@ -156,6 +156,10 @@ public class CreateTomorrowDialogFragment extends DialogFragment {
                     if (recurring != 0){
                         activityModel.appendToRecurringList(newGoal);
                     }
+                    if (recurring == 1){
+                        newGoal.setDate(date[0], date[1], date[2]+1, date[3], date[4]);
+                        activityModel.appendIncomplete(newGoal);
+                    }
                     dismiss();
                 }
             }

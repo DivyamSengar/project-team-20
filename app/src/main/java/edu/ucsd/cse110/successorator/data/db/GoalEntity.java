@@ -22,16 +22,16 @@ public class GoalEntity {
     public boolean isComplete;
 
     @ColumnInfo(name = "sort_order")
-            public int sort_order;
+    public int sort_order;
 
     // recurring: 0 if not and then rest of fields referring to different recurring categories
     // pending: whether pending or not
     // date: the date to distinguish today/tomorrow and better distinguish recurrent nature
     // for monthly, figure out what the first day of the month was and then determine it
     @ColumnInfo(name = "pending")
-            public boolean pending;
+    public boolean pending;
     @ColumnInfo(name = "recurring")
-            public int recurring;
+    public int recurring;
     // use an int array to represent the distinct counts of minutes, hours, day, month, and year
     @ColumnInfo(name = "hour")
     public int hour;
@@ -52,7 +52,7 @@ public class GoalEntity {
     public int context;
 
     @ColumnInfo(name = "goalPair")
-            public int goalPair;
+    public int goalPair;
 
     /**
      * GoalEntity constructor to initialize its fields

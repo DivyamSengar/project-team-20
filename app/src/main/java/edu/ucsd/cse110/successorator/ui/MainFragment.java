@@ -1,15 +1,20 @@
 package edu.ucsd.cse110.successorator.ui;
+
+import android.graphics.Color;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,12 +26,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentMainBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
+
 /**
  * MainFragment is the main fragment for the application
  */
@@ -34,15 +41,21 @@ public class MainFragment extends Fragment implements FocusModeListener {
     private MainViewModel activityModel;
     private FragmentMainBinding view;
     private MainFragmentAdapter adapter;
+
+
+
     public int getThisContext() {
         return context;
     }
+
     private int context = 0;
+
     /**
      * Required empty public constructor
      */
     public MainFragment() {
     }
+
     /**
      * Creates a new instance of MainFragment
      *
@@ -54,6 +67,7 @@ public class MainFragment extends Fragment implements FocusModeListener {
         fragment.setArguments(args);
         return fragment;
     }
+
     /**
      * Method that runs when MainFragment is created
      *
@@ -62,14 +76,19 @@ public class MainFragment extends Fragment implements FocusModeListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // Initialize the model
         var modelOwner = requireActivity();
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
         var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
+
         // Initialize the adapter
         this.adapter = new MainFragmentAdapter(requireContext(), List.of());
+
+
         // Observe goals, adapter fills the ListView
+
         /* UDPATE! Need to fix this! We want each fragment to have its own view, so for example,
         today view should call getGoalsLessThanOrEqualToDay() with today's date as argument,
         tomorrow view should call getGoalsbyDay on tomorrow's date, and recurring and pending should call
@@ -92,7 +111,9 @@ public class MainFragment extends Fragment implements FocusModeListener {
                     adapter.addAll(new ArrayList<>(goal));
                     adapter.notifyDataSetChanged();
                 });
+
     }
+
     /**
      * Method that runs when the View is created
      *
@@ -106,12 +127,17 @@ public class MainFragment extends Fragment implements FocusModeListener {
                              @NonNull ViewGroup container,
                              @NonNull Bundle savedInstanceState) {
         this.view = FragmentMainBinding.inflate(inflater, container, false);
+
         // Set the list's adapter
         view.listGoals.setAdapter(adapter);
+
         showTopBar();
-        activityModel.removeContext();
-        activityModel.setContext(0);
-        activityModel.rollover();
+//        activityModel.removeContext();
+//        activityModel.setContext(0);
+        int[] prevTime = activityModel.getFieldsForLastDate();
+        activityModel.rollover(activityModel.getTodayTime(), LocalDateTime.of(prevTime[0],
+                prevTime[1], prevTime[2], prevTime[3], prevTime[4]));
+
         checkGoalsIsEmpty();
         addPlusButtonListener();
         addFocusModeListener();
@@ -119,33 +145,43 @@ public class MainFragment extends Fragment implements FocusModeListener {
         createSpinner();
         createDeveloperButton();
         onFocusModeSelected(0);
+        updateGoals();
+
         // Inflate the layout for this fragment
         return view.getRoot();
     }
+
     @Override
     public void onResume(){
         System.out.println("resumed??");
         super.onResume();
         // Show the current date at the top
         LocalDateTime todayTime = activityModel.getTodayTime();
-        System.out.println("so now what is the time?" + todayTime);
-        activityModel.updateTodayTime(todayTime);
+//        System.out.println("so now what is the time?" + todayTime);
+//        activityModel.updateTodayTime(todayTime);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
         String formattedDate = formatter.format(todayTime);
 //        LocalDateTime update = LocalDateTime.from((TemporalAccessor) date);
         String currentDate = "Today, " + formattedDate;
+
         view.topText.setText(currentDate);
-        activityModel.rollover();
+        int[] prevTime = activityModel.getFieldsForLastDate();
+        activityModel.rollover(todayTime, LocalDateTime.of(prevTime[0],
+                prevTime[1], prevTime[2], prevTime[3], prevTime[4]));
         updateGoals();
     }
+
     public void showTopBar(){
         // Show the current date at the top
         LocalDateTime todayTime = activityModel.getTodayTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
         String formattedDate = formatter.format(todayTime);
+
         String currentDate = "Today, " + formattedDate;
+
         view.topText.setText(currentDate);
     }
+
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
@@ -153,24 +189,37 @@ public class MainFragment extends Fragment implements FocusModeListener {
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
     }
+
     public void addFocusModeListener(){
         view.hamburgerMenu.setOnClickListener(v -> {
             var dialogFragment = FocusModeDialogFragment.newInstance(this);
             System.out.println(dialogFragment.getFocusContext() + "printed here");
             dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
+            updateGoals();
         });
+
     }
-
-
-
-
-
 
     @Override
     public void onFocusModeSelected(int context) {
         this.context = context;
         updateGoals();
+        if (context == 0) {
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#D6D7D7"));
+        } else if (context == 1){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#FFFBB9"));
+        }
+        else if (context == 2){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#92E3FD"));
+        }
+        else if (context == 3){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#EFCAFF"));
+        }
+        else if (context == 4){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#DFEED4"));
+        }
     }
+    // modify update Goals so that it properly divides into complete/incomplete sections?
     public void updateGoals() {
         LocalDateTime current = activityModel.getTodayTime();
         Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
@@ -192,7 +241,9 @@ public class MainFragment extends Fragment implements FocusModeListener {
                     adapter.notifyDataSetChanged();
                 });
     }
-    //        view.hamburgerMenu.onScreenStateChanged(v -> {
+
+
+//        view.hamburgerMenu.onScreenStateChanged(v -> {
 //            LocalDateTime current = activityModel.getTodayTime();
 //            Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
 //            Calendar today = Calendar.getInstance();
@@ -213,6 +264,10 @@ public class MainFragment extends Fragment implements FocusModeListener {
 //                    });
 //            view.hamburgerMenu.onWindowFocusChanged();
 //        });
+
+
+
+
     public void checkGoalsIsEmpty(){
         // Observer to check whether or not goals is empty to display the ListView or TextView
         activityModel.isGoalsEmpty().observe(isGoalsEmpty -> {
@@ -224,17 +279,21 @@ public class MainFragment extends Fragment implements FocusModeListener {
                 view.emptyGoals.setVisibility(View.INVISIBLE);
                 view.listGoals.setVisibility(View.VISIBLE);
             }
+
         });
     }
+
     public void addGoalListeners (){
         // Listener for taps/clicks on each list item
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
+            if (adapter.getCount() == 0) return;
             Goal goal = adapter.getItem(position);
             assert goal != null;
             // If the tapped goal is incomplete, make it complete
             if (!goal.isComplete()){
                 goal.makeComplete();
                 activityModel.removeGoalIncomplete(goal.id());
+                updateGoals();
                 activityModel.appendComplete(goal);
                 updateGoals();
             }
@@ -242,21 +301,27 @@ public class MainFragment extends Fragment implements FocusModeListener {
             else{
                 goal.makeInComplete();
                 activityModel.removeGoalComplete(goal.id());
+                updateGoals();
                 activityModel.prependIncomplete(goal);
+//                updateGoals();
                 updateGoals();
             }
+//            updateGoals();
         });
     }
+
     public void addGoalIncomplete(Goal goal) {
         activityModel.appendIncomplete(goal);
         adapter.addAll(goal);
         adapter.notifyDataSetChanged();
     }
+
     public void addGoalComplete(Goal goal) {
         activityModel.appendComplete(goal);
         adapter.addAll(goal);
         adapter.notifyDataSetChanged();
     }
+
     public void createSpinner(){
         /*
         https://developer.android.com/develop/ui/views/components/spinner#java
@@ -267,12 +332,15 @@ public class MainFragment extends Fragment implements FocusModeListener {
          */
         ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
         dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
 //        dropdownAdapter.add("");
         dropdownAdapter.add("Today");
         dropdownAdapter.add("Tomorrow");
         dropdownAdapter.add("Pending");
         dropdownAdapter.add("Recurring");
+
         view.dropdown.setAdapter(dropdownAdapter);
+
         view.dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
@@ -299,6 +367,7 @@ public class MainFragment extends Fragment implements FocusModeListener {
                             .replace(R.id.fragment_container, RecurringFragment.newInstance())
                             .commit();
                 }
+
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -306,6 +375,7 @@ public class MainFragment extends Fragment implements FocusModeListener {
             }
         });
     }
+
     public void createDeveloperButton(){
         // Show the current date at the top
 //        SimpleDateFormat date = new SimpleDateFormat("E MM/dd", Locale.getDefault());
@@ -315,6 +385,7 @@ public class MainFragment extends Fragment implements FocusModeListener {
 //            Calendar c = Calendar.getInstance();
 //            Calendar c2 = Calendar.getInstance();
 //            LocalDateTime todayTime = activityModel.getTodayTime();
+
             @Override
             public void onClick(View v){
 //                LocalDateTime todayTime = activityModel.getTodayTime();
@@ -322,22 +393,40 @@ public class MainFragment extends Fragment implements FocusModeListener {
 //                c.setTimeInMillis(instant.toEpochMilli());
 //                c2.setTimeInMillis(instant.toEpochMilli());
 //                String formattedDate = formatter.format(c);
+
 //                c.add(Calendar.DATE, 1);
 //                c2.add(Calendar.DATE, 1);
 //                if (c.equals(c2)){
 //                    c2.add(Calendar.DATE, 1);
 //                }
+                LocalDateTime previous = activityModel.getTodayTime();
                 activityModel.updateTodayTime(activityModel.getTodayTime().plusDays(1));
                 LocalDateTime current = activityModel.getTodayTime();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
                 String formattedDate = formatter.format(current);
+
+
+
                 // CALL ROLLOVER IN ALL ONRESUME METHODS AND IN ALL OTHER APPLICABLE METHODS (ON CREATE?)
                 String currentDate =  "Today, " + formattedDate;
 //                String nextDate = date.format(c2.getTime());
+
                 view.topText.setText(currentDate);
-                activityModel.rollover();
+
+                activityModel.rollover(current, previous);
                 updateGoals();
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, MainFragment.newInstance())
+                        .commit();
+//                var x = new Goal(100, "", false, 0,
+//                        false, 0, 0, 0, 0, 0, 0, 0, 0);
+//                activityModel.appendIncomplete(x);
+//                activityModel.appendIncomplete(x);
+//                activityModel.removeGoalIncomplete(100);
+//                activityModel.removeGoalComplete(100);
             }
         });
     }
 }
+

@@ -3,7 +3,9 @@ package edu.ucsd.cse110.successorator.lib.domain;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
 import java.util.Objects;
@@ -140,16 +142,6 @@ public class Goal implements Serializable {
         this.year=year;
     }
 
-    public Goal withId(int id) {
-        return new Goal(id, this.text, this.isComplete, this.sortOrder, this.pending, this.recurring,
-                this.minutes, this.hour, this.day, this.month, this.year, this.context, this.goalPair);
-    }
-
-    public Goal withSortOrder(int sortOrder) {
-        return new Goal(this.id, this.text, this.isComplete, sortOrder, this.pending, this.recurring,
-                this.minutes, this.hour, this.day, this.month, this.year, this.context, this.goalPair);
-    }
-
     /* returns the boundary/recurring date if it is a recurring goal,
     else it returns the same date to indicate that it is a one-time goal
     */
@@ -164,7 +156,7 @@ public class Goal implements Serializable {
              recurring days of the week, not just going to the same date in the next month
             */
         } else if(this.getRecurring() == 3) {
-            return goal_Time.plusMonths(1);
+            return getNextDayOfWeekInMonth(goal_Time);
         } else if(this.getRecurring() == 4) {
             return goal_Time.plusYears(1);
         }
@@ -173,28 +165,63 @@ public class Goal implements Serializable {
     /*updates  recurring goals to their next recurring date
 
      */
-    public Goal updateRecurring(){
+    public Goal updateRecurring(LocalDateTime currentTime, LocalDateTime previousTime){
         LocalDateTime goal_Time = LocalDateTime.of(this.getYear(),
                 this.getMonth(), this.getDay(), this.getHour(), this.getMinutes());
+
+        Period period = Period.between(previousTime.toLocalDate(), currentTime.toLocalDate());
+        LocalDate baseDate = goal_Time.toLocalDate();
+
+        // Add the period to the LocalDate
+        LocalDate newDate = baseDate.plus(period);
+
+        // Create a new LocalDateTime with the new date and original time
+        LocalDateTime NewDateTime = LocalDateTime.of(newDate, goal_Time.toLocalTime());
+
         if(this.getRecurring() == 1){
-            goal_Time = goal_Time.plusDays(1);
-        } else if(this.getRecurring() == 2) {
-            goal_Time = goal_Time.plusWeeks(1);
+            //
+            goal_Time = NewDateTime;
+        }
+        NewDateTime = currentTime;
+        if(this.getRecurring() == 2) {
+            if (NewDateTime.isBefore(this.getBoundaryRecurringDate()) ||
+                    NewDateTime.isEqual(this.getBoundaryRecurringDate())) goal_Time = goal_Time.plusWeeks(1);
+            else if (NewDateTime.isAfter(goal_Time)) {
+                while(goal_Time.plusWeeks(1).isBefore(NewDateTime)
+                        || goal_Time.plusWeeks(1).isEqual(NewDateTime)){
+                    goal_Time = goal_Time.plusWeeks(1);
+                }
+            }
             /* this monthly is likely incorrect given that the monthly option is supposed to be for
              recurring days of the week, not just going to the same date in the next month
             */
         } else if(this.getRecurring() == 3) {
-            goal_Time = getNextDayOfWeekInMonth(goal_Time);
+            if (NewDateTime.isBefore(this.getBoundaryRecurringDate()) ||
+                    NewDateTime.isEqual(this.getBoundaryRecurringDate()) ) goal_Time = this.getNextDayOfWeekInMonth(goal_Time);
+            else if (NewDateTime.isAfter(goal_Time)) {
+                while(this.getNextDayOfWeekInMonth(goal_Time).isBefore(NewDateTime)
+                        || this.getNextDayOfWeekInMonth(goal_Time).isEqual(NewDateTime)){
+                    goal_Time = this.getNextDayOfWeekInMonth(goal_Time);
+                }
+            }
 //            goal_Time = goal_Time.plusMonths(1);
         } else if(this.getRecurring() == 4) {
-            goal_Time = goal_Time.plusYears(1);
+            if (NewDateTime.isBefore(this.getBoundaryRecurringDate()) ||
+                    NewDateTime.isEqual(this.getBoundaryRecurringDate())) goal_Time = goal_Time.plusYears(1);
+            else if (NewDateTime.isAfter(goal_Time)) {
+                while(goal_Time.plusYears(1).isBefore(NewDateTime)
+                        || goal_Time.plusYears(1).isEqual(NewDateTime)){
+                    goal_Time = goal_Time.plusYears(1);
+                }
+            }
+
         }
         this.setDate(goal_Time.getMinute(), goal_Time.getHour(), goal_Time.getDayOfMonth(),
                 goal_Time.getMonthValue(), goal_Time.getYear());
         return this;
     }
 
-    static LocalDateTime getNextDayOfWeekInMonth(LocalDateTime current) {
+    public static LocalDateTime getNextDayOfWeekInMonth(LocalDateTime current) {
         int currentOrdinal = (current.getDayOfMonth() - 1) / 7 + 1; // Calculate current ordinal position
         LocalDateTime temp = current.plusWeeks(1);
         int tempOrdinal = (temp.getDayOfMonth()-1)/7 + 1;

@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.successorator.timedata.db;
 
 import java.time.LocalDateTime;
+
 import edu.ucsd.cse110.successorator.lib.domain.TimeKeeper;
 
 /**
@@ -44,9 +45,5 @@ public class RoomTimeKeeper implements TimeKeeper {
      */
     public void removeDateTime(){
         timeDao.deleteTime();
-    }
-
-    public void appendTime(LocalDateTime dateTime){
-        timeDao.insertTime(TimeEntity.fromLocalDateTime(dateTime));
     }
 }

@@ -103,11 +103,16 @@ public class MainViewModel extends ViewModel {
             else {
                 orderedGoals = newGoals.stream()
                         .sorted(Comparator.comparingInt(Goal::getYear).thenComparing(Goal::getMonth)
-                        .thenComparing(Goal::getDay).thenComparing(Goal::getHour).thenComparing(Goal::getMinutes))
+                                .thenComparing(Goal::getDay).thenComparing(Goal::getHour).thenComparing(Goal::getMinutes))
                         .collect(Collectors.toList());
-            }
-            for (var goal : orderedGoals){
-                System.out.println(goal.getText() + goal.getMinutes() + goal.getHour());
+                ArrayList<Goal> copyList = new ArrayList<>();
+                copyList.addAll(orderedGoals);
+                int con = getCurrentContextValue();
+                if (con != 0){
+                    for (var otherGoal : copyList){
+                        if (otherGoal.getContext() != con )orderedGoals.remove(otherGoal);
+                    }
+                }
             }
             recurringGoals.setValue(orderedGoals);
         });
@@ -120,7 +125,16 @@ public class MainViewModel extends ViewModel {
             else if (newGoals.size() == 0);
             else {
                 orderedGoals = newGoals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
                         .collect(Collectors.toList());
+                ArrayList<Goal> copyList = new ArrayList<>();
+                copyList.addAll(orderedGoals);
+                int con = getCurrentContextValue();
+                if (con != 0){
+                    for (var otherGoal : copyList){
+                        if (otherGoal.getContext() != con )orderedGoals.remove(otherGoal);
+                    }
+                }
             }
 
             goalsCompleted.setValue(orderedGoals);
@@ -136,6 +150,14 @@ public class MainViewModel extends ViewModel {
                 orderedGoals = newGoals.stream()
                         .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
+                ArrayList<Goal> copyList = new ArrayList<>();
+                copyList.addAll(orderedGoals);
+                int con = getCurrentContextValue();
+                if (con != 0){
+                    for (var otherGoal : copyList){
+                        if (otherGoal.getContext() != con )orderedGoals.remove(otherGoal);
+                    }
+                }
             }
             goalsIncompleted.setValue(orderedGoals);
         });
@@ -202,9 +224,10 @@ public class MainViewModel extends ViewModel {
      *
      * For Rollover/in general, we show date less than or equal to today for the today view (based on the rollover logic above)
      */
-    public void rollover() {
+    public void rollover(LocalDateTime currentTime, LocalDateTime previousTime) {
+        System.out.println("Rollover starts here, blud");
         // Current time and time that the app was last opened
-        LocalDateTime currentTime = getTodayTime();
+        currentTime = getTodayTime();
         int lastOpenedHour = this.getFieldsForLastDate()[3];
         int lastOpenedMinute = this.getFieldsForLastDate()[4];
         int lastDay = this.getFieldsForLastDate()[2];
@@ -223,49 +246,64 @@ public class MainViewModel extends ViewModel {
         // If current time is at least 24 hours ahead, perform completed goals deletion
         var minus24 = currentTime.minusHours(24);
         if(minus24.isAfter(previous)){
-            this.deleteCompleted();
-            IncompleteRecurrentRollover();
+            this.deleteCompleted(currentTime, previousTime);
+            IncompleteRecurrentRollover(currentTime, previousTime);
+            System.out.println("Actual rollover ran");
         }
         else if (minus24.isEqual(previous)){
-            this.deleteCompleted();
-            IncompleteRecurrentRollover();
+            this.deleteCompleted(currentTime, previousTime);
+            IncompleteRecurrentRollover(currentTime, previousTime);
+            System.out.println("Actual rollover ran");
         }
         else if (currentTime.isBefore(previous));
         else if (currDay > lastDay) {
             if ((lastDay + 1) < currDay) {
-                this.deleteCompleted();
-                IncompleteRecurrentRollover();
+                this.deleteCompleted(currentTime, previousTime);
+                IncompleteRecurrentRollover(currentTime, previousTime);
+                System.out.println("Actual rollover ran");
             } else {
                 if (hour >= 2) {
-                    this.deleteCompleted();
-                    IncompleteRecurrentRollover();
+                    this.deleteCompleted(currentTime, previousTime);
+                    IncompleteRecurrentRollover(currentTime, previousTime);
+                    System.out.println("Actual rollover ran");
                 }
             }
         }
         else {
             if ((hour >= 2)
                     && (lastOpenedHour <= 2)) {
-                this.deleteCompleted();
-                IncompleteRecurrentRollover();
+                this.deleteCompleted(currentTime, previousTime);
+                IncompleteRecurrentRollover(currentTime, previousTime);
+                System.out.println("Actual rollover ran");
             }
         }
         this.deleteTime();
         this.appendTime(currentTime);
     }
     // updates dates of boundary recurring incomplete goals if necessary
-    public void IncompleteRecurrentRollover(){
+    public void IncompleteRecurrentRollover(LocalDateTime currentTime, LocalDateTime previousTime){
         var list = getRecurringGoalsIncomplete();
-        if (list.getValue() == null || list.getValue().isEmpty()){
+        if (list == null || list.isEmpty()){
+            System.out.println("incomplete recurring list empty");
             return;
         }
         LocalDateTime today = getTodayTime();
-        for (var goal : list.getValue()){
-            if (today.isBefore(goal.getBoundaryRecurringDate())){
-
+        for (var goal : list){
+            System.out.println("This is the incomplete recurring goal" + goal.getText());
+            if (goal.getRecurring() == 1){
+                continue;
+//                var pairedList = goalRepositoryIncomplete.getGoalPairVals(goal.getGoalPair());
+//                if
+//                goalRepositoryIncomplete.remove(goal.id());
+//                goal.updateRecurring();
+//                goalRepositoryIncomplete.append(goal);
+            }
+            else if (today.isBefore(goal.getBoundaryRecurringDate())){
             }
             else {
-                goal.updateRecurring();
+                System.out.println("incomplete recurring goal should have been updated");
                 goalRepositoryIncomplete.remove(goal.id());
+                goal.updateRecurring(currentTime, previousTime);
                 goalRepositoryIncomplete.append(goal);
             }
         }
@@ -293,6 +331,14 @@ public class MainViewModel extends ViewModel {
                 goalList = goals.stream()
                         .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
+                ArrayList<Goal> copyList = new ArrayList<>();
+                copyList.addAll(goalList);
+                int con = getCurrentContextValue();
+                if (con != 0){
+                    for (var otherGoal : copyList){
+                        if (otherGoal.getContext() != con )goalList.remove(otherGoal);
+                    }
+                }
             }
             incomplete.setValue(goalList);
         });
@@ -309,11 +355,11 @@ public class MainViewModel extends ViewModel {
         return pendingGoals;
     }
 
-    public Subject<List<Goal>> getRecurringGoalsIncomplete() {
+    public List<Goal> getRecurringGoalsIncomplete() {
         return goalRepositoryIncomplete.getRecurringGoals();
     }
 
-    public Subject<List<Goal>> getRecurringGoalsComplete() {
+    public List<Goal> getRecurringGoalsComplete() {
         return goalRepositoryComplete.getRecurringGoals();
     }
 
@@ -332,6 +378,14 @@ public class MainViewModel extends ViewModel {
                 goalList = goals.stream()
                         .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
+                ArrayList<Goal> copyList = new ArrayList<>();
+                copyList.addAll(goalList);
+                int con = getCurrentContextValue();
+                if (con != 0){
+                    for (var otherGoal : copyList){
+                        if (otherGoal.getContext() != con )goalList.remove(otherGoal);
+                    }
+                }
             }
 //            System.out.println("Incomplete size" + goalList.size());
             incomplete.setValue(goalList);
@@ -342,8 +396,17 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+//                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
+                ArrayList<Goal> copyList = new ArrayList<>();
+                copyList.addAll(goalList);
+                int con = getCurrentContextValue();
+                if (con != 0){
+                    for (var otherGoal : copyList){
+                        if (otherGoal.getContext() != con )goalList.remove(otherGoal);
+                    }
+                }
             }
 //            System.out.println("Incomplete size" + goalList.size());
             complete.setValue(goalList);
@@ -380,63 +443,63 @@ public class MainViewModel extends ViewModel {
         return goalsForDay;
 
     }
-    public Subject<List<Goal>> getRecurringGoals(){
-        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
-        MutableSubject<List<Goal>> recurring = new SimpleSubject<>();
-
-        goalRepositoryIncomplete.getRecurringGoals().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-            incomplete.setValue(goalList);
-//            System.out.println("incomp recurring size" + incomplete.getValue().size());
-        });
-
-        goalRepositoryComplete.getRecurringGoals().observe(goals -> {
-            List<Goal> goalList = List.of();
-            if (goals == null){}
-            else if (goals.size() == 0){} else {
-                goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
-                        .collect(Collectors.toList());
-            }
-//            System.out.println("Complete size" + goalList.size());
-            complete.setValue(goalList);
-        });
-
-        incomplete.observe(goals -> {
-            if (goals == null) return;
-
-            if (complete.getValue() == null){
-                complete.setValue(List.of());
-            }
-
-            recurring.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
-                    .collect(Collectors.toList())
-            );
-        });
-
-        complete.observe(goals -> {
-            if (goals == null) return;
-
-            if (incomplete.getValue() == null){
-                incomplete.setValue(List.of());
-            }
-
-            recurring.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
-                    .collect(Collectors.toList())
-            );
-
-//            System.out.println("Recurring size" + recurring.getValue().size());
-        });
-
-        return recurring;
-    }
+//    public Subject<List<Goal>> getRecurringGoals(){
+//        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+//        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+//        MutableSubject<List<Goal>> recurring = new SimpleSubject<>();
+//
+//        goalRepositoryIncomplete.getRecurringGoals().observe(goals -> {
+//            List<Goal> goalList = List.of();
+//            if (goals == null){}
+//            else if (goals.size() == 0){} else {
+//                goalList = goals.stream()
+//                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
+//                        .collect(Collectors.toList());
+//            }
+//            incomplete.setValue(goalList);
+////            System.out.println("incomp recurring size" + incomplete.getValue().size());
+//        });
+//
+//        goalRepositoryComplete.getRecurringGoals().observe(goals -> {
+//            List<Goal> goalList = List.of();
+//            if (goals == null){}
+//            else if (goals.size() == 0){} else {
+//                goalList = goals.stream()
+//                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
+//                        .collect(Collectors.toList());
+//            }
+////            System.out.println("Complete size" + goalList.size());
+//            complete.setValue(goalList);
+//        });
+//
+//        incomplete.observe(goals -> {
+//            if (goals == null) return;
+//
+//            if (complete.getValue() == null){
+//                complete.setValue(List.of());
+//            }
+//
+//            recurring.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+//                    .collect(Collectors.toList())
+//            );
+//        });
+//
+//        complete.observe(goals -> {
+//            if (goals == null) return;
+//
+//            if (incomplete.getValue() == null){
+//                incomplete.setValue(List.of());
+//            }
+//
+//            recurring.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+//                    .collect(Collectors.toList())
+//            );
+//
+////            System.out.println("Recurring size" + recurring.getValue().size());
+//        });
+//
+//        return recurring;
+//    }
 
     public Subject<List<Goal>> getGoalsLessThanOrEqualToDay(int year, int month, int day) {
 //        var first = goalRepositoryIncomplete.getGoalsLessThanOrEqualToDay(year, month, day);
@@ -453,6 +516,14 @@ public class MainViewModel extends ViewModel {
                 goalList = goals.stream()
                         .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
+                ArrayList<Goal> copyList = new ArrayList<>();
+                copyList.addAll(goalList);
+                int con = getCurrentContextValue();
+                if (con != 0){
+                    for (var otherGoal : copyList){
+                        if (otherGoal.getContext() != con )goalList.remove(otherGoal);
+                    }
+                }
             }
 //            System.out.println("Incomplete size" + goalList.size());
             incomplete.setValue(goalList);
@@ -463,8 +534,17 @@ public class MainViewModel extends ViewModel {
             if (goals == null){}
             else if (goals.size() == 0){} else {
                 goalList = goals.stream()
-                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+//                        .sorted(Comparator.comparingInt(Goal::getContext).thenComparing(Goal::sortOrder))
                         .collect(Collectors.toList());
+                ArrayList<Goal> copyList = new ArrayList<>();
+                copyList.addAll(goalList);
+                int con = getCurrentContextValue();
+                if (con != 0){
+                    for (var otherGoal : copyList){
+                        if (otherGoal.getContext() != con )goalList.remove(otherGoal);
+                    }
+                }
             }
 //            System.out.println("Complete size" + goalList.size());
             complete.setValue(goalList);
@@ -525,6 +605,246 @@ public class MainViewModel extends ViewModel {
     }
 
 
+    public Subject<List<Goal>> getContextHome() {
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> contextHome = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getContextHome().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getContextHome().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            contextHome.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(contextHome.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            contextHome.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(contextHome.getValue().size());
+        });
+
+        return contextHome;
+    }
+
+    public Subject<List<Goal>> getContextWork() {
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> contextWork = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getContextWork().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getContextWork().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            contextWork.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(contextWork.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            contextWork.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(contextWork.getValue().size());
+        });
+
+        return contextWork;
+    }
+
+    public Subject<List<Goal>> getContextSchool() {
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> contextSchool = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getContextSchool().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getContextSchool().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            contextSchool.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(contextSchool.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            contextSchool.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(contextSchool.getValue().size());
+        });
+
+        return contextSchool;
+    }
+
+    public Subject<List<Goal>> getContextErrands() {
+        MutableSubject<List<Goal>> incomplete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> complete = new SimpleSubject<>();
+        MutableSubject<List<Goal>> contextErrands = new SimpleSubject<>();
+
+        goalRepositoryIncomplete.getContextErrands().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Incomplete size" + goalList.size());
+            incomplete.setValue(goalList);
+        });
+
+        goalRepositoryComplete.getContextErrands().observe(goals -> {
+            List<Goal> goalList = List.of();
+            if (goals == null){}
+            else if (goals.size() == 0){} else {
+                goalList = goals.stream()
+                        .sorted(Comparator.comparingInt(Goal::sortOrder))
+                        .collect(Collectors.toList());
+            }
+//            System.out.println("Complete size" + goalList.size());
+            complete.setValue(goalList);
+        });
+
+        incomplete.observe(goals -> {
+            if (goals == null) return;
+
+            if (complete.getValue() == null){
+                complete.setValue(List.of());
+            }
+
+            contextErrands.setValue(Stream.concat(goals.stream(), complete.getValue().stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(contextErrands.getValue().size());
+        });
+
+        complete.observe(goals -> {
+            if (goals == null) return;
+
+            if (incomplete.getValue() == null){
+                incomplete.setValue(List.of());
+            }
+
+            contextErrands.setValue(Stream.concat(incomplete.getValue().stream(), goals.stream())
+                    .collect(Collectors.toList())
+            );
+
+//            System.out.println(contextErrands.getValue().size());
+        });
+
+        return contextErrands;
+    }
+
     /**
      * Checks if list of goals is empty
      *
@@ -546,6 +866,26 @@ public class MainViewModel extends ViewModel {
      */
     public void removeGoalComplete (int id){
         goalRepositoryComplete.remove(id);
+        var arg1 = goalRepositoryComplete.findAll().getValue();
+//        if (arg1 == null) {
+//            this.goalsCompleted.setValue(List.of());
+//            return;
+//        }
+//        var list1 = new ArrayList<>(goalRepositoryComplete.findAll().getValue());
+//        if (getCurrentContextValue() != 0) {
+//            var copy = new ArrayList<Goal>();
+//            for (var goal : list1) {
+//                copy.add(goal);
+//            }
+//            for (var goal : copy) {
+//                if (goal.getContext() != getCurrentContextValue()) list1.remove(goal);
+//            }
+//        }
+//        MutableSubject<List<Goal>> subj1 = new SimpleSubject<List<Goal>>();
+//        subj1.setValue(list1);
+//        this.goalsIncompleted = getContext(subj1, getCurrentContextValue());
+        this.goalsCompleted.setValue(arg1);
+
     }
 
     /**
@@ -555,6 +895,26 @@ public class MainViewModel extends ViewModel {
      */
     public void removeGoalIncomplete (int id){
         goalRepositoryIncomplete.remove(id);
+        var arg1 = goalRepositoryIncomplete.findAll().getValue();
+//        if (arg1 == null) {
+//            this.goalsIncompleted.setValue(List.of());
+//            return;
+//        }
+//        var list1 = new ArrayList<>(goalRepositoryIncomplete.findAll().getValue());
+//        if (getCurrentContextValue() != 0) {
+//            var copy = new ArrayList<Goal>();
+//            for (var goal : list1) {
+//                copy.add(goal);
+//            }
+//            for (var goal : copy) {
+//                if (goal.getContext() != getCurrentContextValue()) list1.remove(goal);
+//            }
+//        }
+//        MutableSubject<List<Goal>> subj1 = new SimpleSubject<List<Goal>>();
+//        subj1.setValue(list1);
+//        this.goalsIncompleted = getContext(subj1, getCurrentContextValue());
+        this.goalsIncompleted.setValue(arg1);
+
     }
 
     /**
@@ -564,7 +924,22 @@ public class MainViewModel extends ViewModel {
      */
     public void appendComplete(Goal goal){
         goalRepositoryComplete.append(goal);
-        this.goalsCompleted.setValue(goalRepositoryComplete.findAll().getValue());
+        var arg1 = goalRepositoryComplete.findAll().getValue();
+//        if (arg1 == null) {
+//            this.goalsCompleted.setValue(List.of());
+//            return;
+//        }
+//        var list1 = new ArrayList<>(goalRepositoryComplete.findAll().getValue());
+//        if (getCurrentContextValue() != 0) {
+//            var copy = new ArrayList<Goal>();
+//            for (var goal2 : list1) {
+//                copy.add(goal2);
+//            }
+//            for (var goal2 : copy) {
+//                if (goal2.getContext() != getCurrentContextValue()) list1.remove(goal2);
+//            }
+//        }
+        this.goalsCompleted.setValue(arg1);
     }
 
     /**
@@ -584,6 +959,23 @@ public class MainViewModel extends ViewModel {
      */
     public void prependIncomplete(Goal goal){
         goalRepositoryIncomplete.prepend(goal);
+        var arg1 = goalRepositoryIncomplete.findAll().getValue();
+//        if (arg1 == null) {
+//            this.goalsIncompleted.setValue(List.of());
+//            return;
+//        }
+//        var list1 = new ArrayList<>(goalRepositoryIncomplete.findAll().getValue());
+//        if (getCurrentContextValue() != 0) {
+//            var copy = new ArrayList<Goal>();
+//            for (var goal2 : list1) {
+//                copy.add(goal2);
+//            }
+//            for (var goal2 : copy) {
+//                if (goal2.getContext() != getCurrentContextValue()) list1.remove(goal2);
+//            }
+//        }
+        this.goalsIncompleted.setValue(arg1);
+
     }
 
     /**
@@ -593,23 +985,109 @@ public class MainViewModel extends ViewModel {
      * NEW ASSUMPTION (IMPORTANT): When doing the rollover, should the recurring goals get added
      * first or should the incompleted goals get rolld over first? The order of the goals changes based on this
      */
-    public void deleteCompleted(){
-        LocalDateTime today = getTodayTime();
+    public void deleteCompleted(LocalDateTime currentTime, LocalDateTime previousTime){
+        LocalDateTime valueToUse = getTodayTime().minusDays(1);
         var recGoals = goalRepositoryComplete.getRecurringGoals();
-        if (recGoals.getValue() == null || recGoals.getValue().isEmpty()){
-            System.out.println("ayo bruh this happened");
-            goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
+        ArrayList<Goal> toAdd = new ArrayList<>();
+        for (var goal : recGoals){
+            System.out.println("this is the rec goal in del completed" + goal.getText());
+            toAdd.add(goal);
+        }
+        var incompleteDailyGoals = goalRepositoryIncomplete.getRecurringGoals();
+        for (var g : incompleteDailyGoals){
+            if (g.getRecurring() == 1) toAdd.add(g);
+        }
+        if (toAdd == null || toAdd.isEmpty()){
+
+            System.out.println("delete completed recurring goals list null");
+            goalRepositoryComplete.deleteCompletedNonDaily(valueToUse.getYear(), valueToUse.getMonthValue(), valueToUse.getDayOfMonth());
+//            System.out.println(recGoals.getValue().toString());
             return;
         }
-        ArrayList<Goal> toAdd = new ArrayList<>();
-        for (var goal : recGoals.getValue()){
-            goal.makeInComplete();
-            toAdd.add(goal.updateRecurring());
-        }
-        goalRepositoryComplete.deleteCompleted(today.getYear(), today.getMonthValue(), today.getDayOfMonth());
+        goalRepositoryComplete.deleteCompletedNonDaily(valueToUse.getYear(), valueToUse.getMonthValue(), valueToUse.getDayOfMonth());
+        goalsCompleted.setValue(goalRepositoryComplete.findAll().getValue());
         for (var goal : toAdd){
-            goalRepositoryIncomplete.append(goal);
+            if (goal.getRecurring() == 1){
+                System.out.println("ran this amount of times");
+                var pairedGoals = getGoalPairValyes(goal.getGoalPair());
+                System.out.println(pairedGoals.size() + "paired goals size");
+                if (pairedGoals.size() <= 1) continue;
+                Goal today = pairedGoals.get(0);
+                Goal tomorrow = pairedGoals.get(1);
+
+                if (today.getDay() > tomorrow.getDay()){
+                    var temp = tomorrow;
+                    tomorrow = today;
+                    today = temp;
+                }
+                if (today.getDay() >= getTodayTime().getDayOfMonth() &&
+                        tomorrow.getDay() >= getTodayTime().getDayOfMonth()){
+                    System.out.println("skipped because greater>=");
+                    continue;
+                }
+                if (today.isComplete() && tomorrow.isComplete()){
+                    System.out.println("This one! Variation 1");
+                    today.updateRecurring(currentTime, previousTime);
+                    goalRepositoryComplete.remove(today.id());
+                    goalRepositoryComplete.append(today);
+                    tomorrow.makeInComplete();
+                    System.out.println(tomorrow.getDay() + tomorrow.getText());
+                    tomorrow.updateRecurring(currentTime, previousTime);
+                    goalRepositoryComplete.remove(tomorrow.id());
+                    appendIncomplete(tomorrow);
+
+                }
+                else if (today.isComplete() && !tomorrow.isComplete()){
+                    System.out.println("This one! Variation 2");
+                    today.makeInComplete();
+                    today.updateRecurring(currentTime, previousTime);
+                    goalRepositoryComplete.remove(today.id());
+                    goalRepositoryIncomplete.append(today);
+                    tomorrow.updateRecurring(currentTime, previousTime);
+                    goalRepositoryIncomplete.remove(tomorrow.id());
+                    goalRepositoryIncomplete.append(tomorrow);;
+                }
+                else if (!today.isComplete() && tomorrow.isComplete()){
+                    System.out.println("This one! Variation 3");
+                    goalRepositoryIncomplete.remove(today.id());
+                    today.makeComplete();
+                    today.updateRecurring(currentTime, previousTime);
+                    goalRepositoryComplete.append(today);
+                    goalRepositoryComplete.remove(tomorrow.id());
+                    tomorrow.makeInComplete();
+                    tomorrow.updateRecurring(currentTime, previousTime);
+                    goalRepositoryIncomplete.append(tomorrow);
+                }
+                else {
+                    System.out.println("This one! Variation 4");
+                    goalRepositoryIncomplete.remove(today.id());
+                    goalRepositoryIncomplete.remove(tomorrow.id());
+                    today.updateRecurring(currentTime, previousTime);
+                    tomorrow.updateRecurring(currentTime, previousTime);
+                    goalRepositoryIncomplete.append(today);
+                    goalRepositoryComplete.append(tomorrow);
+                }
+                // today complete and tomorrow complete -> next today complete and next tomorrow incomplete
+                // today incompltete and tomorrow incomplete -> next today incomplete and next tomorrow incomplete
+                // today incomplete and tomorrow complete -> next today complete and next tomorrow incomplete
+                // today complete and tomorrow incomplete -> next today incomplete and next tomorrow incomplete
+
+
+                // if not equal to this one, then remove it
+                // from complete/incomplete and add it to the other with the updated date
+
+            }
+            else {
+                goal.makeInComplete();
+                goal.updateRecurring(currentTime, previousTime);
+                goalRepositoryIncomplete.append(goal);
+            }
+            System.out.println("added in del completed" + goal.getText());
+//            goalRepositoryIncomplete.append(goal);
+            this.goalsIncompleted.setValue(goalRepositoryIncomplete.findAll().getValue());
+            this.goalsCompleted.setValue(goalRepositoryComplete.findAll().getValue());
         }
+
     }
 
 
@@ -640,19 +1118,34 @@ public class MainViewModel extends ViewModel {
 
 
     public void removeGoalFromRecurringList (int id){
-//        List<Goal> listOfGoalsWithId = (List<Goal>) goalRepositoryRecurring.findListOfGoalsById(id).getValue();
-//        for (var goal : listOfGoalsWithId){
-//            int newSortOrder = goal.sortOrder();
-//            if (goal.isComplete()){
-//                removeGoalComplete(id);
-//                InsertWithSortOrderAndRecurringToRecurringListComplete(goal, newSortOrder, null);
-//            }
-//            if (!goal.isComplete()){
-//                removeGoalIncomplete(id);
-//                InsertWithSortOrderAndRecurringToRecurringListIncomplete(goal, newSortOrder, null);
-//            }
-//        }
-        goalRepositoryRecurring.remove(id);
+        goalRepositoryRecurring.findListOfGoalsById(id).observe(goals -> {
+            if (goals == null) {
+                System.out.println("Null Value");
+                return;
+            }
+            // from the recurring list goal, get its pairID
+            // use the pairID to get its related recurring goals (int hte other views)
+            // when I have them, delete them
+            goals.forEach(goal -> {
+                int pairID = goal.getGoalPair();
+                var subjListOfGoalPairs = getGoalPairValyes(pairID);
+                if (subjListOfGoalPairs == null){
+                    System.out.println("it happened ono again bruh");
+                    return;
+                }
+                subjListOfGoalPairs.forEach(goal1 -> {
+                    int newSortOrder = goal1.sortOrder();
+                    if (goal1.isComplete()) {
+                        removeGoalComplete(goal1.id());
+                        InsertWithSortOrderAndRecurringToRecurringListComplete(goal1, newSortOrder, 0);
+                    } else {
+                        removeGoalIncomplete(goal1.id());
+                        InsertWithSortOrderAndRecurringToRecurringListIncomplete(goal1, newSortOrder, 0);
+                    }
+                });
+            });
+            goalRepositoryRecurring.remove(id);
+        });
     }
 
     public void appendToRecurringList(Goal goal){
@@ -690,10 +1183,10 @@ public class MainViewModel extends ViewModel {
         goalRepositoryIncomplete.InsertWithSortOrder(goal, sortOrder);
     }
 
-    public void InsertWithSortOrderAndRecurringToRecurringListComplete(Goal goal, int sortOrder, String recurring){
+    public void InsertWithSortOrderAndRecurringToRecurringListComplete(Goal goal, int sortOrder, int recurring){
         goalRepositoryComplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
     }
-    public void InsertWithSortOrderAndRecurringToRecurringListIncomplete(Goal goal, int sortOrder, String recurring){
+    public void InsertWithSortOrderAndRecurringToRecurringListIncomplete(Goal goal, int sortOrder, int recurring){
         goalRepositoryIncomplete.InsertWithSortOrderAndRecurring(goal, sortOrder, recurring);
     }
     public LocalDateTime getTodayTime() {
@@ -727,7 +1220,29 @@ public class MainViewModel extends ViewModel {
         return contextRepository.getContext();
     }
 
-    public int getMaxGoalPair() {
-        return contextRepository.getContext();
+    public int getMaxGoalPair(){
+        int max1 =  goalRepositoryComplete.getMaxGoalPair();
+        int max2 = goalRepositoryIncomplete.getMaxGoalPair();
+        return Math.max(max1, max2);
+    }
+    List<Goal> getGoalPairValyes(int goalPair){
+        var subj1 = goalRepositoryIncomplete.getGoalPairVals(goalPair);
+        var subj2 = goalRepositoryComplete.getGoalPairVals(goalPair);
+        System.out.println(subj2.toString() + "getGoalPairValsStrings" +subj1.toString());
+        if (subj1 != null && subj2 != null) {
+            subj1.addAll(subj2);
+            return subj1;
+
+        }
+        else if (subj1== null && subj2 != null){
+            return subj2;
+        }
+        else if (subj1 != null && subj2 == null){
+            return subj1;
+        }
+        else {
+            System.out.println("ran ???? manoon");
+            return List.of();
+        }
     }
 }

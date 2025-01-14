@@ -138,10 +138,10 @@ public class CreateRecurringDialogFragment extends DialogFragment {
 
                         // if user enters a date that is before today, then just dismiss and do nothing
 
-                         if (LocalDateTime.of(date[4], date[3], date[2], date[1], date[0]).isBefore(now)) {
-                             dismiss();
-                             return;
-                         }
+                        if (LocalDateTime.of(date[4], date[3], date[2], date[1], date[0]).isBefore(now)) {
+                            dismiss();
+                            return;
+                        }
                         int goalPair = activityModel.getMaxGoalPair()+1;
                         var newGoal = new Goal(null, input, false, -1, false, recurring,
                                 date[0], date[1], date[2], date[3], date[4], contextOption, goalPair);

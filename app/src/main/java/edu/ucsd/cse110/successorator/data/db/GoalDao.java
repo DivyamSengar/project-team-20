@@ -75,6 +75,13 @@ public interface GoalDao {
     @Query("SELECT MAX(sort_order) FROM Goals")
     int getMaxSortOrder();
 
+
+    @Query("SELECT MAX(goalPair) FROM Goals")
+    int getMaxgoalPair();
+
+
+
+
     /**
      * Delete goals with given id
      * @param id of goal to delete
@@ -85,8 +92,11 @@ public interface GoalDao {
     /**
      * Delete goals with isComplete being true
      */
-    @Query("DELETE from Goals WHERE isComplete = true")
-    void deleteComplete();
+    @Query("DELETE from Goals WHERE isComplete = true AND year <= :year AND month <= :month AND day <= :day" )
+    void deleteComplete(int year, int month, int day);
+
+    @Query("DELETE from Goals WHERE isComplete = true AND recurring != 1 AND year <= :year AND month <= :month AND day <= :day" )
+    void deleteCompleteNonDaily(int year, int month, int day);
 
     @Query("SELECT * from Goals WHERE Pending = true")
     LiveData<List<GoalEntity>> getPending();
@@ -94,39 +104,33 @@ public interface GoalDao {
     @Query("SELECT * from Goals WHERE year = :year AND month = :month AND day = :day")
     LiveData<List<GoalEntity>> getByDay(int year, int month, int day);
 
-    @Query("SELECT * from Goals WHERE year = :year AND month = :month AND day = :day AND isComplete = false")
-    LiveData<List<GoalEntity>> getByDayIncomplete(int year, int month, int day);
-
-    @Query("SELECT * from Goals WHERE year = :year AND month = :month AND day = :day AND isComplete = true")
-    LiveData<List<GoalEntity>> getByDayComplete(int year, int month, int day);
-
     @Query("SELECT * from Goals WHERE year <= :year AND month <= :month AND day <= :day")
     LiveData<List<GoalEntity>> getLessThanOrEqualToDay(int year, int month, int day);
 
-    @Query("SELECT * from Goals WHERE recurring != null")
-    LiveData<List<GoalEntity>> getRecurring();
+    @Query("SELECT * from Goals WHERE recurring != 0")
+    List<GoalEntity> getRecurring();
 
-    @Query("SELECT * from Goals WHERE recurring != null AND isComplete = false")
-    LiveData<List<GoalEntity>> getRecurringIncomplete();
-
-    @Query("SELECT * from Goals WHERE recurring != null AND isComplete = true")
-    LiveData<List<GoalEntity>> getRecurringComplete();
-
-    @Query("SELECT * from Goals WHERE recurring != null AND year = :year AND month = :month AND day = :day")
+    @Query("SELECT * from Goals WHERE recurring != 0 AND year = :year AND month = :month AND day = :day")
     LiveData<List<GoalEntity>> getRecurringByDay(int year, int month, int day);
 
-    @Query("SELECT * from Goals WHERE recurring != null AND year = :year AND month = :month AND day = :day AND isComplete = true")
-    LiveData<List<GoalEntity>> getRecurringByDayComplete(int year, int month, int day);
+    @Query("SELECT * from Goals WHERE context = 1")
+    LiveData<List<GoalEntity>> getContextHome();
 
-    @Query("SELECT COUNT(*) = 0 AS is_empty FROM goals")
-    boolean isGoalsEmpty();
+    @Query("SELECT * from Goals WHERE context = 2")
+    LiveData<List<GoalEntity>> getContextWork();
 
-    @Query("DELETE FROM goals WHERE id = :id;")
-    void removeGoalComplete(int id);
+    @Query("SELECT * from Goals WHERE context = 3")
+    LiveData<List<GoalEntity>> getContextSchool();
 
-    @Query("DELETE FROM goals WHERE id = :id;")
-    void removeGoalIncomplete(int id);
+    @Query("SELECT * from Goals WHERE context = 4")
+    LiveData<List<GoalEntity>> getContextErrands();
 
+    @Query("SELECT * from Goals WHERE goalPair = :goalPair")
+    List<GoalEntity> getGoalPairVals(int goalPair);
+
+
+    @Query("SELECT * FROM Goals WHERE id = :id")
+    LiveData<List<GoalEntity>> findListOfGoalsById(int id);
 
     /**
      * Append a goal to the list
@@ -136,22 +140,6 @@ public interface GoalDao {
     @Transaction
     default int append(GoalEntity goal){
         var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
-                getMaxSortOrder()+1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
-        return Math.toIntExact(insert(newGoalEntity));
-    }
-
-    @Transaction
-    default int appendComplete(GoalEntity goal){
-        var newGoalEntity = new GoalEntity(goal.id, goal.text, true,
-                getMaxSortOrder()+1, goal.pending, goal.recurring,
-                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
-        return Math.toIntExact(insert(newGoalEntity));
-    }
-
-    @Transaction
-    default int appendIncomplete(GoalEntity goal){
-        var newGoalEntity = new GoalEntity(goal.id, goal.text, false,
                 getMaxSortOrder()+1, goal.pending, goal.recurring,
                 goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
@@ -169,4 +157,21 @@ public interface GoalDao {
                 goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
         return Math.toIntExact(insert(newGoalEntity));
     }
+
+    @Transaction
+    default int InsertWithSortOrder(GoalEntity goal, int sortOrder){
+        var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
+                sortOrder, goal.pending, goal.recurring,
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
+        return Math.toIntExact(insert(newGoalEntity));
+    }
+
+    @Transaction
+    default int InsertWithSortOrderAndRecurring(GoalEntity goal, int sortOrder, int recurring){
+        var newGoalEntity = new GoalEntity(goal.id, goal.text, goal.isComplete,
+                sortOrder, goal.pending, recurring,
+                goal.minutes, goal.hour,goal.day, goal.month, goal.year, goal.context, goal.goalPair);
+        return Math.toIntExact(insert(newGoalEntity));
+    }
+
 }

@@ -1,4 +1,6 @@
 package edu.ucsd.cse110.successorator.ui;
+
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -8,16 +10,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.PopupMenu;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentPendingBinding;
@@ -26,28 +31,36 @@ import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.CreateRecurringDialogFragment;
 import edu.ucsd.cse110.successorator.ui.dialog.FocusModeDialogFragment;
+
 public class RecurringFragment extends Fragment implements FocusModeListener {
     private FragmentRecurringBinding view;
     private RecurringFragmentAdapter adapter;
     private MainViewModel activityModel;
+
     private int context = 0;
+
     public RecurringFragment(){
     }
+
     public static RecurringFragment newInstance() {
         Bundle args = new Bundle();
         RecurringFragment fragment = new RecurringFragment();
         fragment.setArguments(args);
         return fragment;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         var modelOwner = requireActivity();
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
         var modelProvider = new ViewModelProvider(modelOwner,modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
+
         // Initialize the adapter
         this.adapter = new RecurringFragmentAdapter(requireContext(), List.of());
+
         activityModel.getContext(activityModel.getGoalsFromRecurringList(),
                 activityModel.getCurrentContextValue()).observe(goal -> {
             if (goal == null) return;
@@ -56,30 +69,40 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
             adapter.notifyDataSetChanged();
         });
     }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @NonNull ViewGroup container,
                              @NonNull Bundle savedInstanceState) {
         this.view = FragmentRecurringBinding.inflate(inflater, container, false);
+
         view.listGoals.setAdapter(adapter);
+
         createSpinner();
         showTopBar();
-        activityModel.rollover();
+        int[] prevTime = activityModel.getFieldsForLastDate();
+        activityModel.rollover(activityModel.getTodayTime(), LocalDateTime.of(prevTime[0],
+                prevTime[1], prevTime[2], prevTime[3], prevTime[4]));
         addPlusButtonListener();
         addFocusModeListener();
         addGoalListeners();
+
         // Inflate the layout for this fragment
         return view.getRoot();
     }
+
     public void showTopBar(){
         view.topText.setText(R.string.recurring);
     }
     @Override
     public void onResume(){
         super.onResume();
-        activityModel.rollover();
+        int[] prevTime = activityModel.getFieldsForLastDate();
+        activityModel.rollover(activityModel.getTodayTime(), LocalDateTime.of(prevTime[0],
+                prevTime[1], prevTime[2], prevTime[3], prevTime[4]));
         updateGoals();
     }
+
     public void addPlusButtonListener(){
         // Show DialogFragment when button is clicked
         view.imageButton.setOnClickListener(v -> {
@@ -87,17 +110,21 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
             dialogFragment.show(getParentFragmentManager(), "CreateGoalDialogFragment");
         });
     }
+
     @Override
     public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add("Delete");
     }
+
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Goal goal = adapter.getItem(info.position);
+
         return true;
     }
+
     private void showPopupMenu(View view, Goal goal) {
         PopupMenu popupMenu = new PopupMenu(requireContext(), view);
         popupMenu.inflate(R.menu.recurring_goal_context_menu);
@@ -109,6 +136,7 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
         });
         popupMenu.show();
     }
+
     public void addGoalListeners() {
         view.listGoals.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -119,10 +147,14 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
             }
         });
     }
+
     private void deleteGoal(Goal goal) {
         activityModel.removeGoalFromRecurringList(goal.id());
         adapter.notifyDataSetChanged();
     }
+
+
+
     public void addFocusModeListener(){
         view.hamburgerMenu.setOnClickListener(v -> {
             var dialogFragment = FocusModeDialogFragment.newInstance(this);
@@ -130,11 +162,27 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
             this.context = dialogFragment.getFocusContext();
         });
     }
+
     @Override
     public void onFocusModeSelected(int context) {
         this.context = context;
         updateGoals();
+        if (context == 0) {
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#D6D7D7"));
+        } else if (context == 1){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#FFFBB9"));
+        }
+        else if (context == 2){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#92E3FD"));
+        }
+        else if (context == 3){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#EFCAFF"));
+        }
+        else if (context == 4){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#DFEED4"));
+        }
     }
+
     public void updateGoals() {
 //        LocalDateTime current = activityModel.getTodayTime();
 //        Instant instant = current.atZone(ZoneId.systemDefault()).toInstant();
@@ -155,6 +203,7 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
                     adapter.notifyDataSetChanged();
                 });
     }
+
     public void createSpinner(){
         /*
         https://developer.android.com/develop/ui/views/components/spinner#java
@@ -165,12 +214,16 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
          */
         ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
         dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
         //dropdownAdapter.add("");
         dropdownAdapter.add("Recurring");
         dropdownAdapter.add("Today");
         dropdownAdapter.add("Tomorrow");
         dropdownAdapter.add("Pending");
+
+
         view.dropdown.setAdapter(dropdownAdapter);
+
         view.dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
@@ -195,6 +248,7 @@ public class RecurringFragment extends Fragment implements FocusModeListener {
                             .commit();
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 return;

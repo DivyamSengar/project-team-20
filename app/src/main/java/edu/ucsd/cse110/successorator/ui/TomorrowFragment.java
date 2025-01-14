@@ -1,5 +1,6 @@
 package edu.ucsd.cse110.successorator.ui;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,7 +68,7 @@ public class TomorrowFragment extends Fragment implements FocusModeListener {
         var tomorrow = activityModel.getTodayTime().plusDays(1);
         System.out.println("Tomorrow date" + tomorrow.getYear() + " " + (tomorrow.getMonthValue()) + " " + tomorrow.getDayOfMonth());
         activityModel.getContext(activityModel.getGoalsByDay(tomorrow.getYear(),
-                        (tomorrow.getMonthValue()), tomorrow.getDayOfMonth()),
+                                (tomorrow.getMonthValue()), tomorrow.getDayOfMonth()),
                         activityModel.getCurrentContextValue())
                 .observe(goal -> {
                     if (goal == null) return;
@@ -94,11 +95,15 @@ public class TomorrowFragment extends Fragment implements FocusModeListener {
 
         createSpinner();
         showTopBar();
-        activityModel.rollover();
+        int[] prevTime = activityModel.getFieldsForLastDate();
+        activityModel.rollover(activityModel.getTodayTime(), LocalDateTime.of(prevTime[0],
+                prevTime[1], prevTime[2], prevTime[3], prevTime[4]));
         addPlusButtonListener();
         addFocusModeListener();
         addGoalListeners();
         createDeveloperButton();
+//        onFocusModeSelected(0);
+        updateGoals();
 
         // Inflate the layout for this fragment
         return view.getRoot();
@@ -112,9 +117,9 @@ When the US7 button is tapped, the time is updated to the current time plus 24 h
     public void onResume(){
         super.onResume();
         // Show the current date at the top
-        LocalDateTime tomorrowTime = activityModel.getTodayTime();
-        activityModel.updateTodayTime(tomorrowTime);
-        tomorrowTime = tomorrowTime.plusDays(1);
+        LocalDateTime currTime = activityModel.getTodayTime();
+//        activityModel.updateTodayTime(tomorrowTime);
+        LocalDateTime tomorrowTime = currTime.plusDays(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MM/dd");
         String formattedDate = formatter.format(tomorrowTime);
 
@@ -124,7 +129,9 @@ When the US7 button is tapped, the time is updated to the current time plus 24 h
 //        Calendar t = Calendar.getInstance();
 //        t.add(Calendar.DATE, 1);
         String tomorrow = "Tomorrow, " + formattedDate;
-        activityModel.rollover();
+        int[] prevTime = activityModel.getFieldsForLastDate();
+        activityModel.rollover(currTime, LocalDateTime.of(prevTime[0],
+                prevTime[1], prevTime[2], prevTime[3], prevTime[4]));
         updateGoals();
 
         view.topText.setText(tomorrow);
@@ -157,20 +164,26 @@ When the US7 button is tapped, the time is updated to the current time plus 24 h
     public void addGoalListeners() {
         // Listener for taps/clicks on each list item
         view.listGoals.setOnItemClickListener((parent, view, position, id) -> {
+//            updateGoals();
             Goal goal = adapter.getItem(position);
             assert goal != null;
             // If the tapped goal is incomplete, make it complete
             if (!goal.isComplete()) {
                 goal.makeComplete();
                 activityModel.removeGoalIncomplete(goal.id());
+                updateGoals();
                 activityModel.appendComplete(goal);
+                updateGoals();
             }
             // If goal is complete make incomplete
             else {
                 goal.makeInComplete();
                 activityModel.removeGoalComplete(goal.id());
+                updateGoals();
                 activityModel.prependIncomplete(goal);
+                updateGoals();
             }
+            updateGoals();
         });
     }
 
@@ -179,6 +192,7 @@ When the US7 button is tapped, the time is updated to the current time plus 24 h
             var dialogFragment = FocusModeDialogFragment.newInstance(this);
             dialogFragment.show(getParentFragmentManager(), "FocusModeDialogFragment");
             this.context = dialogFragment.getFocusContext();
+            updateGoals();
         });
     }
 
@@ -241,6 +255,20 @@ When the US7 button is tapped, the time is updated to the current time plus 24 h
     public void onFocusModeSelected(int context) {
         this.context = context;
         updateGoals();
+        if (context == 0) {
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#D6D7D7"));
+        } else if (context == 1){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#FFFBB9"));
+        }
+        else if (context == 2){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#92E3FD"));
+        }
+        else if (context == 3){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#EFCAFF"));
+        }
+        else if (context == 4){
+            view.hamburgerMenu.setBackgroundColor(Color.parseColor("#DFEED4"));
+        }
     }
 
     public void updateGoals() {
@@ -288,6 +316,7 @@ When the US7 button is tapped, the time is updated to the current time plus 24 h
 //                    c2.add(Calendar.DATE, 1);
 //                }
 //                String currentDate =  "Today, " + date.format(c.getTime());
+                LocalDateTime previous = activityModel.getTodayTime();
                 activityModel.updateTodayTime(activityModel.getTodayTime().plusDays(1));
                 LocalDateTime current = activityModel.getTodayTime();
                 LocalDateTime nextDay = current.plusDays(1);
@@ -297,8 +326,16 @@ When the US7 button is tapped, the time is updated to the current time plus 24 h
                 String nextDate = "Tomorrow, " + nextFormatted;
 
                 view.topText.setText(nextDate);
-                activityModel.rollover();
+                activityModel.rollover(current, previous);
                 updateGoals();
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, TomorrowFragment.newInstance())
+                        .commit();
+//                var x = new Goal(100, "", false, 0,
+//                        false, 0, 0, 0, 0, 0, 0, 0, 0);
+//                activityModel.appendIncomplete(x);
+//                activityModel.removeGoalIncomplete(100);
 
             }
         });

@@ -1,6 +1,5 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
 
@@ -26,32 +25,21 @@ public interface GoalRepository {
 
     Subject<List<Goal>> getPendingGoals();
 
-    Subject<List<Goal>> getRecurringGoals();
+    List<Goal> getRecurringGoals();
 
-    Subject<List<Goal>> getRecurringGoalsIncomplete();
+    Subject<List<Goal>> getContextHome();
 
-    Subject<List<Goal>> getRecurringGoalsComplete();
+    Subject<List<Goal>> getContextWork();
 
-    Subject<List<Goal>> getGoalsByDayIncomplete(int year, int month, int day);
+    Subject<List<Goal>> getContextSchool();
 
-    Subject<List<Goal>> getGoalsByDayComplete(int year, int month, int day);
-
+    Subject<List<Goal>> getContextErrands();
 
     Subject<List<Goal>> getGoalsByDay(int year, int month, int day);
 
     Subject<List<Goal>> getRecurringGoalsByDay(int year, int month, int day);
-    Subject<List<Goal>> getRecurringGoalsByDayComplete(int year, int month, int day);
 
     Subject<List<Goal>> getGoalsLessThanOrEqualToDay(int year, int month, int day);
-
-    void removeGoalComplete(int id);
-    void removeGoalIncomplete(int id);
-
-    void appendComplete(Goal goal);
-
-    void appendIncomplete(Goal goal);
-    boolean isGoalsEmpty();
-
 
     /**
      * Removes a goal with a specific id from the list
@@ -74,18 +62,18 @@ public interface GoalRepository {
     /**
      * Removes all the goals in the list
      */
-    void deleteCompleted();
+    void deleteCompleted(int year, int month, int day);
 
 
-    void getContextHome();
-
-    void deleteCompleted(int year, int monthValue, int dayOfMonth);
-
-    void getContextSchool();
+    Subject<List<Goal>> findListOfGoalsById(int id);
 
     void InsertWithSortOrder(Goal goal, int sortOrder);
 
-    void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, String recurring);
+    void InsertWithSortOrderAndRecurring(Goal goal, int sortOrder, int recurring);
 
-    Subject<Object> findListOfGoalsById(int id);
+    int getMaxGoalPair();
+
+    List<Goal> getGoalPairVals(int goalPair);
+    void deleteCompletedNonDaily(int year, int month, int day);
+
 }

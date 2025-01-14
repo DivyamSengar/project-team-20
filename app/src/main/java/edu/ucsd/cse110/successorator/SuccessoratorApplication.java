@@ -42,7 +42,7 @@ public class SuccessoratorApplication extends Application{
 
         // Initialize the database for the repository of complete goals
         var database = Room.databaseBuilder(getApplicationContext(),
-                SuccessoratorDatabase.class, "successorator-database")
+                        SuccessoratorDatabase.class, "successorator-database")
                 .allowMainThreadQueries()
                 .build();
         this.goalRepositoryComplete = new RoomGoalRepository(database.goalDao());
@@ -68,7 +68,7 @@ public class SuccessoratorApplication extends Application{
         this.goalRepositoryRecurring = new RoomGoalRepository(database4.goalDao());
 
         var database5 = Room.databaseBuilder(getApplicationContext(),
-                SuccessoratorContextDatabase.class, "successorator-database5")
+                        SuccessoratorContextDatabase.class, "successorator-database5")
                 .allowMainThreadQueries()
                 .build();
         this.contextRepository = new RoomContextRepository(database5.contextDao());
@@ -84,7 +84,7 @@ public class SuccessoratorApplication extends Application{
 
         var isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         if (isFirstRun && database3.timeDao().count() == 0 && database5.contextDao().count() == 0){
-            timeKeeper.setDateTime(LocalDateTime.of(1900, 1, 20, 10, 30));
+            timeKeeper.setDateTime(LocalDateTime.now());
             contextRepository.setContext(0);
 
 

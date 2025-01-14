@@ -72,7 +72,7 @@ public class TimeEntity {
      * Returns int array of all the fields of the TimeEntity object
      */
     public int[] Fields(){
-            int[] arr = {year, month, day, hour, minutes};
-            return arr;
+        int[] arr = {year, month, day, hour, minutes};
+        return arr;
     }
 }

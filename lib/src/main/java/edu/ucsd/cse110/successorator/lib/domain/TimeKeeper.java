@@ -2,6 +2,8 @@ package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.time.LocalDateTime;
 
+import edu.ucsd.cse110.successorator.lib.util.Subject;
+
 /**
  * Interface to describe the attributes and behavior of timekeeper
  */
@@ -23,6 +25,6 @@ public interface TimeKeeper {
      */
     int[] getFields();
 
-
     int count();
+
 }
